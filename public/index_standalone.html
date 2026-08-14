@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Education Platform - Anh Sao Khue (0346513056) - Hệ Thống Trợ Lý Giáo Viên Toàn Diện</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- html2canvas CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <!-- jsPDF CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+    @keyframes marquee {
+      0% { transform: translateX(0%); }
+      100% { transform: translateX(-50%); }
+    }
+    .animate-marquee {
+      display: inline-flex;
+      animation: marquee 22s linear infinite;
+    }
+    .animate-marquee:hover {
+      animation-play-state: paused;
+    }
+    
+    @media print {
+      body {
+        background: white !important;
+        color: black !important;
+        font-family: 'Times New Roman', Times, serif !important;
+        font-size: 12pt !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .print-only-container {
+        padding: 0 !important;
+        margin: 0 !important;
+        border: none !important;
+        background: white !important;
+        color: black !important;
+      }
+      .print-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .print-table th, .print-table td {
+        border: 1px solid #000 !important;
+        padding: 6px 8px !important;
+        color: black !important;
+      }
+      .page-break {
+        page-break-before: always;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col antialiased selection:bg-amber-400 selection:text-slate-950">
+
+  <!-- MARQUEE COPYRIGHT & BANNER -->
+  <div class="bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-slate-950 py-1.5 px-4 font-black text-xs uppercase tracking-wider overflow-hidden whitespace-nowrap border-b border-amber-300 shadow-md no-print">
+    <div class="animate-marquee items-center gap-8">
+      <span>🌟 TÁC GIẢ BẢN QUYỀN HỆ THỐNG: <strong>ANH SAO KHUE – ZALO/ĐIỆN THOẠI: 0346513056</strong></span>
+      <span>•</span>
+      <span>⚡ AI EDUCATION PLATFORM - SOẠN GIÁO ÁN CHUẨN CÔNG VĂN 5512 - QUẢN LÝ LỚP HỌC & ĐIỂM DANH THÔNG MINH</span>
+      <span>•</span>
+      <span>🤖 TÍNH NĂNG AI TRỢ LÝ MISS YẾN CÒI - CHẤM BÀI - LUYỆN PHÁT ÂM - KIỂM TRA MIỆNG NGẪU NHIÊN</span>
+      <span>•</span>
+      <span>🌟 TÁC GIẢ BẢN QUYỀN HỆ THỐNG: <strong>ANH SAO KHUE – ZALO/ĐIỆN THOẠI: 0346513056</strong></span>
+      <span>•</span>
+      <span>⚡ AI EDUCATION PLATFORM - SOẠN GIÁO ÁN CHUẨN CÔNG VĂN 5512 - QUẢN LÝ LỚP HỌC & ĐIỂM DANH THÔNG MINH</span>
+    </div>
+  </div>
+
+  <!-- NAVIGATION HEADER -->
+  <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-40 shadow-xl no-print">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- Logo & Title -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-400 to-orange-500 flex items-center justify-center text-slate-950 font-black shadow-lg shadow-amber-500/20">
+          <i data-lucide="sparkles" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h1 class="text-sm sm:text-base font-black text-white uppercase tracking-wide flex items-center gap-2">
+            AI EDUCATION PLATFORM
+            <span class="text-[10px] bg-amber-400 text-slate-950 px-2 py-0.5 rounded-full font-bold">PRO v3.5</span>
+          </h1>
+          <p class="text-[11px] text-amber-300 font-bold">
+            Bản quyền: <strong class="text-white">Anh Sao Khue – 0346513056</strong>
+          </p>
+        </div>
+      </div>
+
+      <!-- Quick Contact Info -->
+      <div class="flex items-center gap-2">
+        <a href="tel:0346513056" class="bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 px-3 py-1.5 rounded-xl font-black text-xs flex items-center gap-1.5 shadow transition">
+          <i data-lucide="phone" class="w-4 h-4 text-amber-400"></i>
+          <span>Hotline/Zalo: 0346513056</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- MAIN NAVIGATION TABS BAR -->
+    <div class="bg-slate-950 border-t border-slate-800 px-4 py-2 overflow-x-auto scrollbar-none">
+      <div class="max-w-7xl mx-auto flex items-center gap-1.5 text-xs font-extrabold min-w-max">
+        
+        <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn active bg-amber-400 text-slate-950 px-3 py-2 rounded-xl flex items-center gap-1.5 transition">
+          <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+          <span>Trang Chủ</span>
+        </button>
+
+        <button onclick="switchTab('lesson')" id="tab-lesson" class="tab-btn bg-slate-800 text-slate-300 hover:text-white px-3 py-2 rounded-xl flex items-center gap-1.5 transition">
+          <i data-lucide="file-text" class="w-4 h-4"></i>
+          <span>Soạn Giáo Án CV 5512</span>
+        </button>
+
+        <button onclick="switchTab('attendance')" id="tab-attendance" class="tab-btn bg-slate-800 text-slate-300 hover:text-white px-3 py-2 rounded-xl flex items-center gap-1.5 transition">
+          <i data-lucide="qr-code" class="w-4 h-4"></i>
+          <span>Điểm Danh & QR</span>
+        </button>
+
+        <button onclick="switchTab('classes')" id="tab-classes" class="tab-btn bg-slate-800 text-slate-300 hover:text-white px-3 py-2 rounded-xl flex items-center gap-1.5 transition">
+          <i data-lucide="users" class="w-4 h-4"></i>
+          <span>Quản Lý Lớp & Học Sinh</span>
+        </button>
+
+        <button onclick="switchTab('homework')" id="tab-homework" class="tab-btn bg-slate-800 text-slate-300 hover:text-white px-3 py-2 rounded-xl flex items-center gap-1.5 transition">
+          <i data-lucide="book-open" class="w-4 h-4"></i>
+          <span>Bài Tập Về Nhà</span>
+        </button>
+
+        <button onclick="switchTab('audio')" id="tab-audio" class="tab-btn bg-slate-800 text-slate-300 hover:text-white px-3 py-2 rounded-xl flex items-center gap-1.5 transition">
+          <i data-lucide="mic" class="w-4 h-4"></i>
+          <span>Luyện Phát Âm</span>
+        </button>
+
+        <button onclick="switchTab('oral')" id="tab-oral" class="tab-btn bg-slate-800 text-slate-300 hover:text-white px-3 py-2 rounded-xl flex items-center gap-1.5 transition">
+          <i data-lucide="help-circle" class="w-4 h-4"></i>
+          <span>Kiểm Tra Miệng</span>
+        </button>
+
+        <button onclick="switchTab('grading')" id="tab-grading" class="tab-btn bg-slate-800 text-slate-300 hover:text-white px-3 py-2 rounded-xl flex items-center gap-1.5 transition">
+          <i data-lucide="award" class="w-4 h-4"></i>
+          <span>Chấm Điểm & Đánh Giá</span>
+        </button>
+
+        <button onclick="switchTab('resources')" id="tab-resources" class="tab-btn bg-slate-800 text-slate-300 hover:text-white px-3 py-2 rounded-xl flex items-center gap-1.5 transition">
+          <i data-lucide="folder" class="w-4 h-4"></i>
+          <span>Kho Học Liệu</span>
+        </button>
+
+        <button onclick="switchTab('chatbot')" id="tab-chatbot" class="tab-btn bg-slate-800 text-slate-300 hover:text-white px-3 py-2 rounded-xl flex items-center gap-1.5 transition">
+          <i data-lucide="bot" class="w-4 h-4 text-cyan-400"></i>
+          <span>Trợ Lý Miss Yến Còi</span>
+        </button>
+
+        <button onclick="switchTab('settings')" id="tab-settings" class="tab-btn bg-slate-800 text-slate-300 hover:text-white px-3 py-2 rounded-xl flex items-center gap-1.5 transition">
+          <i data-lucide="settings" class="w-4 h-4"></i>
+          <span>Cài Đặt</span>
+        </button>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN APP CONTENT AREA -->
+  <main class="max-w-7xl mx-auto p-4 sm:p-6 space-y-6 flex-1 w-full">
+
+    <!-- VIEW 1: DASHBOARD -->
+    <div id="view-dashboard" class="tab-view space-y-6">
+      <div class="bg-gradient-to-r from-blue-900/60 to-indigo-900/60 border border-blue-700/50 p-6 rounded-2xl shadow-xl space-y-3">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-amber-400 flex items-center justify-center text-slate-950 font-black">
+            <i data-lucide="layout-dashboard" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <h2 class="text-lg font-black text-white uppercase">Tổng Quan Hệ Thống Giảng Dạy AI</h2>
+            <p class="text-xs text-slate-300">Chào mừng Thầy/Cô đến với nền tảng hỗ trợ giáo viên trực tuyến 2026</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4">
+          <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800 space-y-1">
+            <p class="text-xs text-slate-400 font-bold uppercase">Tổng Số Lớp</p>
+            <p class="text-2xl font-black text-amber-400">6 Lớp</p>
+            <p class="text-[11px] text-emerald-400">Khối 6, 7, 8 & 9</p>
+          </div>
+          <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800 space-y-1">
+            <p class="text-xs text-slate-400 font-bold uppercase">Tổng Học Sinh</p>
+            <p class="text-2xl font-black text-cyan-400">225 Học sinh</p>
+            <p class="text-[11px] text-cyan-300">Tỷ lệ đi học: 98.2%</p>
+          </div>
+          <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800 space-y-1">
+            <p class="text-xs text-slate-400 font-bold uppercase">Giáo Án Đã Soạn</p>
+            <p class="text-2xl font-black text-emerald-400">42 Giáo án</p>
+            <p class="text-[11px] text-emerald-300">Chuẩn CV 5512 Bộ GD&ĐT</p>
+          </div>
+          <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800 space-y-1">
+            <p class="text-xs text-slate-400 font-bold uppercase">Bài Tập Về Nhà</p>
+            <p class="text-2xl font-black text-purple-400">18 Bài tập</p>
+            <p class="text-[11px] text-purple-300">Đã chấm: 94%</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Shortcut Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div onclick="switchTab('lesson')" class="bg-slate-900 p-5 rounded-2xl border border-slate-800 hover:border-amber-400 transition cursor-pointer space-y-2">
+          <i data-lucide="file-text" class="w-8 h-8 text-amber-400"></i>
+          <h3 class="text-sm font-black text-white">Soạn Giáo Án Nhanh</h3>
+          <p class="text-xs text-slate-400">Tạo giáo án chuẩn Công văn 5512 với đầy đủ 4 hoạt động dạy học.</p>
+        </div>
+        <div onclick="switchTab('attendance')" class="bg-slate-900 p-5 rounded-2xl border border-slate-800 hover:border-cyan-400 transition cursor-pointer space-y-2">
+          <i data-lucide="qr-code" class="w-8 h-8 text-cyan-400"></i>
+          <h3 class="text-sm font-black text-white">Điểm Danh Lớp Học</h3>
+          <p class="text-xs text-slate-400">Quét mã QR học sinh hoặc điểm danh bằng danh sách nhanh chóng.</p>
+        </div>
+        <div onclick="switchTab('chatbot')" class="bg-slate-900 p-5 rounded-2xl border border-slate-800 hover:border-emerald-400 transition cursor-pointer space-y-2">
+          <i data-lucide="bot" class="w-8 h-8 text-emerald-400"></i>
+          <h3 class="text-sm font-black text-white">Hỏi Trợ Lý Miss Yến Còi</h3>
+          <p class="text-xs text-slate-400">Trò chuyện AI hỗ trợ soạn bài, tư vấn sư phạm và xử lý tình huống.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 2: LESSON PLAN CV 5512 -->
+    <div id="view-lesson" class="tab-view hidden space-y-6">
+      <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl space-y-4 no-print">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
+          <div class="flex items-center gap-2">
+            <i data-lucide="sparkles" class="w-5 h-5 text-amber-400"></i>
+            <h2 class="text-base font-extrabold text-white uppercase">Thông Tin Bài Soạn Giáo Án (Công Văn 5512)</h2>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-slate-400">Mẫu nhanh:</span>
+            <button type="button" onclick="loadPreset('math')" class="bg-slate-800 hover:bg-slate-700 text-amber-300 text-[11px] px-2.5 py-1 rounded-lg font-bold border border-slate-700">Toán 7</button>
+            <button type="button" onclick="loadPreset('science')" class="bg-slate-800 hover:bg-slate-700 text-cyan-300 text-[11px] px-2.5 py-1 rounded-lg font-bold border border-slate-700">KHTN 7</button>
+            <button type="button" onclick="loadPreset('english')" class="bg-slate-800 hover:bg-slate-700 text-emerald-300 text-[11px] px-2.5 py-1 rounded-lg font-bold border border-slate-700">Tiếng Anh 7</button>
+          </div>
+        </div>
+
+        <form id="lessonForm" onsubmit="event.preventDefault(); generateLesson();" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">Tên Trường:</label>
+            <input type="text" id="schoolName" value="THCS Kết Nối Tri Thức" class="w-full bg-slate-950 text-white p-2.5 rounded-xl border border-slate-700 focus:border-amber-400 outline-none" required />
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">Giáo Viên Dạy:</label>
+            <input type="text" id="teacherName" value="Cô Nguyễn Thị Hồng Yến" class="w-full bg-slate-950 text-white p-2.5 rounded-xl border border-slate-700 focus:border-amber-400 outline-none" required />
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">Môn Học:</label>
+            <select id="subject" class="w-full bg-slate-950 text-white p-2.5 rounded-xl border border-slate-700 focus:border-amber-400 outline-none">
+              <option value="TOÁN">TOÁN</option>
+              <option value="TIẾNG ANH" selected>TIẾNG ANH (Global Success)</option>
+              <option value="KHOA HỌC TỰ NHIÊN">KHOA HỌC TỰ NHIÊN</option>
+              <option value="NGỮ VĂN">NGỮ VĂN</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">Khối Lớp:</label>
+            <select id="gradeLevel" class="w-full bg-slate-950 text-white p-2.5 rounded-xl border border-slate-700 focus:border-amber-400 outline-none">
+              <option value="Lớp 6">Lớp 6</option>
+              <option value="Lớp 7" selected>Lớp 7</option>
+              <option value="Lớp 8">Lớp 8</option>
+              <option value="Lớp 9">Lớp 9</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">Tên Bài Học:</label>
+            <input type="text" id="lessonTitle" value="Unit 3: Community Service - Lesson 1: Getting Started" class="w-full bg-slate-950 text-white p-2.5 rounded-xl border border-slate-700 focus:border-amber-400 outline-none" required />
+          </div>
+
+          <div>
+            <label class="block font-bold text-slate-300 mb-1">Thời Lượng:</label>
+            <input type="text" id="durationText" value="1 tiết (45 phút)" class="w-full bg-slate-950 text-white p-2.5 rounded-xl border border-slate-700 focus:border-amber-400 outline-none" required />
+          </div>
+
+          <div class="sm:col-span-2 lg:col-span-3 pt-2">
+            <button type="submit" class="w-full bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 text-slate-950 font-black py-3 rounded-xl text-xs uppercase tracking-wider shadow-lg flex items-center justify-center gap-2 cursor-pointer">
+              <i data-lucide="sparkles" class="w-4 h-4"></i> TẠO GIÁO ÁN CHUẨN CÔNG VĂN 5512 VỚI AI
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- LESSON PLAN PREVIEW A4 -->
+      <div id="lessonPreviewContainer" class="bg-white text-slate-950 p-8 sm:p-12 rounded-2xl shadow-2xl space-y-6 print-only-container max-w-4xl mx-auto font-serif text-sm leading-relaxed border border-slate-200">
+        <div id="lessonContent">
+          <!-- Dynamically Generated Content -->
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 3: ATTENDANCE & QR -->
+    <div id="view-attendance" class="tab-view hidden space-y-6">
+      <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <h2 class="text-base font-black text-amber-400 uppercase flex items-center gap-2">
+            <i data-lucide="qr-code" class="w-5 h-5 text-amber-400"></i> Điểm Danh Lớp 7A1 - Ngày Hôm Nay
+          </h2>
+          <span class="text-xs bg-emerald-500/20 text-emerald-300 font-bold px-3 py-1 rounded-full border border-emerald-500/30">Có mặt: 38/40 (95%)</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+          <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
+            <div>
+              <p class="font-bold text-white">01. Nguyễn Văn An</p>
+              <p class="text-[10px] text-slate-400">Mã HS: HS001</p>
+            </div>
+            <span class="bg-emerald-500/20 text-emerald-300 font-bold px-2 py-0.5 rounded text-[10px]">Có mặt</span>
+          </div>
+
+          <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
+            <div>
+              <p class="font-bold text-white">02. Trần Thị Bình</p>
+              <p class="text-[10px] text-slate-400">Mã HS: HS002</p>
+            </div>
+            <span class="bg-emerald-500/20 text-emerald-300 font-bold px-2 py-0.5 rounded text-[10px]">Có mặt</span>
+          </div>
+
+          <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex items-center justify-between">
+            <div>
+              <p class="font-bold text-white">03. Lê Hoàng Cường</p>
+              <p class="text-[10px] text-slate-400">Mã HS: HS003</p>
+            </div>
+            <span class="bg-rose-500/20 text-rose-300 font-bold px-2 py-0.5 rounded text-[10px]">Vắng (Có phép)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 4: CLASS & STUDENT MANAGEMENT -->
+    <div id="view-classes" class="tab-view hidden space-y-6">
+      <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-4">
+        <h2 class="text-base font-black text-amber-400 uppercase flex items-center gap-2">
+          <i data-lucide="users" class="w-5 h-5"></i> Danh Sách Lớp Học Quản Lý
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+            <h3 class="font-bold text-amber-300">Lớp 7A1 - Chủ Nhiệm</h3>
+            <p class="text-xs text-slate-400">Sĩ số: 40 học sinh | Phòng: 201</p>
+            <button class="bg-slate-800 text-amber-300 text-xs px-3 py-1.5 rounded-lg font-bold w-full">Xem danh sách</button>
+          </div>
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+            <h3 class="font-bold text-cyan-300">Lớp 7A2 - Bộ Môn</h3>
+            <p class="text-xs text-slate-400">Sĩ số: 38 học sinh | Phòng: 202</p>
+            <button class="bg-slate-800 text-cyan-300 text-xs px-3 py-1.5 rounded-lg font-bold w-full">Xem danh sách</button>
+          </div>
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+            <h3 class="font-bold text-emerald-300">Lớp 8A1 - Bộ Môn</h3>
+            <p class="text-xs text-slate-400">Sĩ số: 42 học sinh | Phòng: 301</p>
+            <button class="bg-slate-800 text-emerald-300 text-xs px-3 py-1.5 rounded-lg font-bold w-full">Xem danh sách</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 5: HOMEWORK -->
+    <div id="view-homework" class="tab-view hidden space-y-6">
+      <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-4">
+        <h2 class="text-base font-black text-purple-400 uppercase flex items-center gap-2">
+          <i data-lucide="book-open" class="w-5 h-5"></i> Quản Lý Bài Tập Về Nhà
+        </h2>
+        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2 text-xs">
+          <p class="font-bold text-amber-300">Bài tập Unit 3: Vocabulary & Reading</p>
+          <p class="text-slate-400">Hạn nộp: 23:59 - Ngày 15/10/2026 | Đã nộp: 36/40 học sinh</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 6: AUDIO PRACTICE -->
+    <div id="view-audio" class="tab-view hidden space-y-6">
+      <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-4">
+        <h2 class="text-base font-black text-cyan-400 uppercase flex items-center gap-2">
+          <i data-lucide="mic" class="w-5 h-5"></i> Luyện Âm & Phát Âm Tiếng Anh
+        </h2>
+        <p class="text-xs text-slate-300">Hỗ trợ giáo viên phát âm mẫu và ghi âm nhận xét bài nói phát âm của học sinh bằng AI.</p>
+      </div>
+    </div>
+
+    <!-- VIEW 7: ORAL TEST -->
+    <div id="view-oral" class="tab-view hidden space-y-6">
+      <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-4 text-center">
+        <h2 class="text-base font-black text-amber-400 uppercase flex items-center justify-center gap-2">
+          <i data-lucide="help-circle" class="w-5 h-5"></i> Vòng Quay Chọn Học Sinh Kiểm Tra Miệng
+        </h2>
+        <div class="py-8 space-y-4">
+          <div id="selectedStudentName" class="text-3xl font-black text-cyan-300 uppercase tracking-widest bg-slate-950 py-6 px-8 rounded-2xl border border-slate-800 inline-block shadow-inner">
+            BẤM NÚT ĐỂ QUAY NGẪU NHIÊN
+          </div>
+          <div>
+            <button onclick="pickRandomStudent()" class="bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black px-6 py-3 rounded-xl text-xs uppercase shadow-lg cursor-pointer">
+              🎲 Xoay Vòng Chọn Học Sinh
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 8: GRADING -->
+    <div id="view-grading" class="tab-view hidden space-y-6">
+      <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-4">
+        <h2 class="text-base font-black text-emerald-400 uppercase flex items-center gap-2">
+          <i data-lucide="award" class="w-5 h-5"></i> Chấm Điểm & Nhận Xét Học Sinh
+        </h2>
+        <p class="text-xs text-slate-300">Bảng tổng hợp điểm kiểm tra thường xuyên, giữa kỳ và nhận xét tự động theo Thông tư mới.</p>
+      </div>
+    </div>
+
+    <!-- VIEW 9: RESOURCES -->
+    <div id="view-resources" class="tab-view hidden space-y-6">
+      <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-4">
+        <h2 class="text-base font-black text-cyan-400 uppercase flex items-center gap-2">
+          <i data-lucide="folder" class="w-5 h-5"></i> Kho Học Liệu & Google Drive
+        </h2>
+        <p class="text-xs text-slate-300">Kết nối kho tài liệu bài giảng Google Docs, Google Drive và Video giảng dạy YouTube.</p>
+      </div>
+    </div>
+
+    <!-- VIEW 10: MISS YẾN CÒI CHATBOT -->
+    <div id="view-chatbot" class="tab-view hidden space-y-6">
+      <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-4">
+        <div class="flex items-center gap-3 border-b border-slate-800 pb-3">
+          <div class="w-10 h-10 rounded-xl bg-cyan-400 text-slate-950 font-black flex items-center justify-center">
+            <i data-lucide="bot" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <h2 class="text-base font-black text-white uppercase">Trợ Lý AI Miss Yến Còi</h2>
+            <p class="text-xs text-cyan-300">Tư vấn phương pháp sư phạm & soạn bài dạy 24/7</p>
+          </div>
+        </div>
+
+        <div id="chatHistory" class="bg-slate-950 p-4 rounded-xl border border-slate-800 h-64 overflow-y-auto space-y-3 text-xs">
+          <div class="bg-slate-900 p-3 rounded-xl border border-slate-800 max-w-lg">
+            <p class="font-bold text-amber-300">Miss Yến còi:</p>
+            <p class="text-slate-200 mt-1">Xin chào Thầy/Cô! Em là Miss Yến còi. Em có thể giúp gì cho Thầy/Cô trong việc soạn giáo án hay quản lý lớp học hôm nay ạ?</p>
+          </div>
+        </div>
+
+        <div class="flex gap-2">
+          <input type="text" id="chatInput" placeholder="Nhập câu hỏi cho Miss Yến còi..." class="flex-1 bg-slate-950 text-white p-3 rounded-xl border border-slate-700 text-xs outline-none focus:border-amber-400" />
+          <button onclick="sendChatMessage()" class="bg-amber-400 hover:bg-amber-300 text-slate-950 font-black px-4 py-3 rounded-xl text-xs flex items-center gap-1 cursor-pointer">
+            <i data-lucide="send" class="w-4 h-4"></i> Gửi
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 11: SETTINGS -->
+    <div id="view-settings" class="tab-view hidden space-y-6">
+      <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-4">
+        <h2 class="text-base font-black text-amber-400 uppercase flex items-center gap-2">
+          <i data-lucide="settings" class="w-5 h-5"></i> Cài Đặt Hệ Thống & Tác Giả
+        </h2>
+        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2 text-xs">
+          <p class="font-bold text-white">Tác giả & Bản quyền:</p>
+          <p class="text-amber-300 font-bold">Anh Sao Khue - Hotline/Zalo: 0346513056</p>
+          <p class="text-slate-400">Phiên bản: AI Education Platform Pro v3.5 (2026)</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER COPYRIGHT -->
+  <footer class="bg-slate-900 border-t border-slate-800 py-6 px-4 mt-auto no-print">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+      <div>
+        <p class="font-bold text-slate-200">AI Education Platform - Anh Sao Khue</p>
+        <p class="text-[11px] text-slate-400">Được phát triển hỗ trợ giáo viên Việt Nam soạn giảng chuẩn CV 5512.</p>
+      </div>
+      <div class="text-center sm:text-right">
+        <p class="font-black text-amber-400">Hotline/Zalo: 0346513056</p>
+        <p class="text-[10px] text-slate-400">Bản quyền © 2026 Anh Sao Khue. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Tab Switcher Function
+    function switchTab(tabId) {
+      // Hide all view panels
+      document.querySelectorAll('.tab-view').forEach(el => el.classList.add('hidden'));
+      // Show selected view panel
+      const targetView = document.getElementById('view-' + tabId);
+      if (targetView) targetView.classList.remove('hidden');
+
+      // Update button active styles
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('bg-amber-400', 'text-slate-950');
+        btn.classList.add('bg-slate-800', 'text-slate-300');
+      });
+
+      const activeBtn = document.getElementById('tab-' + tabId);
+      if (activeBtn) {
+        activeBtn.classList.remove('bg-slate-800', 'text-slate-300');
+        activeBtn.classList.add('bg-amber-400', 'text-slate-950');
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Load Quick Presets for Lesson Plan
+    function loadPreset(type) {
+      if (type === 'math') {
+        document.getElementById('subject').value = 'TOÁN';
+        document.getElementById('lessonTitle').value = 'Bài 5: Góc và đường thẳng song song (Tiết 1)';
+      } else if (type === 'science') {
+        document.getElementById('subject').value = 'KHOA HỌC TỰ NHIÊN';
+        document.getElementById('lessonTitle').value = 'Bài 12: Tế bào - Đơn vị cơ sở của sự sống';
+      } else if (type === 'english') {
+        document.getElementById('subject').value = 'TIẾNG ANH';
+        document.getElementById('lessonTitle').value = 'Unit 3: Community Service - Lesson 1: Getting Started';
+      }
+      generateLesson();
+    }
+
+    // Generate Sample Lesson Plan Content
+    function generateLesson() {
+      const school = document.getElementById('schoolName').value || 'THCS Kết Nối Tri Thức';
+      const teacher = document.getElementById('teacherName').value || 'Cô Nguyễn Thị Hồng Yến';
+      const subject = document.getElementById('subject').value || 'TIẾNG ANH';
+      const grade = document.getElementById('gradeLevel').value || 'Lớp 7';
+      const title = document.getElementById('lessonTitle').value || 'Bài Học Chuẩn';
+      const duration = document.getElementById('durationText').value || '1 tiết (45 phút)';
+
+      const html = `
+        <div class="text-center font-bold uppercase space-y-1 border-b border-slate-300 pb-4 mb-6">
+          <p class="text-xs">TRƯỜNG ${school.toUpperCase()}</p>
+          <p class="text-xs">TỔ CHUYÊN MÔN: KHOA HỌC XÃ HỘI / NGOẠI NGỮ</p>
+          <p class="text-base text-blue-900 mt-2">KẾ HOẠCH BÀI DẠY (GIÁO ÁN CHUẨN CÔNG VĂN 5512)</p>
+          <p class="text-xs text-amber-700">MÔN: ${subject} - ${grade.toUpperCase()}</p>
+          <p class="text-xs text-slate-700">Giáo viên thực hiện: ${teacher}</p>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="font-bold text-blue-900 border-b border-blue-900 pb-1 uppercase">TÊN BÀI HỌC: ${title.toUpperCase()}</h3>
+          <p><strong>Thời lượng thực hiện:</strong> ${duration}</p>
+
+          <h4 class="font-bold text-slate-900 mt-4">I. MỤC TIÊU BÀI HỌC</h4>
+          <p><strong>1. Về kiến thức:</strong> Học sinh nắm vững từ vựng, cấu trúc ngữ pháp trọng tâm bài học ${title}.</p>
+          <p><strong>2. Về năng lực:</strong> Phát triển năng lực giao tiếp, hợp tác nhóm và tự học cá nhân.</p>
+          <p><strong>3. Về phẩm chất:</strong> Rèn luyện tinh thần trách nhiệm, chăm chỉ và yêu thích môn học.</p>
+
+          <h4 class="font-bold text-slate-900 mt-4">II. THIẾT BỊ DẠY HỌC VÀ HỌC LIỆU</h4>
+          <p><strong>1. Giáo viên:</strong> Giáo án điện tử, máy chiếu, bảng phụ, tệp nghe audio.</p>
+          <p><strong>2. Học sinh:</strong> Sách giáo khoa, vở ghi, đồ dùng học tập.</p>
+
+          <h4 class="font-bold text-slate-900 mt-4">III. TIẾN TRÌNH DẠY HỌC (CÔNG VĂN 5512)</h4>
+          <div class="space-y-3">
+            <div class="bg-slate-50 p-3 rounded border border-slate-200">
+              <p class="font-bold text-blue-900">1. Hoạt động 1: Mở đầu (Warm-up - 5 phút)</p>
+              <p>- <em>Mục tiêu:</em> Tạo khí thế học tập, kết nối kiến thức cũ và bài mới.</p>
+              <p>- <em>Nội dung:</em> Chơi trò chơi khởi động ngẫu nhiên.</p>
+            </div>
+            <div class="bg-slate-50 p-3 rounded border border-slate-200">
+              <p class="font-bold text-blue-900">2. Hoạt động 2: Hình thành kiến thức mới (20 phút)</p>
+              <p>- <em>Mục tiêu:</em> Khám phá từ vựng và mẫu câu mới của bài học.</p>
+              <p>- <em>Sản phẩm:</em> Học sinh hoàn thành phiếu học tập cá nhân.</p>
+            </div>
+            <div class="bg-slate-50 p-3 rounded border border-slate-200">
+              <p class="font-bold text-blue-900">3. Hoạt động 3: Luyện tập (12 phút)</p>
+              <p>- <em>Mục tiêu:</em> Củng cố kiến thức thông qua bài tập thực hành.</p>
+            </div>
+            <div class="bg-slate-50 p-3 rounded border border-slate-200">
+              <p class="font-bold text-blue-900">4. Hoạt động 4: Vận dụng & Dặn dò (8 phút)</p>
+              <p>- <em>Mục tiêu:</em> Ứng dụng kiến thức vào thực tiễn cuộc sống.</p>
+            </div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('lessonContent').innerHTML = html;
+    }
+
+    // Pick Random Student for Oral Test
+    function pickRandomStudent() {
+      const students = [
+        "Nguyễn Văn An (HS001)",
+        "Trần Thị Bình (HS002)",
+        "Lê Hoàng Cường (HS003)",
+        "Phạm Minh Đức (HS004)",
+        "Hoàng Thị Giang (HS005)",
+        "Đỗ Hải Nam (HS006)"
+      ];
+      const random = students[Math.floor(Math.random() * students.length)];
+      document.getElementById('selectedStudentName').innerText = random;
+    }
+
+    // Send Chatbot Message
+    function sendChatMessage() {
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const history = document.getElementById('chatHistory');
+      
+      // User message
+      const userDiv = document.createElement('div');
+      userDiv.className = 'bg-slate-900 p-3 rounded-xl border border-slate-800 ml-auto max-w-lg text-right';
+      userDiv.innerHTML = `<p class="font-bold text-cyan-300">Thầy/Cô:</p><p class="text-slate-200 mt-1">${text}</p>`;
+      history.appendChild(userDiv);
+
+      input.value = '';
+      history.scrollTop = history.scrollHeight;
+
+      // Bot reply
+      setTimeout(() => {
+        const botDiv = document.createElement('div');
+        botDiv.className = 'bg-slate-900 p-3 rounded-xl border border-slate-800 max-w-lg';
+        botDiv.innerHTML = `<p class="font-bold text-amber-300">Miss Yến còi:</p><p class="text-slate-200 mt-1">Dạ, em nhận được câu hỏi "${text}" của Thầy/Cô rồi ạ! Thầy/Cô có thể áp dụng trò chơi nhóm hoặc tạo câu hỏi tương tác để học sinh hứng thú hơn ạ!</p>`;
+        history.appendChild(botDiv);
+        history.scrollTop = history.scrollHeight;
+      }, 600);
+    }
+
+    // Auto generate default lesson on load
+    generateLesson();
+  </script>
+</body>
+</html>

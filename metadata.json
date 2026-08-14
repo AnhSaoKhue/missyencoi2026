@@ -1,0 +1,9 @@
+{
+  "name": "AI Teacher Management PRO - Anh Sao Khue",
+  "description": "Nền tảng quản lý giáo viên, soạn giáo án CV 5512, kho học liệu, điểm danh, thời khóa biểu & Trợ lý Miss Yến còi",
+  "requestFramePermissions": [
+    "microphone",
+    "camera"
+  ],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

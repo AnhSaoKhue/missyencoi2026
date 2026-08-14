@@ -1,0 +1,26 @@
+export const COMPREHENSIVE_SUBJECTS = [
+  'Toán',
+  'Ngữ Văn',
+  'Vật Lý',
+  'Hóa Học',
+  'Sinh Học',
+  'Lịch Sử',
+  'Địa Lý',
+  'Ngoại ngữ 1 (Tiếng Anh)',
+  'Ngoại ngữ 2 (Tiếng Pháp/Trung/Nhật/Hàn)',
+  'GDCD (Giáo dục công dân)',
+  'Giáo dục Pháp luật',
+  'Tin học',
+  'Công nghệ',
+  'STEM',
+  'Âm nhạc',
+  'Mĩ thuật',
+  'Thể dục (Giáo dục thể chất)',
+  'HĐTN-HN (Hoạt động trải nghiệm)',
+  'Câu lạc bộ',
+  'Các cuộc thi năng khiếu',
+  'Tư vấn hướng nghiệp',
+  'Khởi nghiệp',
+] as const;
+
+export type SubjectName = typeof COMPREHENSIVE_SUBJECTS[number];

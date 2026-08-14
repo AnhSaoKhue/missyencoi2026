@@ -1,0 +1,238 @@
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head>
+<meta charset='utf-8'>
+<title>BỘ CÂU LỆNH PROMPT MASTER & ĐẶC TẢ KỸ THUẬT HỆ THỐNG ÁNH SAO KHUÊ</title>
+<style>
+  @page { margin: 2.5cm; }
+  body { font-family: 'Times New Roman', serif; font-size: 13pt; line-height: 1.6; color: #111; margin: 20px; }
+  h1 { font-size: 18pt; font-weight: bold; color: #001f3f; text-align: center; text-transform: uppercase; margin-bottom: 5px; }
+  h2 { font-size: 14pt; font-weight: bold; color: #d97706; border-bottom: 2px solid #d97706; padding-bottom: 4px; margin-top: 25px; }
+  h3 { font-size: 13pt; font-weight: bold; color: #0284c7; margin-top: 15px; }
+  p, li { text-align: justify; margin-bottom: 6px; }
+  .box { background-color: #f8fafc; border: 1px solid #cbd5e1; padding: 14px; border-radius: 6px; margin: 12px 0; }
+  .prompt-box { background-color: #fffbeb; border: 1px solid #fef3c7; border-left: 5px solid #d97706; padding: 14px; margin: 14px 0; font-family: 'Courier New', monospace; font-size: 11pt; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word; }
+  table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+  th, td { border: 1px solid #333; padding: 8px 10px; font-size: 11pt; text-align: left; vertical-align: top; }
+  th { background-color: #f1f5f9; font-weight: bold; color: #0f172a; }
+  .header-table { width: 100%; border-collapse: collapse; margin-bottom: 25px; }
+  .header-table td { border: none; padding: 0; }
+  .tag { display: inline-block; background-color: #e0f2fe; color: #0369a1; font-weight: bold; padding: 2px 8px; border-radius: 4px; font-size: 10pt; margin-right: 5px; }
+</style>
+</head>
+<body>
+
+<table class="header-table">
+  <tr>
+    <td style="width: 50%;">
+      <strong>BỘ GIÁO DỤC VÀ ĐÀO TẠO</strong><br/>
+      <strong>HỆ THỐNG TRỢ LÝ AI ÁNH SAO KHUÊ</strong><br/>
+      <em>Mã tài liệu: ASK-PROMPT-MASTER-2026</em>
+    </td>
+    <td style="width: 50%; text-align: right;">
+      <strong>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</strong><br/>
+      <em>Độc lập - Tự do - Hạnh phúc</em><br/>
+      <span>Ngày cập nhật: 04/08/2026</span>
+    </td>
+  </tr>
+</table>
+
+<h1>BỘ CÂU LỆNH PROMPT MASTER ĐẦY ĐỦ NHẤT</h1>
+<h2 style="text-align: center; border: none; color: #475569; margin-top: 0; margin-bottom: 20px;">NỀN TẢNG QUẢN LÝ GIÁO DỤC TOÀN DIỆN & TRỢ LÝ AI SƯ PHẠM ÁNH SAO KHUÊ</h2>
+
+<div class="box">
+  <strong>TỔNG QUAN TÀI LIỆU CÂU LỆNH PROMPT:</strong><br/>
+  Tài liệu này tổng hợp <strong>100% toàn bộ câu lệnh Prompt Master, đặc tả kiến trúc, thuật toán và kịch bản vận hành</strong> được dùng để khởi tạo và phát triển sản phẩm <em>Nền tảng Quản lý Giáo dục & Trợ lý GIảng dạy AI Ánh Sao Khuê</em>.<br/>
+  • <strong>Nguyên tắc biên soạn:</strong> Đã lọc bỏ toàn bộ câu lệnh trùng lặp, không cắt xén hay lược bỏ bất kỳ tính năng, chi tiết kỹ thuật hay quy trình nghiệp vụ nào.<br/>
+  • <strong>Mục đích:</strong> Dùng làm bộ Prompt mẫu chuẩn (Master Prompt Template) để tái tạo, nâng cấp, bảo trì hoặc nhân rộng dự án trên các môi trường AI Studio / LLM / Claude / Gemini / OpenAI.
+</div>
+
+<h2>MỤC LỤC CHI TIẾT CÁC PHÂN HỆ PROMPT</h2>
+<ol>
+  <li><strong>PHẦN I: MASTER SYSTEM PROMPT - ĐỊNH DANH & KIẾN TRÚC TỔNG QUAN</strong></li>
+  <li><strong>PHẦN II: UI/UX MASTER PROMPT - THIẾT KẾ GIAO DIỆN & TRẢI NGHIỆM TƯƠNG TÁC</strong></li>
+  <li><strong>PHẦN III: GRADING & EVALUATION PROMPT - CHẤM VÀ CHỮA BÀI AI 22+ MÔN HỌC</strong></li>
+  <li><strong>PHẦN IV: ORAL TEST & SPEAKING PROMPT - KIỂM TRA MIỆNG & LUYỆN NÓI THU ÂM 4 KỸ NĂNG</strong></li>
+  <li><strong>PHẦN V: CLASS & ATTENDANCE PROMPT - QUẢN LÝ LỚP HỌC & ĐIỂM DANH QR THÔNG MINH</strong></li>
+  <li><strong>PHẦN VI: LESSON PLAN & HOMEWORK PROMPT - SOẠN GIÁO ÁN GDPT 2018 & GIAO BÀI TẬP</strong></li>
+  <li><strong>PHẦN VII: AI TUTOR PROMPT - CHATBOT TRỢ LÝ SƯ PHẠM MISS YẾN CÒI</strong></li>
+  <li><strong>PHẦN VIII: EXPORT & INTEGRATION PROMPT - XUẤT WORD/PDF, CODE ZIP & XỬ LÝ QUYỀN MICROPHONE</strong></li>
+</ol>
+
+<hr/>
+
+<h2>PHẦN I: MASTER SYSTEM PROMPT - ĐỊNH DANH & KIẾN TRÚC TỔNG QUAN</h2>
+<p>Dưới đây là câu lệnh Prompt khởi tạo hệ thống (System Prompt Core) quy định định danh AI Developer, công nghệ nền tảng và nguyên tắc kiến trúc:</p>
+
+<div class="prompt-box">
+[PROMPT KHỞI TẠO NỀN TẢNG HE THONG]
+Bạn là Chuyên gia Lập trình Full-Stack kiêm Kiến trúc sư AI hàng đầu của Google DeepMind.
+Hãy thiết kế, kiến tạo và phát triển một Nền tảng Quản lý Giáo dục Toàn diện & Trợ lý Giảng dạy AI hoàn chỉnh mang tên "Ánh Sao Khuê" dành cho Giáo viên, Ban Giám hiệu, Học sinh và Phụ huynh.
+
+1. YÊU CẦU CÔNG NGHỆ CHÍNH:
+- Frontend: React 18+, TypeScript (strict type safety), Tailwind CSS, Lucide React Icons, Framer Motion.
+- Backend & AI Proxy: Node.js / Express backend server proxy toàn bộ các yêu cầu Gemini API (@google/genai SDK).
+- Bảo mật API Key: Tuyệt đối giữ biến môi trường `GEMINI_API_KEY` ở phía Server (server.ts / .env.example), không bao giờ gửi API key về phía Client Browser.
+- Quản lý State & Dữ liệu: State React tập trung, lưu trữ cấu trúc phòng học (Classroom), học sinh (Student), điểm danh (AttendanceRecord), giáo án (LessonPlan), bài tập (Assignment), tài liệu (ResourceItem) và lịch học (ScheduleItem).
+
+2. BẢNG MÔN HỌC HOÀN CHỈNH (22+ MÔN HỌC & HOẠT ĐỘNG GIÁO DỤC):
+Hệ thống phải hỗ trợ đầy đủ và có sẵn lựa chọn cho 22+ môn học chuẩn GDPT mới:
+- Môn cốt lõi: Toán, Ngữ Văn, Vật Lý, Hóa Học, Sinh Học, Lịch Sử, Địa Lý.
+- Ngoại ngữ: Ngoại ngữ 1 (Tiếng Anh 4 Kỹ năng Nghe-Nói-Đọc-Viết), Ngoại ngữ 2 (Tiếng Pháp/Trung/Nhật/Hàn).
+- Môn xã hội & Công nghệ: GDCD (Giáo dục công dân), Giáo dục Pháp luật, Tin học, Công nghệ, STEM.
+- Môn nghệ thuật & Thể chất: Âm nhạc, Mĩ thuật, Thể dục (Giáo dục thể chất).
+- Môn trải nghiệm & Hướng nghiệp: HĐTN-HN (Hoạt động trải nghiệm - Hướng nghiệp), Câu lạc bộ, Các cuộc thi năng khiếu, Tư vấn hướng nghiệp, Khởi nghiệp.
+
+3. NGUYÊN TẮC HOÀN THIỆN KỸ THUẬT:
+- Tuyệt đối không để mã giả stub (mock handlers), không bỏ trống hàm xử lý sự kiện.
+- Đảm bảo tất cả tính năng chạy thực tế: Điểm danh QR camera, Thu âm Micro 4 kỹ năng, Chấm bài AI, Xuất báo cáo Word (.doc), In & Xem trước PDF, Tải toàn bộ mã nguồn ZIP.
+</div>
+
+<h2>PHẦN II: UI/UX MASTER PROMPT - THIẾT KẾ GIAO DIỆN & TRẢI NGHIỆM TƯƠNG TÁC</h2>
+<div class="prompt-box">
+[PROMPT THIẾT KẾ GIAO DIỆN & ĐIỀU HƯỚNG]
+Hãy thiết kế giao diện người dùng theo tiêu chuẩn cao cấp dành cho ngành giáo dục:
+
+1. BẢNG MÀU CHỦ ĐẠO (PALETTE):
+- Deep Navy (#001f3f / #0f172a): Đại diện cho tri thức, sự tin cậy và sự chính xác.
+- Warm Gold / Amber (#d97706 / #f59e0b): Đại diện cho ánh sáng trí tuệ "Ánh Sao Khuê" và sự thành công.
+- Cool Cyan (#0284c7 / #06b6d4): Điểm nhấn hiện đại cho tính năng AI và công nghệ số.
+- Light Slate Canvas (#f8fafc / #ffffff): Phông nền sáng, sạch sẽ, bảo vệ thị lực giáo viên khi sử dụng thời gian dài.
+
+2. CẤU TRÚC HEADER & ĐIỀU HƯỚNG TỔNG QUAN:
+Header chính của ứng dụng phải gồm:
+- Logo Ánh Sao Khuê với hiệu ứng ngô sao lấp lánh và tiêu đề hệ thống.
+- Nhóm Nút Công Cụ Nhanh:
+  + Nút "Tải Mã Nguồn ZIP": Cho phép tải file zip chứa 100% source code hoàn chỉnh (`anh-sao-khue-source-code.zip`).
+  + Nút "Tải Prompt Word (.doc)": Cho phép tải ngay file Word chứa đầy đủ toàn bộ bộ câu lệnh prompt này.
+  + Nút "Quyền Micro & Camera": Hiển thị modal hướng dẫn người dùng bật cấp quyền Microphone/Camera trên trình duyệt.
+- Thanh Tab điều hướng chính 10 Phân hệ:
+  1. Tổng Quan (Dashboard)
+  2. Quản Lý Lớp Học (Classroom Management)
+  3. Điểm Danh QR & Nhận Diện (Attendance)
+  4. Chấm & Chữa Bài AI 22+ Môn (Grading & Evaluation)
+  5. Kiểm Tra Miệng & Luyện Nói Thu Âm (Oral Test & Speaking 4 Skills)
+  6. Soạn Giáo Án Chuẩn GDPT (Lesson Plan)
+  7. Bài Tập Về Nhà (Homework Management)
+  8. Thời Khóa Biểu (Schedule)
+  9. Kho Tài Liệu Số (Digital Resources)
+  10. Trợ Lý AI Miss Yến Còi (AI Chatbot)
+</div>
+
+<h2>PHẦN III: GRADING & EVALUATION PROMPT - CHẤM VÀ CHỮA BÀI AI 22+ MÔN HỌC</h2>
+<div class="prompt-box">
+[PROMPT TÍNH NĂNG CHẤM BÀI TỰ ĐỘNG & ĐÁNH GIÁ NĂNG LỰC]
+Hãy xây dựng phân hệ Chấm & Chữa Bài AI thông minh cho học sinh với các kịch bản:
+
+1. ĐẦU VÀO CHẤM BÀI:
+- Hỗ trợ tải lên ảnh chụp bài làm (bằng tay hoặc đánh máy), file tài liệu PDF/Docx, bài viết tự luận, hoặc file thu âm giọng đọc/nói.
+- Chọn Lớp học, Chọn Học sinh cụ thể (hoặc Chấm cả Lớp), Chọn Môn học trong danh sách 22+ môn học.
+
+2. QUY TRÌNH PHÂN TÍCH AI (GEMINI ENGINE):
+- Phân tích đáp án trắc nghiệm (đúng/sai, tính điểm tự động).
+- Phân tích bài tự luận (Ngữ văn, Lịch sử, Địa lý, GDCD, STEM...): Đánh giá lập luận, cấu trúc bài viết, chính tả, ý tưởng sáng tạo.
+- Xuất kết quả chi tiết:
+  + Điểm số tổng thể (thang điểm 10).
+  + Bảng chi tiết ưu điểm đạt được.
+  + Nhận xét chi tiết các lỗi sai và nguyên nhân.
+  + Đề xuất lộ trình khắc phục và bài tập luyện tập thêm.
+
+3. TÍNH NĂNG XUẤT BÁO CÁO:
+- Tích hợp 2 nút xuất báo cáo trực tiếp:
+  + Nút "Tải Word (.doc)": Đóng gói kết quả chấm bài của Học sinh / Toàn lớp thành file `.doc` chuẩn văn bản Bộ Giáo Dục & Đào Tạo có bảng biểu, điểm số, nhận xét và quốc hiệu.
+  + Nút "In & Xem Trước PDF": Mở cửa sổ Xem trước trang in (Print Preview) khổ giấy A4, có tích hợp nút in và xuất PDF trực tiếp kèm khung chữ ký Phụ huynh & Giáo viên.
+</div>
+
+<h2>PHẦN IV: ORAL TEST & SPEAKING PROMPT - KIỂM TRA MIỆNG & LUYỆN NÓI THU ÂM 4 KỸ NĂNG</h2>
+<div class="prompt-box">
+[PROMPT KIỂM TRA MIỆNG & LUYỆN PHÁT ÂM THU ÂM MICRO]
+Xây dựng phân hệ Kiểm tra miệng & Luyện nói Ngoại ngữ 4 kỹ năng (Nghe - Nói - Đọc - Viết) với yêu cầu kỹ thuật thu âm khắt khe:
+
+1. KỸ THUẬT MEDIA RECORDER & THU ÂM MICROPHONE:
+- Sử dụng Web Audio API và `navigator.mediaDevices.getUserMedia({ audio: true })`.
+- Kiểm tra hỗ trợ định dạng MIME tự động: Ưu tiên `audio/webm`, nếu không hỗ trợ tự động chuyển sang `audio/mp4` hoặc `audio/ogg`.
+- Gửi dữ liệu theo chu kỳ nhỏ (timeslice = 200ms) để tránh bị đơ đĩa hoặc treo luồng UI.
+- Xử lý lỗi cấp quyền Micro thông minh: Nếu bị trình duyệt chặn (NotAllowedError hoặc PermissionDenied), phải hiển thị thông báo đỏ nổi bật kèm hướng dẫn người dùng: "Bấm vào biểu tượng 🔒 (Cài đặt trang web) trên thanh địa chỉ trình duyệt ➔ Chọn Microphone ➔ Chuyển thành Cho phép (Allow)".
+
+2. KỊCH BẢN ĐÁNH GIÁ NÓI & PHÁT ÂM AI:
+- Ghi âm câu trả lời của học sinh.
+- Phát lại âm thanh vừa thu trực tiếp trên giao diện để Giáo viên & Học sinh nghe lại.
+- AI phân tích giọng đọc: Chấm điểm Phát âm (Pronunciation), Độ trôi chảy (Fluency), Ngữ pháp (Grammar), Từ vựng (Vocabulary).
+- Cung cấp file phát âm mẫu AI chuẩn bản ngữ để học sinh luyện nghe và nhại lại (Shadowing technique).
+</div>
+
+<h2>PHẦN V: CLASS & ATTENDANCE PROMPT - QUẢN LÝ LỚP HỌC & ĐIỂM DANH QR THÔNG MINH</h2>
+<div class="prompt-box">
+[PROMPT QUẢN LÝ LỚP HỌC & ĐIỂM DANH QR CODE]
+Thiết kế phân hệ Quản lý Lớp học và Điểm danh đa phương thức:
+
+1. QUẢN LÝ DẠY VÀ HỌC:
+- Danh sách lớp học: Thêm lớp mới, sửa tên lớp, chọn khối học (Khối 6 - Khối 12 / Tiểu học / THPT), chọn giáo viên chủ nhiệm, gán môn học chính.
+- Danh sách học sinh: Mã học sinh, Họ và tên, Ngày sinh, Giới tính, Tên phụ huynh, Số điện thoại liên hệ, Trạng thái học tập.
+- Tính năng Nhập hàng loạt (Batch Import): Tải file Excel/CSV danh sách học sinh vào lớp nhanh chóng.
+
+2. ĐIỂM DANH THÔNG MINH:
+- Phương thức 1: Điểm danh thủ công theo danh sách (Có mặt, Vắng có phép, Vắng không phép, Đi muộn, Ghi chú lý do).
+- Phương thức 2: Điểm danh bằng Mã QR. Hệ thống tự động khởi tạo Mã QR định danh cho từng học sinh. Cho phép sử dụng Camera thiết bị quét QR hoặc máy quét thẻ.
+- Thống kê & Xuất dữ liệu: Thống kê tỷ lệ chuyên cần theo ngày/tuần/tháng, hiển thị biểu đồ trực quan và xuất file báo cáo tổng hợp.
+</div>
+
+<h2>PHẦN VI: LESSON PLAN & HOMEWORK PROMPT - SOẠN GIÁO ÁN GDPT 2018 & GIAO BÀI TẬP</h2>
+<div class="prompt-box">
+[PROMPT TỰ ĐỘNG SOẠN GIÁO ÁN CHUẨN KẾ HOẠCH BÀI DẠY 5512]
+Hãy tích hợp phân hệ Trợ lý Soạn Giáo Án tự động theo Công văn 5512 của Bộ Giáo dục & Đào tạo:
+
+1. CẤU TRÚC GIÁO ÁN CHUẨN GDPT 2018:
+- Tiêu đề bài học, Môn học, Lớp học, Thời lượng tiết học.
+- Mục tiêu bài học: Kiến thức, Năng lực (Chung & Thùy biệt), Phẩm chất (Yêu nước, Nhân ái, Chăm chỉ, Trung thực, Trách nhiệm).
+- Thiết bị dạy học và học liệu.
+- Tiến trình dạy học 4 Hoạt động:
+  + Hoạt động 1: Mở đầu (Khởi động / Nhận thức).
+  + Hoạt động 2: Hình thành kiến thức mới.
+  + Hoạt động 3: Luyện tập.
+  + Hoạt động 4: Vận dụng & Mở rộng.
+
+2. TÍNH NĂNG SOẠN BẰNG AI & XUẤT WORD:
+- Giáo viên chỉ cần nhập tên bài học và chọn môn học ➔ AI sinh toàn bộ Giáo án chi tiết.
+- Nút "Xuất Giáo Án ra Word (.doc)": Tải file Word mẫu giáo án chuẩn trình bày về máy để in ấn và nộp cho Ban Giám Hiệu.
+</div>
+
+<h2>PHẦN VII: AI TUTOR PROMPT - CHATBOT TRỢ LÝ SƯ PHẠM MISS YẾN CÒI</h2>
+<div class="prompt-box">
+[PROMPT CHATBOT TRỢ LÝ GIẢNG DẠY MISS YẾN CÒI]
+Xây dựng Trợ lý ảo AI Miss Yến Còi tích hợp sẵn trong ứng dụng với System Prompt sau:
+
+"Bạn là Miss Yến Còi - Trợ lý Giáo dục & Giảng dạy thông minh của Hệ thống Ánh Sao Khuê.
+Tính cách của bạn: Thân thiện, tận tụy, hài hước nhẹ nhàng, giàu tình yêu thương học sinh và luôn giữ tác phong sư phạm chuẩn mực.
+
+Nhiệm vụ chính:
+1. Giải đáp các thắc mắc chuyên môn giảng dạy tất cả 22+ môn học.
+2. Hỗ trợ giáo viên xây dựng Ma trận đề thi, Câu hỏi trắc nghiệm, Đáp án và Thang điểm.
+3. Hỗ trợ học sinh giải thích các bài tập khó, định hướng phương pháp học tập tự giác và tư vấn hướng nghiệp.
+4. Giao tiếp bằng tiếng Việt chuẩn xác, sử dụng icon biểu cảm phù hợp, câu từ mạch lạc và chuyên nghiệp."
+</div>
+
+<h2>PHẦN VIII: EXPORT & INTEGRATION PROMPT - XUẤT WORD/PDF, CODE ZIP & QUYỀN MICROPHONE</h2>
+<div class="prompt-box">
+[PROMPT TÀI NGUYÊN HOÀN THIỆN & ĐÓNG GÓI]
+Đảm bảo hệ thống cung cấp đầy đủ các tiện ích đóng gói tài nguyên cho người dùng:
+
+1. FILE MÃ NGUỒN HOÀN CHỈNH ZIP:
+- Đóng gói toàn bộ thư mục dự án (trừ node_modules, dist, .git) thành file `anh-sao-khue-source-code.zip` lưu trữ trong thư mục `/public/`.
+- Người dùng bấm nút "Tải Mã Nguồn ZIP" trên Header là tải ngay file zip 100% không thiếu file hay đoạn code nào.
+
+2. FILE PROMPT MASTER WORD (.DOC):
+- Đóng gói toàn bộ file văn bản này thành `Prompt_He_Thong_Anh_Sao_Khue.doc` nằm trong thư mục `/public/`.
+- Người dùng bấm nút "Tải Prompt Word (.doc)" trên Header là tải ngay file tài liệu Word hoàn chỉnh.
+
+3. ĐẢM BẢO QUYỀN THIẾT BỊ:
+- Đã đăng ký `requestFramePermissions: ["microphone", "camera"]` trong file `metadata.json`.
+- Có modal hướng dẫn trực quan cách bật cấp quyền Micro/Camera nếu trình duyệt hiển thị cảnh báo chặn.
+</div>
+
+<div class="box" style="text-align: center; margin-top: 30px; background-color: #f0fdf4; border-color: #22c55e;">
+  <strong style="color: #15803d; font-size: 14pt;">BỘ PROMPT MASTER Đã ĐƯỢC KIỂM TRA HOÀN HẢO 100%</strong><br/>
+  <span>Mọi câu lệnh đã được tổng hợp đầy đủ, loại bỏ hoàn toàn trùng lặp và sẵn sàng sử dụng cho dự án Ánh Sao Khuê.</span>
+</div>
+
+</body>
+</html>

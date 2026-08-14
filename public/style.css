@@ -1,0 +1,43 @@
+/* style.css - AI Education Platform (Anh Sao Khue - 0346513056) */
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+.animate-marquee {
+  display: inline-flex;
+  animation: marquee 22s linear infinite;
+}
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+    font-family: 'Times New Roman', Times, serif !important;
+    font-size: 12pt !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only-container {
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    background: white !important;
+    color: black !important;
+  }
+  .print-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .print-table th, .print-table td {
+    border: 1px solid #000 !important;
+    padding: 6px 8px !important;
+    color: black !important;
+  }
+  .page-break {
+    page-break-before: always;
+  }
+}
