@@ -24,18 +24,22 @@ def bundle_all():
             z.write('Code.gs', 'Code.gs')
         if os.path.exists('Index.html'):
             z.write('Index.html', 'Index.html')
+        if os.path.exists('AITeacherPlatform.html'):
+            z.write('AITeacherPlatform.html', 'AITeacherPlatform.html')
         if os.path.exists('README.md'):
             z.write('README.md', 'README.md')
+        if os.path.exists('README_HUONG_DAN_SU_DUNG.md'):
+            z.write('README_HUONG_DAN_SU_DUNG.md', 'README_HUONG_DAN_SU_DUNG.md')
     print("Created:", apps_script_zip_path)
 
-    # 3. Build Full Project Source ZIP (clean, ignoring node_modules, dist, .git, zip files)
-    ignored_dirs = {'node_modules', '.git', 'dist', '.cache', '.upm', '.local'}
+    # 3. Build Full Project Source ZIP (clean, ignoring internal dirs and zips)
+    ignored_dirs = {'node_modules', '.git', 'dist', '.cache', '.upm', '.local', '.aistudio', '.vite', '.vscode'}
     
     def add_directory_to_zip(zip_obj, folder_path, exclude_zips=True):
         for root, dirs, files in os.walk(folder_path):
-            dirs[:] = [d for d in dirs if d not in ignored_dirs]
+            dirs[:] = [d for d in dirs if d not in ignored_dirs and not d.startswith('.')]
             for f in files:
-                if exclude_zips and (f.endswith('.zip') or f.endswith('.tar.gz')):
+                if exclude_zips and (f.endswith('.zip') or f.endswith('.tar.gz') or f.endswith('.log')):
                     continue
                 full_p = os.path.join(root, f)
                 rel_p = os.path.relpath(full_p, folder_path)
