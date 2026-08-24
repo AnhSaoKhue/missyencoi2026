@@ -1,399 +1,443 @@
-// ============================================================================
-// HỆ THỐNG BACKEND GOOGLE APPS SCRIPT HOÀN CHỈNH (Code.gs)
-// Nền tảng: AI Lesson Plans - Anh Sao Khue (SĐT/Zalo: 0346513056)
-// Bộ sách: Kết nối tri thức với cuộc sống & Tiếng Anh Global Success (2026-2027)
-// Chức năng: 
-//   - Xử lý API trung gian bảo mật (doGet, doPost)
-//   - Tạo & Xuất file Google Docs / PDF / Word tự động lưu Google Drive
-//   - Soạn Kế hoạch bài dạy AI chuẩn CV 5512 qua Gemini API
-//   - Đồng bộ & Lưu trữ dữ liệu hệ thống vào Google Sheets
-// ============================================================================
-
-const GEMINI_API_KEY = "YOUR_GEMINI_API_KEY_HERE"; // Thay thế API Key Gemini của bạn tại đây
-const SYSTEM_AUTHOR = "Anh Sao Khue - 0346513056";
-const DRIVE_FOLDER_NAME = "AI_Lesson_Plans_AnhSaoKhue";
+/**
+ * ============================================================================
+ * GOOGLE APPS SCRIPT SERVER CODE: Code.gs
+ * Hệ Thống Quản Lý Lớp Học, Điểm Danh, Soạn Giáo Án & Kho Học Liệu - Anh Sao Khue
+ * Triển khai trên Google Sheets hoặc Google Apps Script Web App
+ * ============================================================================
+ */
 
 /**
- * Xử lý yêu cầu HTTP GET từ Frontend / Web App
+ * Tự động tạo Menu khi mở Google Sheet
+ */
+function onOpen(e) {
+  try {
+    var ui = SpreadsheetApp.getUi();
+    ui.createMenu('🌟 Anh Sao Khue Platform')
+      .addItem('🚀 Mở Ứng Dụng (Cửa Sổ Lớn)', 'showAppDialog')
+      .addItem('📱 Mở Cột Bên (Sidebar)', 'showAppSidebar')
+      .addSeparator()
+      .addItem('🔄 Khởi Tạo / Làm Mới Bảng Dữ Liệu', 'initializeSheets')
+      .addToUi();
+  } catch (err) {
+    Logger.log('Không thể tạo Menu trên Sheet (Có thể đang chạy Web App độc lập): ' + err);
+  }
+}
+
+/**
+ * Phục vụ Web App khi truy cập qua URL Web App
  */
 function doGet(e) {
+  var templateName = 'AITeacherPlatform';
   try {
-    const action = e.parameter.action;
-
-    if (action === "getLessonPlans") {
-      return handleGetLessonPlans();
-    } else if (action === "ping") {
-      return createJsonResponse({
-        status: "success",
-        message: "Hệ thống AI Lesson Plans - Anh Sao Khue (0346513056) đang hoạt động 24/7!",
-        timestamp: new Date().toISOString()
-      });
-    }
-
-    return createJsonResponse({
-      status: "success",
-      message: "API Google Apps Script sẵn sàng kết nối!",
-      author: SYSTEM_AUTHOR
-    });
-  } catch (error) {
-    return createJsonResponse({ status: "error", message: error.toString() });
-  }
-}
-
-/**
- * Xử lý yêu cầu HTTP POST từ Frontend / Web App
- */
-function doPost(e) {
-  try {
-    if (!e || !e.postData || !e.postData.contents) {
-      return createJsonResponse({ status: "error", message: "Không tìm thấy dữ liệu POST" });
-    }
-
-    const payload = JSON.parse(e.postData.contents);
-    const action = payload.action;
-    const data = payload.data;
-
-    switch (action) {
-      case "generateLessonPlan":
-        return handleGenerateLessonPlan(data);
-
-      case "exportToDoc":
-        return handleExportToGoogleDoc(data);
-
-      case "saveToDrive":
-        return handleSaveToDriveFolder(data);
-
-      case "saveLessonPlan":
-        return handleSaveToSheet(data);
-
-      case "validateLessonData":
-        return handleProcessAndValidateLessonData(data);
-
-      default:
-        return createJsonResponse({
-          status: "error",
-          message: "Hành động (action) không được hỗ trợ: " + action
-        });
-    }
-  } catch (error) {
-    return createJsonResponse({
-      status: "error",
-      message: "Lỗi xử lý POST: " + error.toString()
-    });
-  }
-}
-
-// ============================================================================
-// 1. TẠO & XUẤT FILE GOOGLE DOCS / DRIVE (GOOGLE INTEGRATION)
-// ============================================================================
-
-/**
- * Tạo file Google Doc tự động trình bày chuẩn mẫu Công văn 5512 Bộ GD&ĐT
- */
-function handleExportToGoogleDoc(lessonData) {
-  try {
-    const docTitle = `Kế hoạch bài dạy - ${lessonData.title || "Bài học"} - ${lessonData.teacherName || "Giáo viên"}`;
-    const doc = DocumentApp.create(docTitle);
-    const body = doc.getBody();
-
-    // Cấu hình lề trang chuẩn văn bản hành chính
-    body.setMarginTop(36);
-    body.setMarginBottom(36);
-    body.setMarginLeft(54);
-    body.setMarginRight(36);
-
-    // Tiêu đề đầu bài
-    const headerPara = body.appendParagraph("BỘ GIÁO DỤC VÀ ĐÀO TẠO - BỘ SÁCH KẾT NỐI TRI THỨC VỚI CUỘC SỐNG");
-    headerPara.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
-    headerPara.setFontSize(10).setBold(true).setForegroundColor("#1e3a8a");
-
-    const titlePara = body.appendParagraph(`KẾ HOẠCH BÀI DẠY (GIÁO ÁN)\n${(lessonData.title || "BÀI HỌC").toUpperCase()}`);
-    titlePara.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
-    titlePara.setFontSize(14).setBold(true).setForegroundColor("#0f172a");
-
-    // Thông tin hành chính
-    const adminInfo = body.appendParagraph(
-      `Trường: ${lessonData.schoolName || "THCS Kết nối tri thức"}\n` +
-      `Giáo viên: ${lessonData.teacherName || "Anh Sao Khue"}\n` +
-      `Môn: ${lessonData.subject || "Toán"} - Lớp: ${lessonData.gradeLevel || "Lớp 7"}\n` +
-      `Thời lượng: ${lessonData.durationText || "1 tiết (45 phút)"} | Ngày soạn: ${lessonData.prepDate || ""} | Ngày dạy: ${lessonData.teachDate || ""}`
-    );
-    adminInfo.setFontSize(10).setItalic(true);
-
-    body.appendHorizontalRule();
-
-    // I. MỤC TIÊU BÀI HỌC
-    body.appendParagraph("I. MỤC TIÊU BÀI HỌC").setFontSize(12).setBold(true).setForegroundColor("#b45309");
-    body.appendParagraph(`1. Kiến thức: ${lessonData.objectives?.knowledge || "Học sinh nắm vững kiến thức cốt lõi."}`);
-    body.appendParagraph(`2. Kỹ năng: ${lessonData.objectives?.skills || "Rèn luyện kỹ năng giải quyết vấn đề."}`);
-    body.appendParagraph(`3. Phẩm chất: ${lessonData.objectives?.qualities || "Yêu nước, chăm chỉ, trung thực, trách nhiệm."}`);
-    body.appendParagraph(`4. Năng lực chung: ${lessonData.objectives?.generalCompetencies || "Tự chủ, giao tiếp và hợp tác."}`);
-    body.appendParagraph(`5. Năng lực đặc thù: ${lessonData.objectives?.specificCompetencies || "Năng lực chuyên môn."}`);
-
-    // II. CHUẨN BỊ
-    body.appendParagraph("\nII. CHUẨN BỊ").setFontSize(12).setBold(true).setForegroundColor("#b45309");
-    body.appendParagraph(`- Giáo viên: ${lessonData.preparation?.teacher || "Máy tính, SGK Kết nối tri thức, thiết bị trình chiếu."}`);
-    body.appendParagraph(`- Học sinh: ${lessonData.preparation?.students || "Đọc trước bài, phiếu học tập."}`);
-
-    // III. TIẾN TRÌNH DẠY HỌC (BẢNG 6 BƯỚC)
-    body.appendParagraph("\nIII. TIẾN TRÌNH DẠY HỌC (45 PHÚT)").setFontSize(12).setBold(true).setForegroundColor("#b45309");
-
-    const steps = lessonData.teachingSteps || [
-      { title: "1. Khởi động (5 phút)", teacher: "Tổ chức trò chơi mở đầu", student: "Tham gia trả lời", product: "Câu trả lời của HS" },
-      { title: "2. Hình thành kiến thức (20 phút)", teacher: "Giảng giải, giao nhiệm vụ", student: "Thảo luận nhóm", product: "Sản phẩm thảo luận" },
-      { title: "3. Luyện tập (10 phút)", teacher: "Giao bài tập phân hóa", student: "Làm bài tập cá nhân", product: "Đáp án bài tập" },
-      { title: "4. Vận dụng (5 phút)", teacher: "Nêu tình huống thực tế", student: "Liên hệ thực tiễn", product: "Giải pháp thực tế" },
-      { title: "5. Củng cố (3 phút)", teacher: "Tóm tắt kiến thức", student: "Ghi nhớ kiến thức", product: "Sơ đồ tư duy" },
-      { title: "6. Hướng dẫn về nhà (2 phút)", teacher: "Giao nhiệm vụ về nhà", student: "Ghi chép dặn dò", product: "Bài làm ở nhà" }
-    ];
-
-    const table = body.appendTable([
-      ["Hoạt động dạy học", "Hoạt động của Giáo viên", "Hoạt động của Học sinh", "Sản phẩm dự kiến"]
-    ]);
-
-    // Format Header Table
-    const headerRow = table.getRow(0);
-    for (let i = 0; i < 4; i++) {
-      headerRow.getCell(i).setBackgroundColor("#1e293b").getChild(0).asParagraph().setFontSize(10).setBold(true).setForegroundColor("#ffffff");
-    }
-
-    steps.forEach((step) => {
-      const row = table.appendRow();
-      row.appendTableCell(step.title || "").getChild(0).asParagraph().setFontSize(9).setBold(true);
-      row.appendTableCell(step.teacher || step.teacherActivity || "").getChild(0).asParagraph().setFontSize(9);
-      row.appendTableCell(step.student || step.studentActivity || "").getChild(0).asParagraph().setFontSize(9);
-      row.appendTableCell(step.product || step.expectedProduct || "").getChild(0).asParagraph().setFontSize(9);
-    });
-
-    // IV. TÍCH HỢP NĂNG LỰC SỐ
-    body.appendParagraph("\nIV. TÍCH HỢP NĂNG LỰC SỐ").setFontSize(12).setBold(true).setForegroundColor("#b45309");
-    body.appendParagraph(`- Công cụ số: ${lessonData.digitalCompetency?.digitalTools || "Sử dụng Canva, Kahoot, AI Assistant."}`);
-    body.appendParagraph(`- Kỹ năng tra cứu & An toàn dữ liệu: ${lessonData.digitalCompetency?.safetySkill || "Hướng dẫn học sinh khai thác thông tin an toàn."}`);
-
-    // V. TÍCH HỢP TIẾNG ANH (ENGLISH INTEGRATION)
-    body.appendParagraph("\nV. TÍCH HỢP TIẾNG ANH (ENGLISH INTEGRATION - CLIL)").setFontSize(12).setBold(true).setForegroundColor("#b45309");
-    if (lessonData.bilingualSection) {
-      body.appendParagraph(`- Thuật ngữ (Vocabulary): ${lessonData.bilingualSection.englishTitle || ""}`);
-      body.appendParagraph(`- Câu hỏi song ngữ: ${lessonData.bilingualSection.questionText || ""}`);
-      body.appendParagraph(`- Đáp án chi tiết: ${lessonData.bilingualSection.explanation || ""}`);
-    } else {
-      body.appendParagraph("- Key Terms: Subject Core Concepts (Dịch nghĩa & Phát âm chuẩn quốc tế)");
-    }
-
-    // Chữ ký & Bản quyền
-    body.appendParagraph(`\nBẢN QUYỀN SẢN PHẨM: ${SYSTEM_AUTHOR}`).setFontSize(9).setItalic(true).setForegroundColor("#64748b");
-
-    doc.saveAndClose();
-
-    // Di chuyển file vào thư mục Google Drive chuyên biệt
-    const file = DriveApp.getFileById(doc.getId());
-    const folder = getOrCreateDriveFolder(DRIVE_FOLDER_NAME);
-    folder.addFile(file);
-    DriveApp.getRootFolder().removeFile(file);
-
-    const pdfExportUrl = `https://docs.google.com/document/d/${doc.getId()}/export?format=pdf`;
-    const docxExportUrl = `https://docs.google.com/document/d/${doc.getId()}/export?format=docx`;
-
-    return createJsonResponse({
-      status: "success",
-      message: "Đã tạo file Google Doc thành công!",
-      docId: doc.getId(),
-      docUrl: doc.getUrl(),
-      pdfExportUrl: pdfExportUrl,
-      docxExportUrl: docxExportUrl,
-      folderName: DRIVE_FOLDER_NAME,
-      author: SYSTEM_AUTHOR
-    });
+    return HtmlService.createHtmlOutputFromFile(templateName)
+      .setTitle('Anh Sao Khue - AI Education Platform')
+      .addMetaTag('viewport', 'width=device-width, initial-scale=1.0')
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
   } catch (err) {
-    return createJsonResponse({ status: "error", message: "Lỗi tạo Google Doc: " + err.toString() });
+    return HtmlService.createHtmlOutputFromFile('Index')
+      .setTitle('Anh Sao Khue - AI Education Platform')
+      .addMetaTag('viewport', 'width=device-width, initial-scale=1.0')
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
   }
 }
 
 /**
- * Lưu file trực tiếp vào Google Drive folder
+ * Hiển thị ứng dụng trong Dialog Lớn trên Google Sheets
  */
-function handleSaveToDriveFolder(data) {
-  try {
-    const folder = getOrCreateDriveFolder(DRIVE_FOLDER_NAME);
-    const fileName = `${data.fileName || "Lesson_Plan"}_${new Date().getTime()}.txt`;
-    const file = folder.createFile(fileName, data.content || "", MimeType.PLAIN_TEXT);
+function showAppDialog() {
+  var html = HtmlService.createHtmlOutputFromFile('AITeacherPlatform')
+    .setWidth(1280)
+    .setHeight(820)
+    .setTitle('Anh Sao Khue - AI Education Platform');
+  SpreadsheetApp.getUi().showModalDialog(html, 'Anh Sao Khue - AI Education Platform');
+}
 
-    return createJsonResponse({
-      status: "success",
-      message: "Đã lưu file thành công vào Google Drive!",
-      fileUrl: file.getUrl(),
-      fileName: fileName
-    });
-  } catch (err) {
-    return createJsonResponse({ status: "error", message: "Lỗi lưu file Drive: " + err.toString() });
+/**
+ * Hiển thị ứng dụng trong Sidebar trên Google Sheets
+ */
+function showAppSidebar() {
+  var html = HtmlService.createHtmlOutputFromFile('AITeacherPlatform')
+    .setTitle('Anh Sao Khue');
+  SpreadsheetApp.getUi().showSidebar(html);
+}
+
+/**
+ * Khởi tạo cấu trúc các Sheet cần thiết trong Google Spreadsheet
+ */
+function initializeSheets() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  if (!ss) return 'Không tìm thấy Google Sheet active!';
+
+  getOrCreateSheet(ss, 'Lớp Học');
+  getOrCreateSheet(ss, 'Học Sinh');
+  getOrCreateSheet(ss, 'Điểm Danh');
+  getOrCreateSheet(ss, 'Giáo Án');
+  getOrCreateSheet(ss, 'Kho Học Liệu');
+  getOrCreateSheet(ss, 'Bài Tập');
+
+  var defaultData = getInitialDefaultData();
+  saveData(defaultData);
+
+  SpreadsheetApp.getUi().alert('✅ Đã khởi tạo các trang tính Google Sheet thành công!');
+  return 'OK';
+}
+
+/**
+ * Khởi tạo & Đọc tất cả dữ liệu từ Google Sheets hoặc PropertiesService
+ */
+function getData() {
+  try {
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    if (!ss) {
+      var props = PropertiesService.getUserProperties();
+      var raw = props.getProperty('ANH_SAO_KHUE_DATA');
+      if (raw) {
+        return JSON.parse(raw);
+      }
+      return getInitialDefaultData();
+    }
+
+    var classroomsSheet = getOrCreateSheet(ss, 'Lớp Học');
+    var studentsSheet = getOrCreateSheet(ss, 'Học Sinh');
+    var attendanceSheet = getOrCreateSheet(ss, 'Điểm Danh');
+    var lessonPlansSheet = getOrCreateSheet(ss, 'Giáo Án');
+    var resourcesSheet = getOrCreateSheet(ss, 'Kho Học Liệu');
+    var homeworkSheet = getOrCreateSheet(ss, 'Bài Tập');
+
+    var classrooms = readClassroomsFromSheet(classroomsSheet, studentsSheet);
+    var attendanceSessions = readAttendanceFromSheet(attendanceSheet);
+    var lessonPlans = readLessonPlansFromSheet(lessonPlansSheet);
+    var resources = readResourcesFromSheet(resourcesSheet);
+    var homework = readHomeworkFromSheet(homeworkSheet);
+
+    if (classrooms.length === 0) {
+      var initData = getInitialDefaultData();
+      saveData(initData);
+      return initData;
+    }
+
+    return {
+      classrooms: classrooms,
+      attendanceSessions: attendanceSessions,
+      lessonPlans: lessonPlans,
+      resources: resources,
+      homework: homework
+    };
+  } catch (e) {
+    return getInitialDefaultData();
   }
 }
 
-// ============================================================================
-// 2. SOẠN BÀI QUA GEMINI AI API (AI ENGINE)
-// ============================================================================
-
-function handleGenerateLessonPlan(formData) {
+/**
+ * Lưu toàn bộ dữ liệu ứng dụng vào Google Sheet / Script Properties
+ */
+function saveData(data) {
   try {
-    if (!GEMINI_API_KEY || GEMINI_API_KEY.includes("YOUR_GEMINI_API_KEY")) {
-      return createJsonResponse({
-        status: "error",
-        message: "Chưa cấu hình GEMINI_API_KEY trong Code.gs. Vui lòng cập nhật API Key của bạn."
-      });
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    if (!ss) {
+      var props = PropertiesService.getUserProperties();
+      props.setProperty('ANH_SAO_KHUE_DATA', JSON.stringify(data));
+      return { success: true, message: 'Đã lưu dữ liệu vào bộ nhớ ứng dụng thành công!' };
     }
 
-    const prompt = `Bạn là Đội ngũ Chuyên gia Thiết kế Hệ thống Giáo dục Phổ thông Việt Nam (Chương trình GDPT 2018).
-Hãy soạn Kế hoạch bài dạy hoàn chỉnh theo Công văn 5512 cho môn ${formData.subject}, Lớp ${formData.gradeLevel}.
-- Tên bài học: ${formData.title}
-- Thời lượng: ${formData.durationText}
-- Trường: ${formData.schoolName}
-- Giáo viên: ${formData.teacherName}
-- Bộ sách: Kết nối tri thức với cuộc sống / Tiếng Anh Global Success (Áp dụng năm 2026-2027).
-- Yêu cầu bắt buộc: Tích hợp Năng lực số cụ thể & Tích hợp 1 phần Tiếng Anh song ngữ (CLIL) kèm thuật ngữ, câu hỏi và đáp án giải thích chi tiết.
-- Yêu cầu chính xác 100% công thức, kí tự, đơn vị, kiến thức chuyên môn.
+    var classroomsSheet = getOrCreateSheet(ss, 'Lớp Học');
+    var studentsSheet = getOrCreateSheet(ss, 'Học Sinh');
+    var attendanceSheet = getOrCreateSheet(ss, 'Điểm Danh');
+    var lessonPlansSheet = getOrCreateSheet(ss, 'Giáo Án');
+    var resourcesSheet = getOrCreateSheet(ss, 'Kho Học Liệu');
+    var homeworkSheet = getOrCreateSheet(ss, 'Bài Tập');
 
-Xuất theo chuẩn 6 phần chính:
-I. MỤC TIÊU BÀI HỌC (Kiến thức, Kỹ năng, Phẩm chất, Năng lực chung, Năng lực đặc thù)
-II. CHUẨN BỊ (Giáo viên & Học sinh)
-III. TIẾN TRÌNH DẠY HỌC (1. Khởi động, 2. Hình thành kiến thức, 3. Luyện tập, 4. Vận dụng, 5. Củng cố, 6. Hướng dẫn về nhà)
-IV. TÍCH HỢP NĂNG LỰC SỐ
-V. TÍCH HỢP TIẾNG ANH (Song ngữ CLIL)
-VI. CHATBOT RÚT KINH NGHIỆM SAU DẠY
-Bản quyền: Anh Sao Khue - 0346513056`;
+    writeClassroomsToSheet(classroomsSheet, studentsSheet, data.classrooms || []);
+    writeAttendanceToSheet(attendanceSheet, data.attendanceSessions || []);
+    writeLessonPlansToSheet(lessonPlansSheet, data.lessonPlans || []);
+    writeResourcesToSheet(resourcesSheet, data.resources || []);
+    writeHomeworkToSheet(homeworkSheet, data.homework || []);
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-    const payload = { contents: [{ parts: [{ text: prompt }] }] };
+    return { success: true, message: 'Đã đồng bộ dữ liệu vào Google Sheets thành công!' };
+  } catch (err) {
+    return { success: false, message: 'Lỗi khi lưu dữ liệu: ' + err.toString() };
+  }
+}
 
-    const options = {
-      method: "post",
-      contentType: "application/json",
-      payload: JSON.stringify(payload),
-      muteHttpExceptions: true
+// ----------------------------------------------------------------------------
+// HÀM BỔ TRỢ ĐỌC/GHI GOOGLE SHEETS
+// ----------------------------------------------------------------------------
+
+function getOrCreateSheet(ss, sheetName) {
+  var sheet = ss.getSheetByName(sheetName);
+  if (!sheet) {
+    sheet = ss.insertSheet(sheetName);
+  }
+  return sheet;
+}
+
+function getInitialDefaultData() {
+  return {
+    classrooms: [
+      {
+        id: 'cls_7a1',
+        name: 'Lớp 7A1',
+        subject: 'Toán Học',
+        schoolYear: '2026–2027',
+        teacher: 'Thầy / Cô Anh Sao Khue',
+        createdAt: new Date().toISOString(),
+        students: [
+          { id: 'st_1', code: 'HS01', name: 'Nguyễn Văn An', notes: 'Học sinh giỏi Toán', createdAt: new Date().toISOString() },
+          { id: 'st_2', code: 'HS02', name: 'Trần Thị Bình', notes: 'Tích cực phát biểu', createdAt: new Date().toISOString() },
+          { id: 'st_3', code: 'HS03', name: 'Lê Hoàng Cường', notes: 'Cần chú ý bài tập về nhà', createdAt: new Date().toISOString() }
+        ]
+      }
+    ],
+    attendanceSessions: [],
+    lessonPlans: [
+      {
+        id: 'lp_1',
+        title: 'Bài 1: Tập hợp các số hữu tỉ',
+        subject: 'Toán Học',
+        classId: 'cls_7a1',
+        className: 'Lớp 7A1',
+        date: new Date().toISOString().split('T')[0],
+        periodsCount: 1,
+        status: 'completed',
+        objectives: 'Học sinh hiểu khái niệm số hữu tỉ, biểu diễn số hữu tỉ trên trục số.',
+        keyKnowledge: 'Số hữu tỉ là số viết được dưới dạng a/b với a, b thuộc Z, b khác 0.',
+        warmupActivity: 'Trò chơi nhanh: Tìm các số thực tế xung quanh.',
+        teacherActivity: 'Giảng giải lý thuyết và đưa ra ví dụ minh họa.',
+        studentActivity: 'Làm bài tập nhóm và trình bày lên bảng.',
+        exercises: 'Bài 1, 2, 3 trang 10 SGK.',
+        notes: 'Học sinh hiểu bài tốt, cần rèn luyện thêm bài tập nâng cao.',
+        createdAt: new Date().toISOString()
+      }
+    ],
+    resources: [
+      {
+        id: 'res_1',
+        title: 'Bộ Bài Giảng Điện Tử Toán 7 - Chương 1',
+        subject: 'Toán Học',
+        linkUrl: 'https://drive.google.com',
+        type: 'drive',
+        description: 'Tổng hợp slide PowerPoint và đề ôn tập Toán 7.',
+        createdAt: new Date().toISOString()
+      },
+      {
+        id: 'res_2',
+        title: 'Video Hướng Dẫn Soạn Giáo Án Theo Công Văn 5512',
+        subject: 'Phương Pháp Dạy Học',
+        linkUrl: 'https://youtube.com',
+        type: 'youtube',
+        description: 'Bài giảng video hướng dẫn thiết kế kế hoạch bài dạy.',
+        createdAt: new Date().toISOString()
+      }
+    ],
+    homework: []
+  };
+}
+
+function readClassroomsFromSheet(classSheet, studentSheet) {
+  var classrooms = [];
+  var classData = classSheet.getDataRange().getValues();
+  var studentData = studentSheet.getDataRange().getValues();
+
+  if (classData.length <= 1) return classrooms;
+
+  for (var i = 1; i < classData.length; i++) {
+    var row = classData[i];
+    if (!row[0]) continue;
+    var cId = String(row[0]);
+    var cls = {
+      id: cId,
+      name: String(row[1] || ''),
+      subject: String(row[2] || ''),
+      schoolYear: String(row[3] || ''),
+      teacher: String(row[4] || ''),
+      createdAt: String(row[5] || new Date().toISOString()),
+      students: []
     };
 
-    const response = UrlFetchApp.fetch(url, options);
-    const json = JSON.parse(response.getContentText());
-
-    if (json.candidates && json.candidates[0]?.content?.parts[0]?.text) {
-      return createJsonResponse({
-        status: "success",
-        content: json.candidates[0].content.parts[0].text,
-        author: SYSTEM_AUTHOR
-      });
-    } else {
-      return createJsonResponse({
-        status: "error",
-        message: "Gemini API không phản hồi đúng định dạng: " + JSON.stringify(json)
-      });
+    for (var j = 1; j < studentData.length; j++) {
+      var sRow = studentData[j];
+      if (String(sRow[1]) === cId) {
+        cls.students.push({
+          id: String(sRow[0]),
+          code: String(sRow[2] || ''),
+          name: String(sRow[3] || ''),
+          notes: String(sRow[4] || ''),
+          createdAt: String(sRow[5] || new Date().toISOString())
+        });
+      }
     }
-  } catch (err) {
-    return createJsonResponse({ status: "error", message: "Lỗi kết nối AI: " + err.toString() });
+
+    classrooms.push(cls);
   }
+  return classrooms;
 }
 
-// ============================================================================
-// 3. ĐỒNG BỘ CSDL GOOGLE SHEETS (SHEETS DATABASE)
-// ============================================================================
+function writeClassroomsToSheet(classSheet, studentSheet, classrooms) {
+  classSheet.clearContents();
+  studentSheet.clearContents();
 
-function handleSaveToSheet(data) {
-  try {
-    const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-    let sheet = spreadsheet.getActiveSheet();
+  classSheet.appendRow(['ID Lớp', 'Tên Lớp', 'Môn Học', 'Năm Học', 'Giáo Viên', 'Ngày Tạo']);
+  studentSheet.appendRow(['ID Học Sinh', 'ID Lớp', 'Mã Học Sinh', 'Họ Và Tên', 'Ghi Chú', 'Ngày Tạo']);
 
-    if (sheet.getLastRow() === 0) {
-      sheet.appendRow([
-        "STT", "Thời Gian Tạo", "Họ Tên Giáo Viên", "Trường Học",
-        "Môn Học", "Lớp", "Tên Bài Học", "Ngày Soạn", "Ngày Dạy",
-        "Dữ Liệu Bài Soạn", "Bản Quyền"
-      ]);
-      sheet.getRange(1, 1, 1, 11).setFontWeight("bold").setBackground("#1e293b").setFontColor("#ffffff");
-    }
-
-    const nextStt = sheet.getLastRow();
-    sheet.appendRow([
-      nextStt,
-      new Date().toLocaleString("vi-VN"),
-      data.teacherName || "Giáo viên Anh Sao Khue",
-      data.schoolName || "THCS Kết nối tri thức",
-      data.subject || "Môn học",
-      data.gradeLevel || "Lớp 7",
-      data.title || "Tên bài học",
-      data.prepDate || "",
-      data.teachDate || "",
-      JSON.stringify(data),
-      SYSTEM_AUTHOR
-    ]);
-
-    return createJsonResponse({
-      status: "success",
-      message: "Đã lưu dữ liệu bài soạn vào Google Sheets!",
-      stt: nextStt
+  classrooms.forEach(function(cls) {
+    classSheet.appendRow([cls.id, cls.name, cls.subject, cls.schoolYear, cls.teacher, cls.createdAt]);
+    (cls.students || []).forEach(function(st) {
+      studentSheet.appendRow([st.id, cls.id, st.code, st.name, st.notes || '', st.createdAt]);
     });
-  } catch (err) {
-    return createJsonResponse({ status: "error", message: "Lỗi lưu Sheets: " + err.toString() });
-  }
-}
-
-function handleGetLessonPlans() {
-  try {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    const rows = sheet.getDataRange().getValues();
-
-    const results = [];
-    for (let i = 1; i < rows.length; i++) {
-      results.push({
-        stt: rows[i][0],
-        createdAt: rows[i][1],
-        teacherName: rows[i][2],
-        schoolName: rows[i][3],
-        subject: rows[i][4],
-        gradeLevel: rows[i][5],
-        title: rows[i][6],
-        prepDate: rows[i][7],
-        teachDate: rows[i][8],
-        author: rows[i][10]
-      });
-    }
-
-    return createJsonResponse({ status: "success", data: results });
-  } catch (err) {
-    return createJsonResponse({ status: "error", message: "Lỗi đọc dữ liệu Sheets: " + err.toString() });
-  }
-}
-
-// ============================================================================
-// 4. KIỂM TRA & RÀ SOÁT DỮ LIỆU DẠY HỌC (VALIDATION ENGINE)
-// ============================================================================
-
-function handleProcessAndValidateLessonData(data) {
-  const issues = [];
-  if (!data.title) issues.push("Thiếu tên bài học");
-  if (!data.subject) issues.push("Thiếu môn học");
-  if (!data.gradeLevel) issues.push("Thiếu khối lớp");
-
-  const isValid = issues.length === 0;
-
-  return createJsonResponse({
-    status: isValid ? "success" : "warning",
-    isValid: isValid,
-    issues: issues,
-    author: SYSTEM_AUTHOR
   });
 }
 
-// ============================================================================
-// UTILITIES HELPERS
-// ============================================================================
+function readAttendanceFromSheet(sheet) {
+  var data = sheet.getDataRange().getValues();
+  if (data.length <= 1) return [];
 
-function getOrCreateDriveFolder(folderName) {
-  const folders = DriveApp.getFoldersByName(folderName);
-  if (folders.hasNext()) {
-    return folders.next();
+  var sessions = [];
+  for (var i = 1; i < data.length; i++) {
+    var row = data[i];
+    if (!row[0]) continue;
+    try {
+      sessions.push({
+        id: String(row[0]),
+        classId: String(row[1]),
+        className: String(row[2]),
+        date: String(row[3]),
+        records: JSON.parse(row[4] || '[]'),
+        savedAt: String(row[5])
+      });
+    } catch(e) {}
   }
-  return DriveApp.createFolder(folderName);
+  return sessions;
 }
 
-function createJsonResponse(data) {
-  return ContentService.createTextOutput(JSON.stringify(data))
-    .setMimeType(ContentService.MimeType.JSON);
+function writeAttendanceToSheet(sheet, sessions) {
+  sheet.clearContents();
+  sheet.appendRow(['ID Buổi', 'ID Lớp', 'Tên Lớp', 'Ngày', 'Dữ Liệu Bảng JSON', 'Thời Gian Lưu']);
+
+  sessions.forEach(function(s) {
+    sheet.appendRow([s.id, s.classId, s.className, s.date, JSON.stringify(s.records || []), s.savedAt]);
+  });
+}
+
+function readLessonPlansFromSheet(sheet) {
+  var data = sheet.getDataRange().getValues();
+  if (data.length <= 1) return [];
+
+  var plans = [];
+  for (var i = 1; i < data.length; i++) {
+    var row = data[i];
+    if (!row[0]) continue;
+    var bSection = null;
+    if (row[21]) {
+      try {
+        bSection = JSON.parse(row[21]);
+      } catch(e) {}
+    }
+
+    plans.push({
+      id: String(row[0]),
+      title: String(row[1] || ''),
+      subject: String(row[2] || ''),
+      classId: String(row[3] || ''),
+      className: String(row[4] || ''),
+      date: String(row[5] || ''),
+      periodsCount: Number(row[6] || 1),
+      status: String(row[7] || 'draft'),
+      objectives: String(row[8] || ''),
+      keyKnowledge: String(row[9] || ''),
+      warmupActivity: String(row[10] || ''),
+      teacherActivity: String(row[11] || ''),
+      studentActivity: String(row[12] || ''),
+      exercises: String(row[13] || ''),
+      notes: String(row[14] || ''),
+      createdAt: String(row[15] || ''),
+      updatedAt: String(row[16] || ''),
+      gradeLevel: String(row[17] || 'THCS - Khối 7'),
+      textbookSet: String(row[18] || 'Kết nối tri thức với cuộc sống'),
+      digitalCompetencies: String(row[19] || ''),
+      devicesAndSoftware: String(row[20] || ''),
+      bilingualSection: bSection
+    });
+  }
+  return plans;
+}
+
+function writeLessonPlansToSheet(sheet, plans) {
+  sheet.clearContents();
+  sheet.appendRow([
+    'ID Giáo Án', 'Tên Bài Học', 'Môn Học', 'ID Lớp', 'Tên Lớp', 'Ngày Dạy',
+    'Số Tiết', 'Trạng Thái', 'Mục Tiêu', 'Kiến Thức Trọng Tâm', 'Khởi Động',
+    'Hoạt Động GV', 'Hoạt Động HS', 'Bài Tập', 'Ghi Chú', 'Ngày Tạo', 'Cập Nhật',
+    'Cấp Học', 'Bộ Sách', 'Mã Năng Lực Số', 'Thiết Bị & Phần Mềm', 'Bilingual JSON'
+  ]);
+
+  plans.forEach(function(p) {
+    var bJson = p.bilingualSection ? JSON.stringify(p.bilingualSection) : '';
+    sheet.appendRow([
+      p.id, p.title, p.subject, p.classId, p.className, p.date,
+      p.periodsCount, p.status, p.objectives, p.keyKnowledge, p.warmupActivity,
+      p.teacherActivity, p.studentActivity, p.exercises, p.notes, p.createdAt, p.updatedAt,
+      p.gradeLevel || 'THCS - Khối 7', p.textbookSet || 'Kết nối tri thức với cuộc sống',
+      p.digitalCompetencies || '', p.devicesAndSoftware || '', bJson
+    ]);
+  });
+}
+
+function readResourcesFromSheet(sheet) {
+  var data = sheet.getDataRange().getValues();
+  if (data.length <= 1) return [];
+
+  var resources = [];
+  for (var i = 1; i < data.length; i++) {
+    var row = data[i];
+    if (!row[0]) continue;
+    resources.push({
+      id: String(row[0]),
+      title: String(row[1] || ''),
+      subject: String(row[2] || ''),
+      linkUrl: String(row[3] || ''),
+      type: String(row[4] || 'drive'),
+      description: String(row[5] || ''),
+      createdAt: String(row[6] || '')
+    });
+  }
+  return resources;
+}
+
+function writeResourcesToSheet(sheet, resources) {
+  sheet.clearContents();
+  sheet.appendRow(['ID Học Liệu', 'Tiêu Đề', 'Môn Học', 'Đường Dẫn Link', 'Loại', 'Mô Tả', 'Ngày Tạo']);
+  resources.forEach(function(r) {
+    sheet.appendRow([r.id, r.title, r.subject, r.linkUrl, r.type, r.description, r.createdAt]);
+  });
+}
+
+function readHomeworkFromSheet(sheet) {
+  var data = sheet.getDataRange().getValues();
+  if (data.length <= 1) return [];
+
+  var list = [];
+  for (var i = 1; i < data.length; i++) {
+    var row = data[i];
+    if (!row[0]) continue;
+    try {
+      list.push({
+        id: String(row[0]),
+        title: String(row[1] || ''),
+        classId: String(row[2] || ''),
+        className: String(row[3] || ''),
+        dueDate: String(row[4] || ''),
+        description: String(row[5] || ''),
+        submissions: JSON.parse(row[6] || '[]')
+      });
+    } catch(e) {}
+  }
+  return list;
+}
+
+function writeHomeworkToSheet(sheet, list) {
+  sheet.clearContents();
+  sheet.appendRow(['ID Bài Tập', 'Tiêu Đề', 'ID Lớp', 'Tên Lớp', 'Hạn Nộp', 'Mô Tả', 'Trạng Thái Nộp Bài JSON']);
+  list.forEach(function(h) {
+    sheet.appendRow([h.id, h.title, h.classId, h.className, h.dueDate, h.description, JSON.stringify(h.submissions || [])]);
+  });
 }

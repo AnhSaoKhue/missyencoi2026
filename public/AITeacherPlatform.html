@@ -981,29 +981,56 @@
         const lessonPlans = ref([
           {
             id: 'lp_1',
-            title: 'Bài 1: Tập hợp các số hữu tỉ',
+            title: 'Bài 1: Đại lượng Tỷ lệ thuận (Bilingual & NLS)',
             subject: 'Toán Học',
             className: 'Lớp 7A1',
-            objectives: 'Học sinh hiểu khái niệm số hữu tỉ, biểu diễn số hữu tỉ trên trục số.'
+            gradeLevel: 'THCS - Khối 7',
+            textbookSet: 'Kết nối tri thức với cuộc sống',
+            digitalCompetencies: '[NLS1.1] Vận dụng thiết bị kỹ thuật số trong học tập.\n[NLS2.3] Khai thác dữ liệu số mô phỏng đồ thị.\n[NLS5.2] Giải quyết vấn đề bằng công cụ AI Miss Yến Còi.',
+            devicesAndSoftware: 'Thiết bị: Máy tính GV/HS, Bảng tương tác, Micro thu âm song ngữ.\nPhần mềm: GeoGebra, Canva, PhET, AI Miss Yến Còi.',
+            objectives: 'Học sinh hiểu rõ khái niệm tỷ lệ thuận, lập công thức y = kx và giao tiếp song ngữ Tiếng Anh cơ bản.',
+            keyKnowledge: 'Hai đại lượng x và y tỷ lệ thuận với nhau nếu y = kx (k khác 0).',
+            warmupActivity: 'Xem video ngắn về ứng dụng tỷ lệ thuận trong đời sống.',
+            teacherActivity: 'Giảng giải công thức toán học và đọc mẫu đoạn văn song ngữ Tiếng Anh.',
+            studentActivity: 'Lắng nghe, luyện phát âm tiếng Anh, thảo luận nhóm và ghi âm bài luyện đọc.',
+            bilingualSection: {
+              title: 'Phân đoạn giảng dạy Song ngữ Tiếng Anh (Bilingual Segment)',
+              englishContent: 'Two quantities x and y are directly proportional if y = kx for a non-zero constant k.',
+              vietnameseTranslation: 'Hai đại lượng x và y tỷ lệ thuận với nhau nếu y = kx với k là hằng số khác 0.',
+              audioText: 'Two quantities x and y are directly proportional if y = kx for a non-zero constant k.',
+              keyTerms: [
+                { word: 'Directly Proportional', ipa: '/daɪˈrektli prəˈpɔːrʃənl/', meaning: 'Tỷ lệ thuận' },
+                { word: 'Constant', ipa: '/ˈkɑːnstənt/', meaning: 'Hằng số' },
+                { word: 'Ratio', ipa: '/ˈreɪʃioʊ/', meaning: 'Tỷ số' }
+              ]
+            }
           }
         ]);
 
         const resources = ref([
           {
             id: 'res_1',
-            title: 'Bộ Bài Giảng Điện Tử Toán 7 - Chương 1',
-            subject: 'Toán Học',
+            title: 'Bộ SGK Kết Nối Tri Thức Với Cuộc Sống - Toán 7 & Tin Học',
+            subject: 'Toán Học & Tin Học',
             type: 'Google Drive',
             linkUrl: 'https://drive.google.com',
-            description: 'Slide giảng dạy và đề kiểm tra Toán 7'
+            description: 'Giáo án điện tử, bài giảng PowerPoint và sách giáo viên Kết nối tri thức với cuộc sống (GDPT 2018 áp dụng 2026-2027)'
           },
           {
             id: 'res_2',
-            title: 'Video Soạn Giáo Án Chuẩn Công Văn 5512',
+            title: 'Bộ SGK Tiếng Anh Global Success - Audio & Extra Practice',
+            subject: 'Tiếng Anh',
+            type: 'Google Drive',
+            linkUrl: 'https://drive.google.com',
+            description: 'File âm thanh chuẩn giọng bản ngữ, kho từ vựng và bài tập bổ trợ bộ Tiếng Anh Global Success'
+          },
+          {
+            id: 'res_3',
+            title: 'Video Soạn Giáo Án Tích Hợp Năng Lực Số Chuẩn Công Văn 5512',
             subject: 'Phương Pháp Dạy Học',
             type: 'YouTube',
             linkUrl: 'https://youtube.com',
-            description: 'Hướng dẫn thiết kế kế hoạch bài dạy sinh động'
+            description: 'Hướng dẫn thiết kế kế hoạch bài dạy tích hợp mã hóa NLS và bài học song ngữ'
           }
         ]);
 

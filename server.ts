@@ -441,12 +441,30 @@ HÃY TRẢ VỀ DUY NHẤT MỘT ĐỐI TƯỢNG JSON (KHÔNG KÈM BẤT KỲ V�
   // API Route for downloading project ZIP source code
   app.get("/api/download-source", (req, res) => {
     const zipPath = path.join(process.cwd(), "public", "anh-sao-khue-source-code.zip");
-    if (fs.existsSync(zipPath)) {
+    const fallbackPath = path.join(process.cwd(), "anh-sao-khue-source-code.zip");
+    const targetPath = fs.existsSync(zipPath) ? zipPath : (fs.existsSync(fallbackPath) ? fallbackPath : null);
+
+    if (targetPath) {
       res.setHeader("Content-Type", "application/zip");
       res.setHeader("Content-Disposition", 'attachment; filename="anh-sao-khue-source-code.zip"');
-      res.sendFile(zipPath);
+      res.sendFile(targetPath);
     } else {
       res.status(404).json({ error: "Tệp mã nguồn ZIP chưa được tạo." });
+    }
+  });
+
+  // API Route for downloading Google Apps Script ZIP
+  app.get("/api/download-apps-script", (req, res) => {
+    const zipPath = path.join(process.cwd(), "public", "apps_script_anh_sao_khue.zip");
+    const fallbackPath = path.join(process.cwd(), "apps_script_anh_sao_khue.zip");
+    const targetPath = fs.existsSync(zipPath) ? zipPath : (fs.existsSync(fallbackPath) ? fallbackPath : null);
+
+    if (targetPath) {
+      res.setHeader("Content-Type", "application/zip");
+      res.setHeader("Content-Disposition", 'attachment; filename="apps_script_anh_sao_khue.zip"');
+      res.sendFile(targetPath);
+    } else {
+      res.status(404).json({ error: "Tệp Apps Script ZIP chưa được tạo." });
     }
   });
 

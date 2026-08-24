@@ -197,29 +197,29 @@ export const MissYenCoiChatbot: React.FC = () => {
             </div>
 
             {/* Messages Scroll Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50 dark:bg-slate-950/50">
+            <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-900 text-slate-100">
               {messages.map((msg) => (
                 <div
                   key={msg.id}
                   className={`flex gap-2.5 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   {msg.sender === 'bot' && (
-                    <div className="w-7 h-7 rounded-full bg-blue-700 text-cyan-200 flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+                    <div className="w-7 h-7 rounded-full bg-blue-600 text-cyan-200 flex items-center justify-center shrink-0 mt-0.5 shadow-sm border border-cyan-400/40">
                       <Bot className="w-4 h-4" />
                     </div>
                   )}
 
                   <div
-                    className={`max-w-[82%] rounded-2xl p-3 text-sm leading-relaxed shadow-sm font-medium ${
+                    className={`max-w-[85%] rounded-2xl p-3.5 text-xs sm:text-sm leading-relaxed shadow-md ${
                       msg.sender === 'user'
-                        ? 'bg-blue-600 text-white rounded-br-none font-medium'
-                        : 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-700 rounded-bl-none font-medium'
+                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-br-none font-semibold border border-blue-400/30'
+                        : 'bg-slate-800 text-slate-100 border border-slate-700 rounded-bl-none font-medium'
                     }`}
                   >
-                    <div className="whitespace-pre-wrap">{msg.text}</div>
+                    <div className="whitespace-pre-wrap leading-relaxed">{msg.text}</div>
                     <div
-                      className={`text-[10px] mt-1 text-right ${
-                        msg.sender === 'user' ? 'text-blue-100' : 'text-slate-400'
+                      className={`text-[10px] mt-1.5 text-right font-medium ${
+                        msg.sender === 'user' ? 'text-blue-200' : 'text-slate-400'
                       }`}
                     >
                       {msg.time}
@@ -227,7 +227,7 @@ export const MissYenCoiChatbot: React.FC = () => {
                   </div>
 
                   {msg.sender === 'user' && (
-                    <div className="w-7 h-7 rounded-full bg-slate-700 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
+                    <div className="w-7 h-7 rounded-full bg-indigo-600 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-sm border border-indigo-400/40">
                       <User className="w-4 h-4" />
                     </div>
                   )}
@@ -235,8 +235,8 @@ export const MissYenCoiChatbot: React.FC = () => {
               ))}
 
               {isLoading && (
-                <div className="flex gap-2.5 items-center text-slate-500 text-xs italic pl-2">
-                  <Bot className="w-4 h-4 text-blue-600 animate-spin" />
+                <div className="flex gap-2.5 items-center text-cyan-300 text-xs italic pl-2 py-1">
+                  <Bot className="w-4 h-4 text-cyan-400 animate-spin" />
                   <span>Miss Yến còi đang suy nghĩ và chuẩn bị câu trả lời...</span>
                 </div>
               )}
@@ -244,9 +244,9 @@ export const MissYenCoiChatbot: React.FC = () => {
             </div>
 
             {/* Quick Prompts Suggestions */}
-            <div className="px-3 py-2 bg-slate-100 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
-              <div className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-1.5 flex items-center gap-1">
-                <Sparkles className="w-3 h-3 text-amber-500" /> Trình gợi ý câu hỏi nhanh:
+            <div className="px-3 py-2.5 bg-slate-950 border-t border-slate-800">
+              <div className="text-[11px] font-bold text-amber-400 mb-1.5 flex items-center gap-1">
+                <Sparkles className="w-3.5 h-3.5 text-amber-400" /> Trình gợi ý câu hỏi nhanh:
               </div>
               <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-thin">
                 {QUICK_PROMPTS.map((prompt, idx) => (
@@ -254,7 +254,7 @@ export const MissYenCoiChatbot: React.FC = () => {
                     key={idx}
                     disabled={isLoading}
                     onClick={() => handleSend(prompt)}
-                    className="whitespace-nowrap bg-white dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-slate-700 border border-blue-200 dark:border-slate-700 text-blue-900 dark:text-cyan-200 text-xs px-2.5 py-1 rounded-full transition-colors shrink-0 shadow-xs"
+                    className="whitespace-nowrap bg-slate-800 hover:bg-slate-700 active:bg-slate-600 border border-slate-700 hover:border-cyan-400/50 text-cyan-200 hover:text-white text-xs font-semibold px-3 py-1.5 rounded-full transition-all shrink-0 shadow-sm cursor-pointer"
                   >
                     {prompt}
                   </button>
@@ -268,7 +268,7 @@ export const MissYenCoiChatbot: React.FC = () => {
                 e.preventDefault();
                 handleSend();
               }}
-              className="p-3 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center gap-2"
+              className="p-3 bg-slate-950 border-t border-slate-800 flex items-center gap-2"
             >
               <input
                 type="text"
@@ -276,12 +276,12 @@ export const MissYenCoiChatbot: React.FC = () => {
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Hỏi Miss Yến còi bất cứ điều gì..."
                 disabled={isLoading}
-                className="flex-1 bg-white dark:bg-slate-800 border-2 border-slate-300 dark:border-slate-600 text-slate-950 dark:text-slate-50 placeholder:text-slate-400 dark:placeholder:text-slate-400 text-sm px-3.5 py-2.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-semibold shadow-xs"
+                className="flex-1 bg-slate-900 border border-slate-700 focus:border-cyan-400 text-white placeholder:text-slate-500 text-xs sm:text-sm px-3.5 py-2.5 rounded-xl focus:outline-none focus:ring-1 focus:ring-cyan-400 font-medium shadow-inner"
               />
               <button
                 type="submit"
                 disabled={!input.trim() || isLoading}
-                className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white p-2.5 rounded-xl transition-all shadow-md flex items-center justify-center shrink-0"
+                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 disabled:opacity-40 text-white p-2.5 rounded-xl transition-all shadow-md flex items-center justify-center shrink-0 cursor-pointer"
               >
                 <Send className="w-4 h-4" />
               </button>

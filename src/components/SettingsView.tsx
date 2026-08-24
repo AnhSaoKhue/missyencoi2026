@@ -193,7 +193,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
               type="text"
               value={profile.fullName}
               onChange={(e) => setProfile({ ...profile, fullName: e.target.value })}
-              className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:border-cyan-400"
+              className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs font-semibold text-white focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400"
+              style={{ color: '#ffffff', backgroundColor: '#020617' }}
               required
             />
           </div>
@@ -204,7 +205,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
               type="text"
               value={profile.school}
               onChange={(e) => setProfile({ ...profile, school: e.target.value })}
-              className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:border-cyan-400"
+              className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs font-semibold text-white focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400"
+              style={{ color: '#ffffff', backgroundColor: '#020617' }}
               required
             />
           </div>
@@ -215,7 +217,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
               type="text"
               value={profile.subject}
               onChange={(e) => setProfile({ ...profile, subject: e.target.value })}
-              className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:border-cyan-400"
+              className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs font-semibold text-white focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400"
+              style={{ color: '#ffffff', backgroundColor: '#020617' }}
             />
           </div>
 
@@ -225,7 +228,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
               type="text"
               value={profile.grade}
               onChange={(e) => setProfile({ ...profile, grade: e.target.value })}
-              className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:border-cyan-400"
+              className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs font-semibold text-white focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400"
+              style={{ color: '#ffffff', backgroundColor: '#020617' }}
             />
           </div>
 
@@ -235,7 +239,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
               type="email"
               value={profile.email}
               onChange={(e) => setProfile({ ...profile, email: e.target.value })}
-              className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:border-cyan-400"
+              className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs font-semibold text-white focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400"
+              style={{ color: '#ffffff', backgroundColor: '#020617' }}
             />
           </div>
 
@@ -245,7 +250,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
               type="text"
               value={profile.phone}
               onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-              className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:border-cyan-400"
+              className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs font-semibold text-white focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400"
+              style={{ color: '#ffffff', backgroundColor: '#020617' }}
             />
           </div>
         </div>
@@ -264,7 +270,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             value={profile.geminiApiKey}
             onChange={(e) => setProfile({ ...profile, geminiApiKey: e.target.value })}
             placeholder="AIzaSy..."
-            className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white font-mono placeholder:text-slate-600 focus:outline-none focus:border-cyan-400"
+            className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs font-semibold text-white font-mono placeholder:text-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400"
+            style={{ color: '#ffffff', backgroundColor: '#020617' }}
           />
         </div>
 
@@ -311,6 +318,109 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
               <span>Chọn File JSON Để Khôi Phục</span>
               <input type="file" accept=".json" onChange={handleImportJSON} className="hidden" />
             </label>
+          </div>
+        </div>
+      </div>
+
+      {/* Export Source Code ZIP Center */}
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4 text-white">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+          <h3 className="text-sm font-extrabold text-amber-400 uppercase tracking-wider flex items-center gap-2">
+            <FileCode className="w-4 h-4 text-amber-400" />
+            <span>4. Tải Xuất Trọn Bộ Mã Nguồn Mới Nhất (Export Source Code ZIP)</span>
+          </h3>
+          <span className="px-2.5 py-0.5 bg-cyan-500/20 text-cyan-300 border border-cyan-400/30 text-[10px] font-black rounded-full uppercase tracking-wider w-fit">
+            Mới nhất 2026-2027 • Full Stack
+          </span>
+        </div>
+
+        <p className="text-xs text-slate-300">
+          Tải về toàn bộ mã nguồn hoàn chỉnh đã được đóng gói và kiểm thử, sẵn sàng triển khai trên máy tính cá nhân, Vercel, Netlify, Docker hoặc Google Apps Script.
+        </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+          {/* Card 1: Full-Stack Project ZIP */}
+          <div className="p-4 bg-slate-950/80 rounded-2xl border border-cyan-500/30 hover:border-cyan-400/60 transition-all flex flex-col justify-between space-y-3 group shadow-lg">
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <span className="p-2 bg-blue-500/10 text-blue-400 rounded-xl">
+                  <HardDrive className="w-5 h-5" />
+                </span>
+                <span className="text-[10px] font-bold bg-blue-900/60 text-cyan-300 px-2 py-0.5 rounded-full border border-blue-700">
+                  Full Stack (.zip)
+                </span>
+              </div>
+              <h4 className="font-extrabold text-xs text-white group-hover:text-cyan-300 transition-colors">
+                Mã Nguồn Toàn Diện (React + Node.js)
+              </h4>
+              <p className="text-[11px] text-slate-400 leading-relaxed">
+                Bao gồm React 18, Vite, TypeScript, Tailwind CSS, Express backend, AI engine và toàn bộ 12 phân hệ chuẩn.
+              </p>
+            </div>
+            <a
+              href="/api/download-source"
+              download="anh-sao-khue-source-code.zip"
+              className="w-full py-2.5 px-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95 text-center"
+            >
+              <Download className="w-4 h-4" />
+              <span>Tải ZIP Toàn Bộ Dự Án</span>
+            </a>
+          </div>
+
+          {/* Card 2: Google Apps Script ZIP */}
+          <div className="p-4 bg-slate-950/80 rounded-2xl border border-amber-500/30 hover:border-amber-400/60 transition-all flex flex-col justify-between space-y-3 group shadow-lg">
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <span className="p-2 bg-amber-500/10 text-amber-400 rounded-xl">
+                  <Sparkles className="w-5 h-5" />
+                </span>
+                <span className="text-[10px] font-bold bg-amber-900/60 text-amber-300 px-2 py-0.5 rounded-full border border-amber-700">
+                  Apps Script (.zip)
+                </span>
+              </div>
+              <h4 className="font-extrabold text-xs text-white group-hover:text-amber-300 transition-colors">
+                Gói Google Apps Script & Sheets
+              </h4>
+              <p className="text-[11px] text-slate-400 leading-relaxed">
+                Bao gồm 2 file cốt lõi <code className="text-amber-300">Code.gs</code> và <code className="text-amber-300">Index.html</code> sẵn sàng dán trực tiếp vào Google Sheets.
+              </p>
+            </div>
+            <a
+              href="/api/download-apps-script"
+              download="apps_script_anh_sao_khue.zip"
+              className="w-full py-2.5 px-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-xs rounded-xl shadow-md flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95 text-center"
+            >
+              <Download className="w-4 h-4" />
+              <span>Tải Gói Apps Script (.ZIP)</span>
+            </a>
+          </div>
+
+          {/* Card 3: Single HTML Standalone */}
+          <div className="p-4 bg-slate-950/80 rounded-2xl border border-emerald-500/30 hover:border-emerald-400/60 transition-all flex flex-col justify-between space-y-3 group shadow-lg">
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <span className="p-2 bg-emerald-500/10 text-emerald-400 rounded-xl">
+                  <Globe className="w-5 h-5" />
+                </span>
+                <span className="text-[10px] font-bold bg-emerald-900/60 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-700">
+                  Single File (.html)
+                </span>
+              </div>
+              <h4 className="font-extrabold text-xs text-white group-hover:text-emerald-300 transition-colors">
+                Bản Single HTML Độc Lập
+              </h4>
+              <p className="text-[11px] text-slate-400 leading-relaxed">
+                Tệp HTML duy nhất tích hợp toàn bộ giao diện và logic, có thể nhấp đúp mở chạy ngay trên trình duyệt mà không cần cài đặt.
+              </p>
+            </div>
+            <a
+              href="/api/download-single-html"
+              download="AI_Education_Platform_Full_SingleFile.html"
+              className="w-full py-2.5 px-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-95 text-center"
+            >
+              <Download className="w-4 h-4" />
+              <span>Tải Bản Single HTML</span>
+            </a>
           </div>
         </div>
       </div>

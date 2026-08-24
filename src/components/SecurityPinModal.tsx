@@ -76,7 +76,8 @@ export const SecurityPinModal: React.FC<SecurityPinModalProps> = ({
                 if (error) setError(false);
               }}
               placeholder="Nhập mã PIN..."
-              className="w-full px-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white font-mono text-center tracking-widest text-lg focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all placeholder:text-slate-600 placeholder:text-sm placeholder:tracking-normal"
+              className="w-full px-4 py-3 bg-slate-950 border-2 border-slate-700 rounded-xl text-white font-mono text-center tracking-widest text-lg font-bold focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 transition-all placeholder:text-slate-400 placeholder:text-sm placeholder:tracking-normal shadow-inner"
+              style={{ color: '#ffffff', backgroundColor: '#020617' }}
               autoFocus
             />
             {error && (
@@ -87,16 +88,13 @@ export const SecurityPinModal: React.FC<SecurityPinModalProps> = ({
             )}
           </div>
 
-          <div className="p-3 bg-slate-800/60 rounded-xl border border-slate-700/60 text-xs text-slate-400 space-y-1">
-            <div className="flex items-center gap-1.5 font-medium text-slate-300">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span>Gợi ý mã PIN mặc định:</span>
+          <div className="p-3.5 bg-slate-950/60 rounded-xl border border-slate-800 text-xs text-slate-300 space-y-1.5">
+            <div className="flex items-center gap-1.5 font-bold text-cyan-300">
+              <ShieldCheck className="w-4 h-4 text-cyan-400" />
+              <span>Bảo mật hệ thống Giáo Dục Ánh Sao Khuê</span>
             </div>
-            <p className="pl-5 text-slate-400">
-              - Quản trị viên (Admin Security): <code className="text-amber-300 font-mono font-bold">ASK2002</code>
-            </p>
-            <p className="pl-5 text-slate-400">
-              - Cài đặt & Bản quyền (Settings): <code className="text-amber-300 font-mono font-bold">ASK2005</code>
+            <p className="text-slate-400 text-[11px] leading-relaxed">
+              Khu vực này được bảo vệ bởi mã PIN quản trị viên. Vui lòng nhập mã bảo mật được cấp bởi Quản trị viên hệ thống để tiếp tục truy cập.
             </p>
           </div>
 
