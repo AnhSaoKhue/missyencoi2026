@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LessonPlan } from '../types';
+import { LessonPlan, TabType } from '../types';
 import { QRCodeModal } from './QRCodeModal';
 import {
   Table,
@@ -14,16 +14,21 @@ import {
   FileText,
   Printer,
   Download,
+  Home,
 } from 'lucide-react';
 
 interface DashboardDataViewProps {
   lessonPlans: LessonPlan[];
   onSelectLessonPlan?: (plan: LessonPlan) => void;
+  onNavigateTab?: (tab: TabType) => void;
+  onBackToHome?: () => void;
 }
 
 export const DashboardDataView: React.FC<DashboardDataViewProps> = ({
   lessonPlans,
   onSelectLessonPlan,
+  onNavigateTab,
+  onBackToHome,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSubject, setSelectedSubject] = useState<string>('all');
@@ -60,7 +65,18 @@ export const DashboardDataView: React.FC<DashboardDataViewProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          {(onBackToHome || onNavigateTab) && (
+            <button
+              type="button"
+              onClick={() => (onBackToHome ? onBackToHome() : onNavigateTab && onNavigateTab('dashboard'))}
+              className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xs rounded-xl border border-slate-600 shadow-md transition-all flex items-center gap-2 cursor-pointer uppercase tracking-tight"
+            >
+              <Home className="w-4 h-4 text-orange-400" />
+              <span>Quay lại trang chủ</span>
+            </button>
+          )}
+
           <div className="bg-slate-900/90 px-4 py-2.5 rounded-xl border border-cyan-400/30 text-center">
             <div className="text-xs text-slate-400 font-bold">Tổng số bài soạn</div>
             <div className="text-xl font-black text-amber-400">{lessonPlans.length}</div>

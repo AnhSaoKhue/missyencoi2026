@@ -32,9 +32,11 @@ import {
   Layers,
   Target,
   Loader2,
+  Home,
 } from 'lucide-react';
 import { Classroom, LessonPlan, TabType, BilingualSection } from '../types';
 import { AudioPracticePlayer } from './AudioPracticePlayer';
+import { BilingualVocabTable } from './BilingualVocabTable';
 import { LessonIllustration } from './LessonIllustration';
 import { exportLessonPlanToWord, exportLessonPlanToPDF } from '../utils/exportHelpers';
 import { QRCodeModal } from './QRCodeModal';
@@ -47,6 +49,7 @@ interface LessonPlanViewProps {
   onUpdateLessonPlan: (plan: LessonPlan) => void;
   onDeleteLessonPlan: (id: string) => void;
   onNavigateTab?: (tab: TabType) => void;
+  onBackToHome?: () => void;
   initialMode?: 'create' | 'list';
 }
 
@@ -57,6 +60,7 @@ export const LessonPlanView: React.FC<LessonPlanViewProps> = ({
   onUpdateLessonPlan,
   onDeleteLessonPlan,
   onNavigateTab,
+  onBackToHome,
   initialMode,
 }) => {
   // Search & Filter states
@@ -105,29 +109,47 @@ export const LessonPlanView: React.FC<LessonPlanViewProps> = ({
     return Array.from(set);
   }, [classrooms, lessonPlans]);
 
-  // Form states for modal
+  // Form states for modal (Mặc định để trống nội dung kiến thức để Giáo viên tự nhập hoặc bấm AI Miss Yến còi tự soạn)
   const [formData, setFormData] = useState({
     title: '',
     subject: 'Toán',
-    classId: classrooms[0]?.id || '',
-    className: classrooms[0]?.name || '',
+    classId: classrooms[0]?.id || 'class-lop-7',
+    className: classrooms[0]?.name || 'Lớp 7',
+    curriculumPeriod: 'Tiết 1',
+    teacherName: localStorage.getItem('sys_teacher_name') || '',
+    schoolName: localStorage.getItem('sys_school_name') || '',
     prepDate: new Date().toISOString().split('T')[0],
     teachDate: new Date().toISOString().split('T')[0],
     periodsCount: 1,
     status: 'ready' as 'draft' | 'ready' | 'completed',
-    gradeLevel: 'THCS - Khối 7',
     textbookSet: 'Kết nối tri thức với cuộc sống' as 'Kết nối tri thức với cuộc sống' | 'Tiếng Anh Global Success',
-    digitalCompetencies: '[NLS1.1] Sử dụng thiết bị số & phần mềm dạy học.\n[NLS2.3] Khai thác và đánh giá dữ liệu học liệu số.\n[NLS5.2] Giải quyết vấn đề bài học bằng công cụ AI Miss Yến Còi & mô phỏng.',
-    devicesAndSoftware: 'Thiết bị: Máy tính, Bảng tương tác Smartboard, Micro thu âm song ngữ.\nPhần mềm: GeoGebra, Canva Education, PhET, Quizizz, AI Miss Yến Còi.',
+    // 1. Mục tiêu (Thái độ - Kiến thức - Kĩ năng - Năng lực số)
     objectives: '',
+    objectivesKnowledge: '',
+    objectivesSkills: '',
+    objectivesAttitude: '',
+    digitalCompetencies: '',
     keyKnowledge: '',
+    // 2. Chuẩn bị (GV - HS)
+    devicesAndSoftware: '',
+    teacherPrep: '',
+    studentPrep: '',
+    // 3. Tiến trình 8 Hoạt động chuẩn Công văn 5512 kèm thời lượng
     warmupActivity: '',
+    warmupTime: '5 phút',
     newLessonActivity: '',
+    newLessonTime: '15 phút',
     practiceActivity: '',
+    practiceTime: '10 phút',
     lowApplicationActivity: '',
+    lowAppTime: '5 phút',
     highApplicationActivity: '',
+    highAppTime: '5 phút',
     consolidationActivity: '',
+    consolidationTime: '3 phút',
     homeworkActivity: '',
+    homeworkTime: '2 phút',
+    reflectionNotes: '',
     projectActivity: '',
     teacherActivity: '',
     studentActivity: '',
@@ -135,33 +157,40 @@ export const LessonPlanView: React.FC<LessonPlanViewProps> = ({
     illustrationTitle: '',
     exercises: '',
     notes: '',
-    // Bilingual Segment
-    enableBilingual: true,
+    // Tích hợp Giảng dạy Song ngữ Tiếng Anh
+    enableBilingual: false,
     bilingualTitle: 'Phân đoạn giảng dạy Song ngữ Tiếng Anh',
-    bilingualEnglish: 'Two quantities x and y are directly proportional if y = kx for a non-zero constant k.',
-    bilingualVietnamese: 'Hai đại lượng x và y tỷ lệ thuận với nhau nếu y = kx với k là hằng số khác 0.',
-    bilingualTermsRaw: 'Directly Proportional | /daɪˈrektli prəˈpɔːrʃənl/ | Tỷ lệ thuận\nConstant | /ˈkɑːnstənt/ | Hằng số',
-    // Signatures & Approval
-    teacherName: localStorage.getItem('sys_teacher_name') || 'Cô Nguyễn Thị Hồng Yến',
+    bilingualEnglish: '',
+    bilingualVietnamese: '',
+    bilingualTermsRaw: '',
+    bilingualActivities: [
+      '1. Khởi động (Warm-up)',
+      '2. Tìm hiểu vào bài / Hình thành kiến thức mới',
+      '7. Hướng dẫn học sinh tự học ở nhà & BTVN',
+    ],
+    // Signatures & Approval (Để trắng để Giáo viên tự điền sau)
     headOfDepartmentReview: 'Bài soạn đạt chuẩn Công văn 5512, tích hợp năng lực số tốt, đảm bảo thời lượng.',
     headOfDepartmentStatus: 'Đã duyệt' as 'Chưa duyệt' | 'Đã duyệt' | 'Yêu cầu sửa',
-    headOfDepartmentName: 'Trần Thị Tổ Trưởng',
+    headOfDepartmentName: '',
     headOfDepartmentSignDate: new Date().toISOString().split('T')[0],
     schoolBoardReview: 'Đồng ý duyệt cho phép áp dụng giảng dạy chính thức.',
     schoolBoardStatus: 'Đã duyệt' as 'Chưa duyệt' | 'Đã duyệt' | 'Yêu cầu sửa',
-    schoolBoardName: 'Lê Văn Hiệu Trưởng',
+    schoolBoardName: '',
     schoolBoardSignDate: new Date().toISOString().split('T')[0],
   });
 
   const [formError, setFormError] = useState<string | null>(null);
 
-  // Sync Teacher Name from System Settings Event
+  // Sync Teacher & School Name from System Settings Event
   useEffect(() => {
     const handleSyncSettings = () => {
       const savedTeacher = localStorage.getItem('sys_teacher_name');
-      if (savedTeacher) {
-        setFormData((prev) => ({ ...prev, teacherName: savedTeacher }));
-      }
+      const savedSchool = localStorage.getItem('sys_school_name');
+      setFormData((prev) => ({
+        ...prev,
+        teacherName: savedTeacher || prev.teacherName,
+        schoolName: savedSchool || prev.schoolName,
+      }));
     };
     window.addEventListener('app_settings_updated', handleSyncSettings);
     return () => window.removeEventListener('app_settings_updated', handleSyncSettings);
@@ -187,7 +216,7 @@ export const LessonPlanView: React.FC<LessonPlanViewProps> = ({
     }));
   };
 
-  // Open Create Modal
+  // Open Create Modal (Để trống hoàn toàn nội dung để AI tự soạn hoặc GV nhập mới)
   const handleOpenCreate = () => {
     const defaultClass = classrooms[0];
     const defaultSub = defaultClass?.subject || 'Toán';
@@ -196,25 +225,43 @@ export const LessonPlanView: React.FC<LessonPlanViewProps> = ({
     setFormData({
       title: '',
       subject: defaultSub,
-      classId: defaultClass?.id || '',
-      className: defaultClass?.name || '',
+      classId: defaultClass?.id || 'class-lop-7',
+      className: defaultClass?.name || 'Lớp 7',
+      curriculumPeriod: 'Tiết 1',
+      teacherName: localStorage.getItem('sys_teacher_name') || '',
+      schoolName: localStorage.getItem('sys_school_name') || '',
       prepDate: new Date().toISOString().split('T')[0],
       teachDate: new Date().toISOString().split('T')[0],
       periodsCount: 1,
       status: 'ready',
-      gradeLevel: 'THCS - Khối 7',
       textbookSet: isEnglish ? 'Tiếng Anh Global Success' : 'Kết nối tri thức với cuộc sống',
-      digitalCompetencies: '[NLS1.1] Vận dụng thiết bị kỹ thuật số trong giảng dạy.\n[NLS2.3] Thu thập dữ liệu mô phỏng bài học.\n[NLS5.2] Giải quyết vấn đề bằng công nghệ AI.',
-      devicesAndSoftware: 'Thiết bị: Máy tính GV/HS, Bảng tương tác, Micro thu âm song ngữ.\nPhần mềm: GeoGebra, Canva, PhET, AI Miss Yến Còi.',
+      // 1. Mục tiêu trống hoàn toàn
       objectives: '',
+      objectivesKnowledge: '',
+      objectivesSkills: '',
+      objectivesAttitude: '',
+      digitalCompetencies: '',
       keyKnowledge: '',
+      // 2. Chuẩn bị trống
+      devicesAndSoftware: '',
+      teacherPrep: '',
+      studentPrep: '',
+      // 3. Tiến trình 8 Hoạt động trống kèm thời gian chuẩn
       warmupActivity: '',
+      warmupTime: '5 phút',
       newLessonActivity: '',
+      newLessonTime: '15 phút',
       practiceActivity: '',
+      practiceTime: '10 phút',
       lowApplicationActivity: '',
+      lowAppTime: '5 phút',
       highApplicationActivity: '',
+      highAppTime: '5 phút',
       consolidationActivity: '',
+      consolidationTime: '3 phút',
       homeworkActivity: '',
+      homeworkTime: '2 phút',
+      reflectionNotes: '',
       projectActivity: '',
       teacherActivity: '',
       studentActivity: '',
@@ -222,19 +269,25 @@ export const LessonPlanView: React.FC<LessonPlanViewProps> = ({
       illustrationTitle: '',
       exercises: '',
       notes: '',
+      // Tích hợp Song ngữ
       enableBilingual: isEnglish,
       bilingualTitle: 'Phân đoạn giảng dạy Song ngữ Tiếng Anh',
-      bilingualEnglish: 'Key concept explained in English with clear terminology.',
-      bilingualVietnamese: 'Khái niệm trọng tâm được giải thích bằng tiếng Anh kèm từ vựng chuyên ngành.',
-      bilingualTermsRaw: 'Vocabulary | /vəˈkæbjəleri/ | Từ vựng\nPronunciation | /prəˌnʌnsiˈeɪʃn/ | Phát âm',
-      teacherName: localStorage.getItem('sys_teacher_name') || 'Cô Nguyễn Thị Hồng Yến',
+      bilingualEnglish: '',
+      bilingualVietnamese: '',
+      bilingualTermsRaw: '',
+      bilingualActivities: [
+        '1. Khởi động (Warm-up)',
+        '2. Tìm hiểu vào bài / Hình thành kiến thức mới',
+        '7. Hướng dẫn học sinh tự học ở nhà & BTVN',
+      ],
+      // Phê duyệt
       headOfDepartmentReview: 'Bài soạn đạt chuẩn Công văn 5512, tích hợp năng lực số tốt.',
       headOfDepartmentStatus: 'Đã duyệt',
-      headOfDepartmentName: 'Trần Thị Tổ Trưởng',
+      headOfDepartmentName: '',
       headOfDepartmentSignDate: new Date().toISOString().split('T')[0],
       schoolBoardReview: 'Đồng ý duyệt cho phép giảng dạy.',
       schoolBoardStatus: 'Đã duyệt',
-      schoolBoardName: 'Lê Văn Hiệu Trưởng',
+      schoolBoardName: '',
       schoolBoardSignDate: new Date().toISOString().split('T')[0],
     });
     setFormError(null);
@@ -253,23 +306,38 @@ export const LessonPlanView: React.FC<LessonPlanViewProps> = ({
       subject: plan.subject,
       classId: plan.classId,
       className: plan.className,
+      curriculumPeriod: plan.curriculumPeriod || 'Tiết 1',
+      teacherName: plan.teacherName || localStorage.getItem('sys_teacher_name') || '',
+      schoolName: plan.schoolName || localStorage.getItem('sys_school_name') || '',
       prepDate: plan.prepDate || plan.date,
       teachDate: plan.teachDate || plan.date,
       periodsCount: plan.periodsCount || 1,
       status: plan.status || 'ready',
-      gradeLevel: plan.gradeLevel || 'THCS - Khối 7',
       textbookSet: (plan.textbookSet as any) || (plan.subject === 'Tiếng Anh' ? 'Tiếng Anh Global Success' : 'Kết nối tri thức với cuộc sống'),
-      digitalCompetencies: plan.digitalCompetencies || '',
-      devicesAndSoftware: plan.devicesAndSoftware || '',
       objectives: plan.objectives || '',
+      objectivesKnowledge: plan.objectivesKnowledge || '',
+      objectivesSkills: plan.objectivesSkills || '',
+      objectivesAttitude: plan.objectivesAttitude || '',
+      digitalCompetencies: plan.digitalCompetencies || '',
       keyKnowledge: plan.keyKnowledge || '',
+      devicesAndSoftware: plan.devicesAndSoftware || '',
+      teacherPrep: plan.teacherPrep || '',
+      studentPrep: plan.studentPrep || '',
       warmupActivity: plan.warmupActivity || '',
+      warmupTime: plan.warmupTime || '5 phút',
       newLessonActivity: plan.newLessonActivity || '',
+      newLessonTime: plan.newLessonTime || '15 phút',
       practiceActivity: plan.practiceActivity || '',
+      practiceTime: plan.practiceTime || '10 phút',
       lowApplicationActivity: plan.lowApplicationActivity || '',
+      lowAppTime: plan.lowAppTime || '5 phút',
       highApplicationActivity: plan.highApplicationActivity || '',
+      highAppTime: plan.highAppTime || '5 phút',
       consolidationActivity: plan.consolidationActivity || '',
+      consolidationTime: plan.consolidationTime || '3 phút',
       homeworkActivity: plan.homeworkActivity || '',
+      homeworkTime: plan.homeworkTime || '2 phút',
+      reflectionNotes: plan.reflectionNotes || plan.notes || '',
       projectActivity: plan.projectActivity || '',
       teacherActivity: plan.teacherActivity || '',
       studentActivity: plan.studentActivity || '',
@@ -282,14 +350,20 @@ export const LessonPlanView: React.FC<LessonPlanViewProps> = ({
       bilingualEnglish: b?.englishContent || '',
       bilingualVietnamese: b?.vietnameseTranslation || '',
       bilingualTermsRaw: termsStr,
-      teacherName: plan.teacherName || 'Nguyễn Văn A',
+      bilingualActivities: b?.targetActivities && b.targetActivities.length > 0
+        ? b.targetActivities
+        : [
+            '1. Khởi động (Warm-up)',
+            '2. Tìm hiểu vào bài / Hình thành kiến thức mới',
+            '7. Hướng dẫn học sinh tự học ở nhà & BTVN',
+          ],
       headOfDepartmentReview: plan.headOfDepartmentReview || 'Đã kiểm tra, giáo án đạt chuẩn 5512.',
       headOfDepartmentStatus: plan.headOfDepartmentStatus || 'Đã duyệt',
-      headOfDepartmentName: plan.headOfDepartmentName || 'Trần Thị Tổ Trưởng',
+      headOfDepartmentName: plan.headOfDepartmentName || '',
       headOfDepartmentSignDate: plan.headOfDepartmentSignDate || plan.date,
       schoolBoardReview: plan.schoolBoardReview || 'Đồng ý phê duyệt.',
       schoolBoardStatus: plan.schoolBoardStatus || 'Đã duyệt',
-      schoolBoardName: plan.schoolBoardName || 'Lê Văn Hiệu Trưởng',
+      schoolBoardName: plan.schoolBoardName || '',
       schoolBoardSignDate: plan.schoolBoardSignDate || plan.date,
     });
     setFormError(null);
@@ -307,19 +381,43 @@ export const LessonPlanView: React.FC<LessonPlanViewProps> = ({
       subject: plan.subject,
       classId: plan.classId,
       className: plan.className,
+      curriculumPeriod: plan.curriculumPeriod || 'Tiết 1',
+      teacherName: plan.teacherName || localStorage.getItem('sys_teacher_name') || '',
+      schoolName: plan.schoolName || localStorage.getItem('sys_school_name') || '',
       prepDate: new Date().toISOString().split('T')[0],
       teachDate: new Date().toISOString().split('T')[0],
       periodsCount: plan.periodsCount || 1,
       status: 'draft',
-      gradeLevel: plan.gradeLevel || 'THCS - Khối 7',
       textbookSet: (plan.textbookSet as any) || (plan.subject === 'Tiếng Anh' ? 'Tiếng Anh Global Success' : 'Kết nối tri thức với cuộc sống'),
-      digitalCompetencies: plan.digitalCompetencies || '',
-      devicesAndSoftware: plan.devicesAndSoftware || '',
       objectives: plan.objectives || '',
+      objectivesKnowledge: plan.objectivesKnowledge || '',
+      objectivesSkills: plan.objectivesSkills || '',
+      objectivesAttitude: plan.objectivesAttitude || '',
+      digitalCompetencies: plan.digitalCompetencies || '',
       keyKnowledge: plan.keyKnowledge || '',
+      devicesAndSoftware: plan.devicesAndSoftware || '',
+      teacherPrep: plan.teacherPrep || '',
+      studentPrep: plan.studentPrep || '',
       warmupActivity: plan.warmupActivity || '',
+      warmupTime: plan.warmupTime || '5 phút',
+      newLessonActivity: plan.newLessonActivity || '',
+      newLessonTime: plan.newLessonTime || '15 phút',
+      practiceActivity: plan.practiceActivity || '',
+      practiceTime: plan.practiceTime || '10 phút',
+      lowApplicationActivity: plan.lowApplicationActivity || '',
+      lowAppTime: plan.lowAppTime || '5 phút',
+      highApplicationActivity: plan.highApplicationActivity || '',
+      highAppTime: plan.highAppTime || '5 phút',
+      consolidationActivity: plan.consolidationActivity || '',
+      consolidationTime: plan.consolidationTime || '3 phút',
+      homeworkActivity: plan.homeworkActivity || '',
+      homeworkTime: plan.homeworkTime || '2 phút',
+      reflectionNotes: plan.reflectionNotes || plan.notes || '',
+      projectActivity: plan.projectActivity || '',
       teacherActivity: plan.teacherActivity || '',
       studentActivity: plan.studentActivity || '',
+      illustrationImage: plan.illustrationImage || '',
+      illustrationTitle: plan.illustrationTitle || '',
       exercises: plan.exercises || '',
       notes: plan.notes || '',
       enableBilingual: !!b,
@@ -327,21 +425,27 @@ export const LessonPlanView: React.FC<LessonPlanViewProps> = ({
       bilingualEnglish: b?.englishContent || '',
       bilingualVietnamese: b?.vietnameseTranslation || '',
       bilingualTermsRaw: termsStr,
-      teacherName: plan.teacherName || 'Nguyễn Văn A',
+      bilingualActivities: b?.targetActivities && b.targetActivities.length > 0
+        ? b.targetActivities
+        : [
+            '1. Khởi động (Warm-up)',
+            '2. Tìm hiểu vào bài / Hình thành kiến thức mới',
+            '7. Hướng dẫn học sinh tự học ở nhà & BTVN',
+          ],
       headOfDepartmentReview: 'Đã kiểm tra bản sao, giáo án đạt chuẩn 5512.',
       headOfDepartmentStatus: 'Đã duyệt',
-      headOfDepartmentName: plan.headOfDepartmentName || 'Trần Thị Tổ Trưởng',
+      headOfDepartmentName: plan.headOfDepartmentName || '',
       headOfDepartmentSignDate: new Date().toISOString().split('T')[0],
       schoolBoardReview: 'Phê duyệt cho bản sao bài dạy.',
       schoolBoardStatus: 'Đã duyệt',
-      schoolBoardName: plan.schoolBoardName || 'Lê Văn Hiệu Trưởng',
+      schoolBoardName: plan.schoolBoardName || '',
       schoolBoardSignDate: new Date().toISOString().split('T')[0],
     });
     setFormError(null);
     setModalMode('duplicate');
   };
 
-  // AI Auto Generator Helper
+  // AI Auto Generator Helper (Gọi API AI Miss Yến còi tự động soạn mới 100% chuẩn CV 5512)
   const handleAiAutoGenerate = async () => {
     setIsGeneratingAi(true);
     try {
@@ -351,9 +455,14 @@ export const LessonPlanView: React.FC<LessonPlanViewProps> = ({
         body: JSON.stringify({
           title: formData.title || 'Bài dạy chuẩn SGK',
           subject: formData.subject,
-          gradeLevel: formData.gradeLevel,
+          className: formData.className,
+          curriculumPeriod: formData.curriculumPeriod,
+          teacherName: formData.teacherName,
+          schoolName: formData.schoolName,
           textbookSet: formData.textbookSet,
           periodsCount: formData.periodsCount,
+          bilingualActivities: formData.bilingualActivities,
+          enableBilingual: formData.enableBilingual,
         }),
       });
 
@@ -364,30 +473,51 @@ export const LessonPlanView: React.FC<LessonPlanViewProps> = ({
           ...prev,
           title: p.title || prev.title || 'Bài dạy chuẩn SGK',
           subject: p.subject || prev.subject,
-          gradeLevel: p.gradeLevel || prev.gradeLevel,
+          className: p.className || prev.className,
+          curriculumPeriod: p.curriculumPeriod || prev.curriculumPeriod,
+          teacherName: p.teacherName || prev.teacherName,
+          schoolName: p.schoolName || prev.schoolName,
           textbookSet: p.textbookSet || prev.textbookSet,
           periodsCount: p.periodsCount || prev.periodsCount,
-          digitalCompetencies: p.digitalCompetencies || prev.digitalCompetencies,
-          devicesAndSoftware: p.devicesAndSoftware || prev.devicesAndSoftware,
+          // 1. Mục tiêu
           objectives: p.objectives || prev.objectives,
+          objectivesKnowledge: p.objectivesKnowledge || prev.objectivesKnowledge || p.objectives,
+          objectivesSkills: p.objectivesSkills || prev.objectivesSkills,
+          objectivesAttitude: p.objectivesAttitude || prev.objectivesAttitude,
+          digitalCompetencies: p.digitalCompetencies || prev.digitalCompetencies,
           keyKnowledge: p.keyKnowledge || prev.keyKnowledge,
+          // 2. Chuẩn bị
+          devicesAndSoftware: p.devicesAndSoftware || prev.devicesAndSoftware,
+          teacherPrep: p.teacherPrep || prev.teacherPrep || p.devicesAndSoftware,
+          studentPrep: p.studentPrep || prev.studentPrep,
+          // 3. Tiến trình 8 Hoạt động chuẩn 5512
           warmupActivity: p.warmupActivity || prev.warmupActivity,
+          warmupTime: p.warmupTime || prev.warmupTime || '5 phút',
           newLessonActivity: p.newLessonActivity || prev.newLessonActivity,
+          newLessonTime: p.newLessonTime || prev.newLessonTime || '15 phút',
           practiceActivity: p.practiceActivity || prev.practiceActivity,
+          practiceTime: p.practiceTime || prev.practiceTime || '10 phút',
           lowApplicationActivity: p.lowApplicationActivity || prev.lowApplicationActivity,
+          lowAppTime: p.lowAppTime || prev.lowAppTime || '5 phút',
           highApplicationActivity: p.highApplicationActivity || prev.highApplicationActivity,
+          highAppTime: p.highAppTime || prev.highAppTime || '5 phút',
           consolidationActivity: p.consolidationActivity || prev.consolidationActivity,
+          consolidationTime: p.consolidationTime || prev.consolidationTime || '3 phút',
           homeworkActivity: p.homeworkActivity || prev.homeworkActivity,
+          homeworkTime: p.homeworkTime || prev.homeworkTime || '2 phút',
+          reflectionNotes: p.reflectionNotes || prev.reflectionNotes || p.notes || '',
           projectActivity: p.projectActivity || prev.projectActivity,
           teacherActivity: p.teacherActivity || prev.teacherActivity,
           studentActivity: p.studentActivity || prev.studentActivity,
           exercises: p.exercises || prev.exercises,
           notes: p.notes || prev.notes,
+          // Song ngữ
           enableBilingual: p.enableBilingual !== undefined ? p.enableBilingual : true,
           bilingualTitle: p.bilingualTitle || prev.bilingualTitle,
           bilingualEnglish: p.bilingualEnglish || prev.bilingualEnglish,
           bilingualVietnamese: p.bilingualVietnamese || prev.bilingualVietnamese,
           bilingualTermsRaw: p.bilingualTermsRaw || prev.bilingualTermsRaw,
+          bilingualActivities: p.targetActivities && p.targetActivities.length > 0 ? p.targetActivities : prev.bilingualActivities,
         }));
         showToast('AI Miss Yến còi đã tự động soạn bài chuẩn CV 5512 & SGK thành công!');
       }
@@ -411,8 +541,8 @@ export const LessonPlanView: React.FC<LessonPlanViewProps> = ({
       setFormError('Vui lòng chọn hoặc nhập Môn học.');
       return;
     }
-    if (!formData.classId) {
-      setFormError('Vui lòng chọn Lớp học.');
+    if (!formData.className.trim()) {
+      setFormError('Vui lòng chọn hoặc nhập Lớp học.');
       return;
     }
     if (!formData.prepDate || !formData.teachDate) {
@@ -420,12 +550,21 @@ export const LessonPlanView: React.FC<LessonPlanViewProps> = ({
       return;
     }
 
-    const targetClass = classrooms.find((c) => c.id === formData.classId);
-    const resolvedClassName = targetClass ? targetClass.name : formData.className || 'Lớp học';
+    // Persist teacher and school name in local storage for default reuse
+    if (formData.teacherName.trim()) {
+      localStorage.setItem('sys_teacher_name', formData.teacherName.trim());
+    }
+    if (formData.schoolName.trim()) {
+      localStorage.setItem('sys_school_name', formData.schoolName.trim());
+    }
+
+    const targetClass = classrooms.find((c) => c.id === formData.classId || c.name === formData.className);
+    const resolvedClassName = formData.className.trim() || (targetClass ? targetClass.name : 'Lớp 7');
+    const resolvedClassId = targetClass ? targetClass.id : formData.classId || `class-${resolvedClassName.toLowerCase().replace(/\s+/g, '-')}`;
 
     // Parse bilingual terms
     let bilingualSection: BilingualSection | undefined = undefined;
-    if (formData.enableBilingual && formData.bilingualEnglish.trim()) {
+    if (formData.enableBilingual && (formData.bilingualEnglish.trim() || formData.bilingualTermsRaw.trim())) {
       const parsedTerms = formData.bilingualTermsRaw
         .split('\n')
         .map((line) => line.trim())
@@ -440,37 +579,60 @@ export const LessonPlanView: React.FC<LessonPlanViewProps> = ({
         });
 
       bilingualSection = {
-        title: formData.bilingualTitle || 'Phân đoạn Song ngữ',
+        title: formData.bilingualTitle || 'Phân đoạn Song ngữ Tiếng Anh',
         englishContent: formData.bilingualEnglish.trim(),
         vietnameseTranslation: formData.bilingualVietnamese.trim(),
         keyTerms: parsedTerms,
         audioText: formData.bilingualEnglish.trim(),
+        targetActivities: formData.bilingualActivities,
       };
     }
 
     const payload = {
       title: formData.title.trim(),
       subject: formData.subject.trim(),
-      classId: formData.classId,
+      classId: resolvedClassId,
       className: resolvedClassName,
+      curriculumPeriod: formData.curriculumPeriod.trim() || 'Tiết 1',
+      schoolName: formData.schoolName.trim(),
+      teacherName: formData.teacherName.trim(),
       date: formData.teachDate,
       prepDate: formData.prepDate,
       teachDate: formData.teachDate,
       periodsCount: Number(formData.periodsCount) || 1,
       status: formData.status,
-      gradeLevel: formData.gradeLevel,
       textbookSet: formData.textbookSet,
+      // 1. Mục tiêu CV 5512
+      objectives: formData.objectives.trim() || [
+        formData.objectivesKnowledge ? `1. Kiến thức: ${formData.objectivesKnowledge}` : '',
+        formData.objectivesSkills ? `2. Năng lực & Kỹ năng: ${formData.objectivesSkills}` : '',
+        formData.objectivesAttitude ? `3. Phẩm chất & Thái độ: ${formData.objectivesAttitude}` : '',
+      ].filter(Boolean).join('\n'),
+      objectivesKnowledge: formData.objectivesKnowledge.trim(),
+      objectivesSkills: formData.objectivesSkills.trim(),
+      objectivesAttitude: formData.objectivesAttitude.trim(),
       digitalCompetencies: formData.digitalCompetencies.trim(),
-      devicesAndSoftware: formData.devicesAndSoftware.trim(),
-      objectives: formData.objectives.trim(),
       keyKnowledge: formData.keyKnowledge.trim(),
+      // 2. Chuẩn bị
+      devicesAndSoftware: formData.devicesAndSoftware.trim(),
+      teacherPrep: formData.teacherPrep.trim(),
+      studentPrep: formData.studentPrep.trim(),
+      // 3. Tiến trình 8 Hoạt động
       warmupActivity: formData.warmupActivity.trim(),
+      warmupTime: formData.warmupTime.trim() || '5 phút',
       newLessonActivity: formData.newLessonActivity.trim(),
+      newLessonTime: formData.newLessonTime.trim() || '15 phút',
       practiceActivity: formData.practiceActivity.trim(),
+      practiceTime: formData.practiceTime.trim() || '10 phút',
       lowApplicationActivity: formData.lowApplicationActivity.trim(),
+      lowAppTime: formData.lowAppTime.trim() || '5 phút',
       highApplicationActivity: formData.highApplicationActivity.trim(),
+      highAppTime: formData.highAppTime.trim() || '5 phút',
       consolidationActivity: formData.consolidationActivity.trim(),
+      consolidationTime: formData.consolidationTime.trim() || '3 phút',
       homeworkActivity: formData.homeworkActivity.trim(),
+      homeworkTime: formData.homeworkTime.trim() || '2 phút',
+      reflectionNotes: formData.reflectionNotes.trim() || formData.notes.trim(),
       projectActivity: formData.projectActivity.trim(),
       teacherActivity: formData.teacherActivity.trim(),
       studentActivity: formData.studentActivity.trim(),
@@ -479,7 +641,6 @@ export const LessonPlanView: React.FC<LessonPlanViewProps> = ({
       bilingualSection,
       exercises: formData.exercises.trim(),
       notes: formData.notes.trim(),
-      teacherName: formData.teacherName.trim(),
       headOfDepartmentReview: formData.headOfDepartmentReview.trim(),
       headOfDepartmentStatus: formData.headOfDepartmentStatus,
       headOfDepartmentName: formData.headOfDepartmentName.trim(),
@@ -594,7 +755,18 @@ export const LessonPlanView: React.FC<LessonPlanViewProps> = ({
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
+            {(onBackToHome || onNavigateTab) && (
+              <button
+                type="button"
+                onClick={() => (onBackToHome ? onBackToHome() : onNavigateTab && onNavigateTab('dashboard'))}
+                className="px-4 py-3.5 bg-slate-800/90 hover:bg-slate-700 text-slate-200 hover:text-white font-bold text-sm rounded-xl border border-slate-700 shadow-md transition-all flex items-center gap-2 cursor-pointer flex-shrink-0"
+              >
+                <Home className="w-4 h-4 text-orange-400" />
+                <span>Quay lại trang chủ</span>
+              </button>
+            )}
+
             <button
               onClick={handleOpenCreate}
               className="px-5 py-3.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-extrabold text-sm rounded-xl shadow-md hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer uppercase tracking-wider active:scale-95 flex-shrink-0"
@@ -963,6 +1135,39 @@ export const LessonPlanView: React.FC<LessonPlanViewProps> = ({
                 </h4>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Họ và tên GV & Trường */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:col-span-2 bg-blue-50/70 p-3 rounded-xl border border-blue-200">
+                    <div className="space-y-1">
+                      <label className="text-xs font-bold text-blue-950 flex items-center gap-1.5">
+                        <UserCheck className="w-3.5 h-3.5 text-blue-600" />
+                        <span>Họ và tên GV <span className="text-rose-500">*</span></span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={formData.teacherName}
+                        onChange={(e) => setFormData({ ...formData, teacherName: e.target.value })}
+                        placeholder="Ví dụ: Cô Nguyễn Thị Hồng Yến..."
+                        className="w-full px-3 py-2 bg-white border border-blue-300 rounded-xl text-sm font-semibold text-slate-900 focus:border-blue-500 focus:outline-none transition-all"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-xs font-bold text-blue-950 flex items-center gap-1.5">
+                        <School className="w-3.5 h-3.5 text-blue-600" />
+                        <span>Trường <span className="text-rose-500">*</span></span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={formData.schoolName}
+                        onChange={(e) => setFormData({ ...formData, schoolName: e.target.value })}
+                        placeholder="Ví dụ: THCS Nguyễn Du, THPT Chu Văn An..."
+                        className="w-full px-3 py-2 bg-white border border-blue-300 rounded-xl text-sm font-semibold text-slate-900 focus:border-blue-500 focus:outline-none transition-all"
+                      />
+                    </div>
+                  </div>
+
                   {/* Tên bài học * */}
                   <div className="md:col-span-2 space-y-1">
                     <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
@@ -989,34 +1194,46 @@ export const LessonPlanView: React.FC<LessonPlanViewProps> = ({
                       value={formData.subject}
                       onChange={(e) => handleSubjectChange(e.target.value)}
                       placeholder="Ví dụ: Tiếng Anh, Toán, Ngữ văn..."
-                      className="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-xl text-sm text-slate-900 focus:border-orange-500 focus:outline-none transition-all"
+                      className="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-xl text-sm text-slate-900 focus:border-orange-500 focus:outline-none transition-all font-medium"
                     />
                   </div>
 
-                  {/* Lớp học * */}
+                  {/* Lớp học (Tự chọn từ Lớp 1 đến Lớp 12) */}
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-700">
-                      Lớp học <span className="text-rose-500">*</span>
+                    <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
+                      <span>Lớp học (Lớp 1 - 12) <span className="text-rose-500">*</span></span>
                     </label>
                     <select
                       required
-                      value={formData.classId}
+                      value={formData.className}
                       onChange={(e) => {
-                        const selectedCls = classrooms.find((c) => c.id === e.target.value);
+                        const val = e.target.value;
                         setFormData({
                           ...formData,
-                          classId: e.target.value,
-                          className: selectedCls ? selectedCls.name : '',
-                          subject: selectedCls ? selectedCls.subject : formData.subject,
+                          className: val,
+                          classId: `class-${val.toLowerCase().replace(/\s+/g, '-')}`,
                         });
                       }}
-                      className="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-xl text-sm text-slate-900 focus:border-orange-500 focus:outline-none transition-all cursor-pointer font-medium"
+                      className="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-xl text-sm font-semibold text-slate-900 focus:border-orange-500 focus:outline-none transition-all cursor-pointer"
                     >
-                      {classrooms.map((cls) => (
-                        <option key={cls.id} value={cls.id}>
-                          {cls.name} — {cls.subject}
-                        </option>
-                      ))}
+                      <optgroup label="Khối THCS (Lớp 6 - 9)">
+                        <option value="Lớp 6">Lớp 6</option>
+                        <option value="Lớp 7">Lớp 7</option>
+                        <option value="Lớp 8">Lớp 8</option>
+                        <option value="Lớp 9">Lớp 9</option>
+                      </optgroup>
+                      <optgroup label="Khối THPT (Lớp 10 - 12)">
+                        <option value="Lớp 10">Lớp 10</option>
+                        <option value="Lớp 11">Lớp 11</option>
+                        <option value="Lớp 12">Lớp 12</option>
+                      </optgroup>
+                      <optgroup label="Khối Tiểu học (Lớp 1 - 5)">
+                        <option value="Lớp 1">Lớp 1</option>
+                        <option value="Lớp 2">Lớp 2</option>
+                        <option value="Lớp 3">Lớp 3</option>
+                        <option value="Lớp 4">Lớp 4</option>
+                        <option value="Lớp 5">Lớp 5</option>
+                      </optgroup>
                     </select>
                   </div>
 
@@ -1072,27 +1289,24 @@ export const LessonPlanView: React.FC<LessonPlanViewProps> = ({
                     </select>
                   </div>
 
-                  {/* Khối lớp & Số tiết */}
+                  {/* Tiết PPCT & Số tiết (Thay thế Cấp học / Khối lớp) */}
                   <div className="grid grid-cols-2 gap-3 md:col-span-2">
                     <div className="space-y-1">
-                      <label className="text-xs font-bold text-slate-700">Cấp học / Khối lớp</label>
-                      <select
-                        value={formData.gradeLevel}
-                        onChange={(e) => setFormData({ ...formData, gradeLevel: e.target.value })}
-                        className="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-xl text-sm text-slate-900 focus:border-orange-500 focus:outline-none transition-all cursor-pointer font-medium"
-                      >
-                        <option value="THCS - Khối 6">THCS - Khối 6</option>
-                        <option value="THCS - Khối 7">THCS - Khối 7</option>
-                        <option value="THCS - Khối 8">THCS - Khối 8</option>
-                        <option value="THCS - Khối 9">THCS - Khối 9</option>
-                        <option value="THPT - Khối 10">THPT - Khối 10</option>
-                        <option value="THPT - Khối 11">THPT - Khối 11</option>
-                        <option value="THPT - Khối 12">THPT - Khối 12</option>
-                      </select>
+                      <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
+                        <span>Tiết PPCT (Phân phối chương trình) <span className="text-rose-500">*</span></span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={formData.curriculumPeriod}
+                        onChange={(e) => setFormData({ ...formData, curriculumPeriod: e.target.value })}
+                        placeholder="Ví dụ: Tiết 1, Tiết 12, Tiết 45, Tiết 1-2..."
+                        className="w-full px-3.5 py-2 bg-white border border-slate-300 rounded-xl text-sm font-semibold text-slate-900 focus:border-orange-500 focus:outline-none transition-all"
+                      />
                     </div>
 
                     <div className="space-y-1">
-                      <label className="text-xs font-bold text-slate-700">Số tiết</label>
+                      <label className="text-xs font-bold text-slate-700">Số tiết (Thời lượng)</label>
                       <input
                         type="number"
                         min="1"
@@ -1106,60 +1320,355 @@ export const LessonPlanView: React.FC<LessonPlanViewProps> = ({
                 </div>
               </div>
 
-              {/* Section 2: Digital Competency & Equipment */}
-              <div className="space-y-4 bg-gradient-to-br from-slate-900 to-indigo-950 p-4.5 rounded-xl border border-cyan-500/30 text-white">
-                <div className="flex items-center justify-between border-b border-cyan-500/30 pb-2">
-                  <h4 className="text-xs font-extrabold text-cyan-300 uppercase tracking-wider flex items-center gap-2">
-                    <Cpu className="w-4 h-4 text-cyan-400" />
-                    <span>2. Khung Năng lực số (NLS) & Thiết bị, Phần mềm</span>
+              {/* Section 2: 1. Mục tiêu bài học (Thái độ - Kiến thức - Kĩ năng) */}
+              <div className="space-y-4 bg-emerald-50/70 p-4.5 rounded-xl border border-emerald-200">
+                <div className="flex items-center justify-between border-b border-emerald-200 pb-2">
+                  <h4 className="text-xs font-extrabold text-emerald-950 uppercase tracking-wider flex items-center gap-2">
+                    <Target className="w-4 h-4 text-emerald-600" />
+                    <span>1. Mục tiêu bài học (Thái độ - Kiến thức - Kĩ năng chuẩn 5512)</span>
                   </h4>
-                  <span className="text-[10px] bg-amber-400 text-blue-950 font-black px-2 py-0.5 rounded-full">
-                    Khung chuẩn GDPT
+                  <span className="text-[10px] bg-emerald-200 text-emerald-900 font-extrabold px-2.5 py-0.5 rounded-full border border-emerald-300">
+                    Phẩm chất & Năng lực
                   </span>
                 </div>
 
-                <div className="space-y-3">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-cyan-200">
-                      Mã hóa chi tiết Năng lực số (VD: [NLS1.1], [NLS2.3], [NLS3.2], [NLS5.2]...)
+                    <label className="text-xs font-bold text-slate-800">
+                      a) Về Kiến thức (Knowledge)
                     </label>
                     <textarea
                       rows={3}
-                      value={formData.digitalCompetencies}
-                      onChange={(e) => setFormData({ ...formData, digitalCompetencies: e.target.value })}
-                      placeholder="Ghi chi tiết các mã năng lực số được phát triển..."
-                      className="w-full px-3.5 py-2.5 bg-slate-950/80 border border-cyan-500/40 rounded-xl text-xs text-cyan-100 focus:border-cyan-400 focus:outline-none transition-all"
+                      value={formData.objectivesKnowledge}
+                      onChange={(e) => setFormData({ ...formData, objectivesKnowledge: e.target.value })}
+                      placeholder="Học sinh nắm vững các khái niệm, quy tắc, định luật..."
+                      className="w-full px-3 py-2 bg-white border border-emerald-300 rounded-xl text-xs sm:text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none transition-all shadow-xs"
                     />
                   </div>
 
                   <div className="space-y-1">
-                    <label className="text-xs font-bold text-cyan-200">
-                      Thiết bị dạy học & Phần mềm sử dụng
+                    <label className="text-xs font-bold text-slate-800">
+                      b) Về Năng lực & Kĩ năng (Skills)
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={formData.objectivesSkills}
+                      onChange={(e) => setFormData({ ...formData, objectivesSkills: e.target.value })}
+                      placeholder="Rèn luyện kỹ năng tính toán, giải quyết vấn đề, giao tiếp..."
+                      className="w-full px-3 py-2 bg-white border border-emerald-300 rounded-xl text-xs sm:text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none transition-all shadow-xs"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-slate-800">
+                      c) Về Phẩm chất & Thái độ (Attitude)
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={formData.objectivesAttitude}
+                      onChange={(e) => setFormData({ ...formData, objectivesAttitude: e.target.value })}
+                      placeholder="Hình thành thái độ nghiêm túc, tích cực, trung thực, trách nhiệm..."
+                      className="w-full px-3 py-2 bg-white border border-emerald-300 rounded-xl text-xs sm:text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none transition-all shadow-xs"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1 pt-1 border-t border-emerald-200/60">
+                  <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <Cpu className="w-3.5 h-3.5 text-emerald-700" />
+                    <span>Mã hóa Khung Năng lực số (NLS) tích hợp vào bài học:</span>
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={formData.digitalCompetencies}
+                    onChange={(e) => setFormData({ ...formData, digitalCompetencies: e.target.value })}
+                    placeholder="[NLS1.1] Sử dụng thiết bị số; [NLS2.3] Khai thác dữ liệu học liệu số; [NLS5.2] Ứng dụng công nghệ AI Miss Yến Còi..."
+                    className="w-full px-3 py-2 bg-white border border-emerald-300 rounded-xl text-xs sm:text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none transition-all shadow-xs"
+                  />
+                </div>
+              </div>
+
+              {/* Section 3: 2. Chuẩn bị (Thiết bị dạy học & Học liệu: GV - HS) */}
+              <div className="space-y-4 bg-sky-50/70 p-4.5 rounded-xl border border-sky-200">
+                <div className="flex items-center justify-between border-b border-sky-200 pb-2">
+                  <h4 className="text-xs font-extrabold text-sky-950 uppercase tracking-wider flex items-center gap-2">
+                    <BookOpen className="w-4 h-4 text-sky-600" />
+                    <span>2. Chuẩn bị thiết bị dạy học & học liệu (GV - HS)</span>
+                  </h4>
+                  <span className="text-[10px] bg-sky-200 text-sky-900 font-extrabold px-2.5 py-0.5 rounded-full border border-sky-300">
+                    Chuẩn 5512
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-slate-800">
+                      a) Chuẩn bị của Giáo viên (GV)
                     </label>
                     <textarea
                       rows={2}
-                      value={formData.devicesAndSoftware}
-                      onChange={(e) => setFormData({ ...formData, devicesAndSoftware: e.target.value })}
-                      placeholder="Thiết bị: Máy tính, Bảng tương tác Smartboard... Phần mềm: GeoGebra, Canva, PhET, Quizizz, AI Miss Yến Còi..."
-                      className="w-full px-3.5 py-2.5 bg-slate-950/80 border border-cyan-500/40 rounded-xl text-xs text-cyan-100 focus:border-cyan-400 focus:outline-none transition-all"
+                      value={formData.teacherPrep}
+                      onChange={(e) => setFormData({ ...formData, teacherPrep: e.target.value, devicesAndSoftware: e.target.value })}
+                      placeholder="Máy tính, máy chiếu, bài giảng số tương tác, phiếu học tập, phần mềm GeoGebra/Canva/AI Miss Yến Còi..."
+                      className="w-full px-3.5 py-2 bg-white border border-sky-300 rounded-xl text-xs sm:text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:border-sky-500 focus:outline-none transition-all shadow-xs"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs font-bold text-slate-800">
+                      b) Chuẩn bị của Học sinh (HS)
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={formData.studentPrep}
+                      onChange={(e) => setFormData({ ...formData, studentPrep: e.target.value })}
+                      placeholder="Sách giáo khoa, vở ghi, đồ dùng học tập, chuẩn bị bài trước ở nhà theo hướng dẫn..."
+                      className="w-full px-3.5 py-2 bg-white border border-sky-300 rounded-xl text-xs sm:text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:border-sky-500 focus:outline-none transition-all shadow-xs"
                     />
                   </div>
                 </div>
               </div>
 
-              {/* Section 3: Bilingual Teaching Segment */}
-              <div className="space-y-4 bg-gradient-to-br from-blue-950 to-slate-900 p-4.5 rounded-xl border border-amber-500/30 text-white">
-                <div className="flex items-center justify-between border-b border-amber-500/30 pb-2">
-                  <h4 className="text-xs font-extrabold text-amber-300 uppercase tracking-wider flex items-center gap-2">
-                    <Globe className="w-4 h-4 text-amber-400" />
-                    <span>3. Giảng dạy Song ngữ Tiếng Anh (Bilingual Segment)</span>
+              {/* Section 4: 3. Tiến trình dạy học (8 Hoạt động chuẩn 5512 kèm phân bổ thời gian) */}
+              <div className="space-y-4 bg-slate-50 p-4.5 rounded-xl border border-slate-200">
+                <div className="flex items-center justify-between border-b border-slate-200 pb-2 flex-wrap gap-2">
+                  <h4 className="text-xs font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                    <Layers className="w-4 h-4 text-orange-600" />
+                    <span>3. Tiến trình bài dạy (8 Hoạt động chuẩn Công văn 5512 kèm thời gian)</span>
                   </h4>
-                  <label className="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-amber-200">
+                  <span className="text-[10px] bg-orange-100 text-orange-950 font-black px-2.5 py-0.5 rounded-full border border-orange-300">
+                    Phân bố thời gian chi tiết
+                  </span>
+                </div>
+
+                {/* 8 Activities with Dedicated Time Inputs */}
+                <div className="space-y-3.5">
+                  {/* Hoạt động 1: Khởi động */}
+                  <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-2">
+                    <div className="flex items-center justify-between flex-wrap gap-2">
+                      <label className="text-xs font-extrabold text-amber-900 flex items-center gap-1.5">
+                        <Zap className="w-3.5 h-3.5 text-amber-600" />
+                        <span>1. Hoạt động Khởi động (Warm-up)</span>
+                      </label>
+                      <div className="flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5 text-slate-400" />
+                        <span className="text-xs font-bold text-slate-600">Thời gian:</span>
+                        <input
+                          type="text"
+                          value={formData.warmupTime}
+                          onChange={(e) => setFormData({ ...formData, warmupTime: e.target.value })}
+                          placeholder="5 phút"
+                          className="w-20 px-2 py-0.5 text-xs font-bold text-amber-900 bg-amber-50 border border-amber-300 rounded-lg text-center focus:outline-none"
+                        />
+                      </div>
+                    </div>
+                    <textarea
+                      rows={2}
+                      value={formData.warmupActivity}
+                      onChange={(e) => setFormData({ ...formData, warmupActivity: e.target.value })}
+                      placeholder="Mục tiêu, nội dung câu hỏi/trò chơi khởi động khơi gợi hứng thú..."
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-medium text-slate-900 focus:bg-white focus:border-amber-500 focus:outline-none transition-all"
+                    />
+                  </div>
+
+                  {/* Hoạt động 2: Tìm hiểu vào bài / Hình thành kiến thức mới */}
+                  <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-2">
+                    <div className="flex items-center justify-between flex-wrap gap-2">
+                      <label className="text-xs font-extrabold text-blue-900 flex items-center gap-1.5">
+                        <BookOpen className="w-3.5 h-3.5 text-blue-600" />
+                        <span>2. Hoạt động Tìm hiểu vào bài / Hình thành kiến thức mới</span>
+                      </label>
+                      <div className="flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5 text-slate-400" />
+                        <span className="text-xs font-bold text-slate-600">Thời gian:</span>
+                        <input
+                          type="text"
+                          value={formData.newLessonTime}
+                          onChange={(e) => setFormData({ ...formData, newLessonTime: e.target.value })}
+                          placeholder="15 phút"
+                          className="w-20 px-2 py-0.5 text-xs font-bold text-blue-900 bg-blue-50 border border-blue-300 rounded-lg text-center focus:outline-none"
+                        />
+                      </div>
+                    </div>
+                    <textarea
+                      rows={3}
+                      value={formData.newLessonActivity}
+                      onChange={(e) => setFormData({ ...formData, newLessonActivity: e.target.value })}
+                      placeholder="Chuyển giao nhiệm vụ học tập, HS làm việc cá nhân/nhóm tìm hiểu kiến thức mới..."
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-medium text-slate-900 focus:bg-white focus:border-blue-500 focus:outline-none transition-all"
+                    />
+                  </div>
+
+                  {/* Hoạt động 3: Thực hành / Luyện tập */}
+                  <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-2">
+                    <div className="flex items-center justify-between flex-wrap gap-2">
+                      <label className="text-xs font-extrabold text-indigo-900 flex items-center gap-1.5">
+                        <Layers className="w-3.5 h-3.5 text-indigo-600" />
+                        <span>3. Hoạt động Thực hành / Luyện tập (Practice)</span>
+                      </label>
+                      <div className="flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5 text-slate-400" />
+                        <span className="text-xs font-bold text-slate-600">Thời gian:</span>
+                        <input
+                          type="text"
+                          value={formData.practiceTime}
+                          onChange={(e) => setFormData({ ...formData, practiceTime: e.target.value })}
+                          placeholder="10 phút"
+                          className="w-20 px-2 py-0.5 text-xs font-bold text-indigo-900 bg-indigo-50 border border-indigo-300 rounded-lg text-center focus:outline-none"
+                        />
+                      </div>
+                    </div>
+                    <textarea
+                      rows={3}
+                      value={formData.practiceActivity}
+                      onChange={(e) => setFormData({ ...formData, practiceActivity: e.target.value })}
+                      placeholder="Bài tập mẫu, bài tập thực hành củng cố lý thuyết vừa học..."
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-medium text-slate-900 focus:bg-white focus:border-indigo-500 focus:outline-none transition-all"
+                    />
+                  </div>
+
+                  {/* Hoạt động 4: Vận dụng thấp */}
+                  <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-2">
+                    <div className="flex items-center justify-between flex-wrap gap-2">
+                      <label className="text-xs font-extrabold text-emerald-900 flex items-center gap-1.5">
+                        <Target className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>4. Hoạt động Vận dụng thấp (Low Application)</span>
+                      </label>
+                      <div className="flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5 text-slate-400" />
+                        <span className="text-xs font-bold text-slate-600">Thời gian:</span>
+                        <input
+                          type="text"
+                          value={formData.lowAppTime}
+                          onChange={(e) => setFormData({ ...formData, lowAppTime: e.target.value })}
+                          placeholder="5 phút"
+                          className="w-20 px-2 py-0.5 text-xs font-bold text-emerald-900 bg-emerald-50 border border-emerald-300 rounded-lg text-center focus:outline-none"
+                        />
+                      </div>
+                    </div>
+                    <textarea
+                      rows={2}
+                      value={formData.lowApplicationActivity}
+                      onChange={(e) => setFormData({ ...formData, lowApplicationActivity: e.target.value })}
+                      placeholder="Giải quyết các tình huống bài tập quen thuộc gắn với thực tiễn cơ bản..."
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-medium text-slate-900 focus:bg-white focus:border-emerald-500 focus:outline-none transition-all"
+                    />
+                  </div>
+
+                  {/* Hoạt động 5: Vận dụng cao */}
+                  <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-2">
+                    <div className="flex items-center justify-between flex-wrap gap-2">
+                      <label className="text-xs font-extrabold text-purple-900 flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+                        <span>5. Hoạt động Vận dụng cao / Sáng tạo (High Application)</span>
+                      </label>
+                      <div className="flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5 text-slate-400" />
+                        <span className="text-xs font-bold text-slate-600">Thời gian:</span>
+                        <input
+                          type="text"
+                          value={formData.highAppTime}
+                          onChange={(e) => setFormData({ ...formData, highAppTime: e.target.value })}
+                          placeholder="5 phút"
+                          className="w-20 px-2 py-0.5 text-xs font-bold text-purple-900 bg-purple-50 border border-purple-300 rounded-lg text-center focus:outline-none"
+                        />
+                      </div>
+                    </div>
+                    <textarea
+                      rows={2}
+                      value={formData.highApplicationActivity}
+                      onChange={(e) => setFormData({ ...formData, highApplicationActivity: e.target.value })}
+                      placeholder="Giải quyết tình huống thực tế phức tạp, bài toán mở, liên môn hoặc dự án sáng tạo..."
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-medium text-slate-900 focus:bg-white focus:border-purple-500 focus:outline-none transition-all"
+                    />
+                  </div>
+
+                  {/* Hoạt động 6: Củng cố */}
+                  <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-2">
+                    <div className="flex items-center justify-between flex-wrap gap-2">
+                      <label className="text-xs font-extrabold text-teal-900 flex items-center gap-1.5">
+                        <CheckCircle className="w-3.5 h-3.5 text-teal-600" />
+                        <span>6. Hoạt động Củng cố kiến thức (Consolidation)</span>
+                      </label>
+                      <div className="flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5 text-slate-400" />
+                        <span className="text-xs font-bold text-slate-600">Thời gian:</span>
+                        <input
+                          type="text"
+                          value={formData.consolidationTime}
+                          onChange={(e) => setFormData({ ...formData, consolidationTime: e.target.value })}
+                          placeholder="3 phút"
+                          className="w-20 px-2 py-0.5 text-xs font-bold text-teal-900 bg-teal-50 border border-teal-300 rounded-lg text-center focus:outline-none"
+                        />
+                      </div>
+                    </div>
+                    <textarea
+                      rows={2}
+                      value={formData.consolidationActivity}
+                      onChange={(e) => setFormData({ ...formData, consolidationActivity: e.target.value })}
+                      placeholder="Tóm tắt sơ đồ tư duy, nhấn mạnh kiến thức then chốt..."
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-medium text-slate-900 focus:bg-white focus:border-teal-500 focus:outline-none transition-all"
+                    />
+                  </div>
+
+                  {/* Hoạt động 7: Hướng dẫn BTVN */}
+                  <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-2">
+                    <div className="flex items-center justify-between flex-wrap gap-2">
+                      <label className="text-xs font-extrabold text-rose-900 flex items-center gap-1.5">
+                        <FileText className="w-3.5 h-3.5 text-rose-600" />
+                        <span>7. Hướng dẫn học sinh tự học ở nhà & BTVN (Homework)</span>
+                      </label>
+                      <div className="flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5 text-slate-400" />
+                        <span className="text-xs font-bold text-slate-600">Thời gian:</span>
+                        <input
+                          type="text"
+                          value={formData.homeworkTime}
+                          onChange={(e) => setFormData({ ...formData, homeworkTime: e.target.value })}
+                          placeholder="2 phút"
+                          className="w-20 px-2 py-0.5 text-xs font-bold text-rose-900 bg-rose-50 border border-rose-300 rounded-lg text-center focus:outline-none"
+                        />
+                      </div>
+                    </div>
+                    <textarea
+                      rows={2}
+                      value={formData.homeworkActivity}
+                      onChange={(e) => setFormData({ ...formData, homeworkActivity: e.target.value })}
+                      placeholder="Giao bài tập về nhà trong SGK/SBT, dặn dò chuẩn bị bài học tiếp theo..."
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-medium text-slate-900 focus:bg-white focus:border-rose-500 focus:outline-none transition-all"
+                    />
+                  </div>
+
+                  {/* Hoạt động 8: Rút kinh nghiệm sau dạy */}
+                  <div className="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs space-y-2">
+                    <label className="text-xs font-extrabold text-amber-950 flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                      <span>8. Rút kinh nghiệm sau bài dạy (Reflection & Adjustment)</span>
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={formData.reflectionNotes || formData.notes}
+                      onChange={(e) => setFormData({ ...formData, reflectionNotes: e.target.value, notes: e.target.value })}
+                      placeholder="Ghi chú về mức độ tiếp thu của học sinh, điều chỉnh phân bố thời gian sau khi dạy thực tế..."
+                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-medium text-slate-900 focus:bg-white focus:border-amber-500 focus:outline-none transition-all"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 5: Giảng dạy Song ngữ Tiếng Anh (3 Cột: Từ - Phiên âm - Dịch nghĩa + Loa đọc phát âm) */}
+              <div className="space-y-4 bg-amber-50/70 p-4.5 rounded-xl border border-amber-200">
+                <div className="flex items-center justify-between border-b border-amber-200 pb-2">
+                  <h4 className="text-xs font-extrabold text-amber-950 uppercase tracking-wider flex items-center gap-2">
+                    <Globe className="w-4 h-4 text-amber-600" />
+                    <span>4. Tích hợp Song ngữ Tiếng Anh (Bilingual Segment 3 cột + Loa phát âm)</span>
+                  </h4>
+                  <label className="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-amber-900 bg-amber-100/90 px-2.5 py-1 rounded-lg border border-amber-300 hover:bg-amber-200 transition-colors">
                     <input
                       type="checkbox"
                       checked={formData.enableBilingual}
                       onChange={(e) => setFormData({ ...formData, enableBilingual: e.target.checked })}
-                      className="rounded text-amber-500 focus:ring-amber-400"
+                      className="rounded text-amber-600 focus:ring-amber-500 cursor-pointer"
                     />
                     <span>Bật phần song ngữ</span>
                   </label>
@@ -1167,147 +1676,171 @@ export const LessonPlanView: React.FC<LessonPlanViewProps> = ({
 
                 {formData.enableBilingual && (
                   <div className="space-y-3">
+                    {/* Activity Selection for English Integration */}
+                    <div className="space-y-2 bg-amber-100/70 p-3 rounded-xl border border-amber-300">
+                      <div className="flex items-center justify-between flex-wrap gap-1">
+                        <label className="text-xs font-black text-amber-950 flex items-center gap-1.5">
+                          <CheckCircle className="w-4 h-4 text-amber-700" />
+                          <span>Chọn hoạt động trong tiến trình để Tích hợp Tiếng Anh:</span>
+                        </label>
+                        <div className="flex items-center gap-1.5 text-[11px]">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setFormData({
+                                ...formData,
+                                bilingualActivities: [
+                                  '1. Khởi động (Warm-up)',
+                                  '2. Tìm hiểu vào bài / Hình thành kiến thức mới',
+                                  '3. Thực hành / Luyện tập (Practice)',
+                                  '4. Vận dụng thấp',
+                                  '5. Vận dụng cao / Sáng tạo',
+                                  '6. Củng cố kiến thức',
+                                  '7. Hướng dẫn học sinh tự học ở nhà & BTVN',
+                                ],
+                              })
+                            }
+                            className="px-2 py-0.5 bg-amber-200 hover:bg-amber-300 text-amber-950 rounded font-bold transition-colors cursor-pointer"
+                          >
+                            Chọn tất cả
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setFormData({
+                                ...formData,
+                                bilingualActivities: [
+                                  '1. Khởi động (Warm-up)',
+                                  '2. Tìm hiểu vào bài / Hình thành kiến thức mới',
+                                  '7. Hướng dẫn học sinh tự học ở nhà & BTVN',
+                                ],
+                              })
+                            }
+                            className="px-2 py-0.5 bg-amber-200 hover:bg-amber-300 text-amber-950 rounded font-bold transition-colors cursor-pointer"
+                          >
+                            Mặc định
+                          </button>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-1.5 pt-1">
+                        {[
+                          { id: '1. Khởi động (Warm-up)', label: '1. Khởi động (Warm-up)' },
+                          { id: '2. Tìm hiểu vào bài / Hình thành kiến thức mới', label: '2. Hình thành kiến thức mới' },
+                          { id: '3. Thực hành / Luyện tập (Practice)', label: '3. Luyện tập / Thực hành' },
+                          { id: '4. Vận dụng thấp', label: '4. Vận dụng thấp' },
+                          { id: '5. Vận dụng cao / Sáng tạo', label: '5. Vận dụng cao / Sáng tạo' },
+                          { id: '6. Củng cố kiến thức', label: '6. Củng cố kiến thức' },
+                          { id: '7. Hướng dẫn học sinh tự học ở nhà & BTVN', label: '7. Hướng dẫn BTVN' },
+                        ].map((act) => {
+                          const isSelected = formData.bilingualActivities.includes(act.id);
+                          return (
+                            <label
+                              key={act.id}
+                              className={`flex items-center gap-2 p-2 rounded-lg border text-xs font-semibold cursor-pointer transition-all ${
+                                isSelected
+                                  ? 'bg-amber-600 text-white border-amber-700 shadow-xs'
+                                  : 'bg-white text-slate-800 border-amber-200 hover:bg-amber-50'
+                              }`}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={isSelected}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    setFormData({
+                                      ...formData,
+                                      bilingualActivities: [...formData.bilingualActivities, act.id],
+                                    });
+                                  } else {
+                                    setFormData({
+                                      ...formData,
+                                      bilingualActivities: formData.bilingualActivities.filter((a) => a !== act.id),
+                                    });
+                                  }
+                                }}
+                                className="rounded text-amber-600 focus:ring-amber-500"
+                              />
+                              <span className="truncate">{act.label}</span>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </div>
+
                     <div className="space-y-1">
-                      <label className="text-xs font-bold text-amber-200">Tiêu đề phân đoạn song ngữ</label>
+                      <label className="text-xs font-bold text-slate-800">Tiêu đề phân đoạn song ngữ</label>
                       <input
                         type="text"
                         value={formData.bilingualTitle}
                         onChange={(e) => setFormData({ ...formData, bilingualTitle: e.target.value })}
-                        placeholder="Ví dụ: Bilingual Segment: Direct Proportion"
-                        className="w-full px-3.5 py-2 bg-slate-950/80 border border-amber-500/40 rounded-xl text-xs text-amber-100 focus:border-amber-400 focus:outline-none"
+                        placeholder="Ví dụ: Bilingual Segment: Core Concept & Vocabulary"
+                        className="w-full px-3.5 py-2 bg-white border border-amber-300 rounded-xl text-xs sm:text-sm font-semibold text-slate-900 placeholder:text-slate-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 focus:outline-none shadow-xs"
                       />
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <div className="space-y-1">
-                        <label className="text-xs font-bold text-amber-200">Nội dung Tiếng Anh (English Content)</label>
+                        <label className="text-xs font-bold text-slate-800">Nội dung Tiếng Anh (English Content)</label>
                         <textarea
                           rows={3}
                           value={formData.bilingualEnglish}
                           onChange={(e) => setFormData({ ...formData, bilingualEnglish: e.target.value })}
-                          placeholder="English text content..."
-                          className="w-full px-3.5 py-2.5 bg-slate-950/80 border border-amber-500/40 rounded-xl text-xs text-amber-100 focus:border-amber-400 focus:outline-none"
+                          placeholder="Nội dung kiến thức bằng tiếng Anh..."
+                          className="w-full px-3.5 py-2.5 bg-white border border-amber-300 rounded-xl text-xs sm:text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 focus:outline-none shadow-xs"
                         />
                       </div>
 
                       <div className="space-y-1">
-                        <label className="text-xs font-bold text-amber-200">Dịch nghĩa Tiếng Việt</label>
+                        <label className="text-xs font-bold text-slate-800">Dịch nghĩa Tiếng Việt (Vietnamese Translation)</label>
                         <textarea
                           rows={3}
                           value={formData.bilingualVietnamese}
                           onChange={(e) => setFormData({ ...formData, bilingualVietnamese: e.target.value })}
-                          placeholder="Dịch nội dung tiếng Việt..."
-                          className="w-full px-3.5 py-2.5 bg-slate-950/80 border border-amber-500/40 rounded-xl text-xs text-amber-100 focus:border-amber-400 focus:outline-none"
+                          placeholder="Dịch nghĩa tiếng Việt tương ứng..."
+                          className="w-full px-3.5 py-2.5 bg-white border border-amber-300 rounded-xl text-xs sm:text-sm font-medium text-slate-900 placeholder:text-slate-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 focus:outline-none shadow-xs"
                         />
                       </div>
                     </div>
 
                     <div className="space-y-1">
-                      <label className="text-xs font-bold text-amber-200">
-                        Từ vựng chuyên ngành (TừTiếngAnh | PhiênÂmIPA | NghĩaTiếngViệt)
+                      <label className="text-xs font-bold text-slate-800 flex items-center justify-between">
+                        <span>Bảng Từ vựng Chuyên ngành 3 Cột (Định dạng: TừTiếngAnh | PhiênÂmIPA | NghĩaTiếngViệt)</span>
+                        <span className="text-[11px] text-amber-700 font-normal">Mỗi từ 1 dòng</span>
                       </label>
                       <textarea
-                        rows={2}
+                        rows={3}
                         value={formData.bilingualTermsRaw}
                         onChange={(e) => setFormData({ ...formData, bilingualTermsRaw: e.target.value })}
-                        placeholder="Direct Proportion | /daɪˈrektli prəˈpɔːrʃənl/ | Tỷ lệ thuận&#10;Constant | /ˈkɑːnstənt/ | Hằng số"
-                        className="w-full px-3.5 py-2.5 bg-slate-950/80 border border-amber-500/40 rounded-xl text-xs text-amber-100 focus:border-amber-400 focus:outline-none font-mono"
+                        placeholder="Direct Proportion | /daɪˈrektli prəˈpɔːrʃənl/ | Tỷ lệ thuận&#10;Constant | /ˈkɑːnstənt/ | Hằng số&#10;Equation | /ɪˈkweɪʒn/ | Phương trình"
+                        className="w-full px-3.5 py-2.5 bg-white border border-amber-300 rounded-xl text-xs sm:text-sm font-mono font-medium text-slate-900 placeholder:text-slate-400 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 focus:outline-none shadow-xs"
                       />
                     </div>
+
+                    {/* Live 3-Column Bilingual Table Preview with Audio Playback */}
+                    {formData.bilingualTermsRaw.trim() && (
+                      <div className="pt-2">
+                        <BilingualVocabTable
+                          rawTerms={formData.bilingualTermsRaw}
+                          title="Bảng Từ Vựng & Thuật Ngữ Song Ngữ (Xem trước có Loa phát âm & 3 Cột)"
+                        />
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
 
-              {/* Section 4: 5512 Lesson Details */}
-              <div className="space-y-4">
-                <h4 className="text-xs font-extrabold text-slate-800 uppercase tracking-wider border-b border-slate-200 pb-2">
-                  4. Tiến trình bài dạy (Công văn 5512)
-                </h4>
-
-                {/* Mục tiêu bài học */}
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-700">Mục tiêu bài học (Kiến thức, Kỹ năng, Thái độ)</label>
-                  <textarea
-                    rows={3}
-                    value={formData.objectives}
-                    onChange={(e) => setFormData({ ...formData, objectives: e.target.value })}
-                    placeholder="Mục tiêu kiến thức, kỹ năng..."
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm text-slate-900 focus:bg-white focus:border-orange-500 focus:outline-none transition-all"
-                  />
-                </div>
-
-                {/* Kiến thức trọng tâm */}
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-700">Kiến thức trọng tâm</label>
-                  <textarea
-                    rows={3}
-                    value={formData.keyKnowledge}
-                    onChange={(e) => setFormData({ ...formData, keyKnowledge: e.target.value })}
-                    placeholder="Nội dung kiến thức cốt lõi..."
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm text-slate-900 focus:bg-white focus:border-orange-500 focus:outline-none transition-all"
-                  />
-                </div>
-
-                {/* Hoạt động khởi động */}
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-700">Hoạt động khởi động</label>
-                  <textarea
-                    rows={2}
-                    value={formData.warmupActivity}
-                    onChange={(e) => setFormData({ ...formData, warmupActivity: e.target.value })}
-                    placeholder="Trò chơi hoặc tình huống dẫn dắt..."
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm text-slate-900 focus:bg-white focus:border-orange-500 focus:outline-none transition-all"
-                  />
-                </div>
-
-                {/* Hoạt động của GV & HS */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-700">Hoạt động của giáo viên</label>
-                    <textarea
-                      rows={3}
-                      value={formData.teacherActivity}
-                      onChange={(e) => setFormData({ ...formData, teacherActivity: e.target.value })}
-                      placeholder="Chuyển giao nhiệm vụ, điều hành..."
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm text-slate-900 focus:bg-white focus:border-orange-500 focus:outline-none transition-all"
-                    />
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-xs font-bold text-slate-700">Hoạt động của học sinh</label>
-                    <textarea
-                      rows={3}
-                      value={formData.studentActivity}
-                      onChange={(e) => setFormData({ ...formData, studentActivity: e.target.value })}
-                      placeholder="Tiếp nhận, thảo luận, báo cáo..."
-                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm text-slate-900 focus:bg-white focus:border-orange-500 focus:outline-none transition-all"
-                    />
-                  </div>
-                </div>
-
-                {/* Bài tập */}
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-700">Bài tập & Củng cố</label>
-                  <textarea
-                    rows={2}
-                    value={formData.exercises}
-                    onChange={(e) => setFormData({ ...formData, exercises: e.target.value })}
-                    placeholder="Bài tập củng cố..."
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm text-slate-900 focus:bg-white focus:border-orange-500 focus:outline-none transition-all"
-                  />
-                </div>
-
-                {/* Ghi chú */}
-                <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-700">Ghi chú thêm</label>
-                  <textarea
-                    rows={2}
-                    value={formData.notes}
-                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                    placeholder="Dặn dò học sinh..."
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm text-slate-900 focus:bg-white focus:border-orange-500 focus:outline-none transition-all"
-                  />
-                </div>
+              {/* Section 6: Exercises & Worksheets */}
+              <div className="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                <label className="text-xs font-extrabold text-slate-800 uppercase tracking-wider block">
+                  5. Bài tập & Phiếu củng cố học tập (Exercises)
+                </label>
+                <textarea
+                  rows={2}
+                  value={formData.exercises}
+                  onChange={(e) => setFormData({ ...formData, exercises: e.target.value })}
+                  placeholder="Phiếu bài tập trắc nghiệm, tự luận hoặc câu hỏi củng cố..."
+                  className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-xs sm:text-sm text-slate-900 focus:border-orange-500 focus:outline-none transition-all font-medium"
+                />
               </div>
 
               {/* Section 5: Signatures & Department Approvals */}
@@ -1322,12 +1855,13 @@ export const LessonPlanView: React.FC<LessonPlanViewProps> = ({
                   <div className="space-y-2 bg-white p-3.5 rounded-xl border border-slate-200">
                     <span className="font-extrabold text-slate-900 block text-xs border-b pb-1">① Giáo Viên Soạn Bài</span>
                     <div className="space-y-1">
-                      <label className="font-bold text-slate-700">Họ và tên GV:</label>
+                      <label className="font-bold text-slate-700">Họ và tên GV (để trống tự điền):</label>
                       <input
                         type="text"
                         value={formData.teacherName}
                         onChange={(e) => setFormData({ ...formData, teacherName: e.target.value })}
-                        className="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs font-semibold"
+                        placeholder="Để trống tự điền tay hoặc nhập tên GV..."
+                        className="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs font-semibold focus:bg-white focus:border-orange-500 focus:outline-none"
                       />
                     </div>
                   </div>
@@ -1341,7 +1875,8 @@ export const LessonPlanView: React.FC<LessonPlanViewProps> = ({
                         rows={2}
                         value={formData.headOfDepartmentReview}
                         onChange={(e) => setFormData({ ...formData, headOfDepartmentReview: e.target.value })}
-                        className="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs"
+                        placeholder="Nhận xét của Tổ trưởng..."
+                        className="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs focus:bg-white focus:border-orange-500 focus:outline-none"
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-2">
@@ -1350,7 +1885,7 @@ export const LessonPlanView: React.FC<LessonPlanViewProps> = ({
                         <select
                           value={formData.headOfDepartmentStatus}
                           onChange={(e) => setFormData({ ...formData, headOfDepartmentStatus: e.target.value as any })}
-                          className="w-full px-2 py-1 border border-slate-300 rounded-lg text-xs font-bold text-emerald-700"
+                          className="w-full px-2 py-1 border border-slate-300 rounded-lg text-xs font-bold text-emerald-700 focus:outline-none"
                         >
                           <option value="Đã duyệt">Đã duyệt</option>
                           <option value="Chưa duyệt">Chưa duyệt</option>
@@ -1363,7 +1898,8 @@ export const LessonPlanView: React.FC<LessonPlanViewProps> = ({
                           type="text"
                           value={formData.headOfDepartmentName}
                           onChange={(e) => setFormData({ ...formData, headOfDepartmentName: e.target.value })}
-                          className="w-full px-2 py-1 border border-slate-300 rounded-lg text-xs font-semibold"
+                          placeholder="Để trống tự điền..."
+                          className="w-full px-2 py-1 border border-slate-300 rounded-lg text-xs font-semibold focus:bg-white focus:border-orange-500 focus:outline-none"
                         />
                       </div>
                     </div>
@@ -1378,7 +1914,8 @@ export const LessonPlanView: React.FC<LessonPlanViewProps> = ({
                         rows={2}
                         value={formData.schoolBoardReview}
                         onChange={(e) => setFormData({ ...formData, schoolBoardReview: e.target.value })}
-                        className="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs"
+                        placeholder="Ý kiến phê duyệt BGH..."
+                        className="w-full px-2.5 py-1.5 border border-slate-300 rounded-lg text-xs focus:bg-white focus:border-orange-500 focus:outline-none"
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-2">
@@ -1387,7 +1924,7 @@ export const LessonPlanView: React.FC<LessonPlanViewProps> = ({
                         <select
                           value={formData.schoolBoardStatus}
                           onChange={(e) => setFormData({ ...formData, schoolBoardStatus: e.target.value as any })}
-                          className="w-full px-2 py-1 border border-slate-300 rounded-lg text-xs font-bold text-blue-700"
+                          className="w-full px-2 py-1 border border-slate-300 rounded-lg text-xs font-bold text-blue-700 focus:outline-none"
                         >
                           <option value="Đã duyệt">Đã duyệt</option>
                           <option value="Chưa duyệt">Chưa duyệt</option>
@@ -1395,12 +1932,13 @@ export const LessonPlanView: React.FC<LessonPlanViewProps> = ({
                         </select>
                       </div>
                       <div>
-                        <label className="font-bold text-slate-700 block">Hiệu trưởng/BGH:</label>
+                        <label className="font-bold text-slate-700 block">Hiệu trưởng:</label>
                         <input
                           type="text"
                           value={formData.schoolBoardName}
                           onChange={(e) => setFormData({ ...formData, schoolBoardName: e.target.value })}
-                          className="w-full px-2 py-1 border border-slate-300 rounded-lg text-xs font-semibold"
+                          placeholder="Để trống tự điền..."
+                          className="w-full px-2 py-1 border border-slate-300 rounded-lg text-xs font-semibold focus:bg-white focus:border-orange-500 focus:outline-none"
                         />
                       </div>
                     </div>
@@ -1447,6 +1985,20 @@ export const LessonPlanView: React.FC<LessonPlanViewProps> = ({
               </div>
 
               <div className="flex items-center gap-2">
+                {(onBackToHome || onNavigateTab) && (
+                  <button
+                    onClick={() => {
+                      setViewDetailPlan(null);
+                      if (onBackToHome) onBackToHome();
+                      else if (onNavigateTab) onNavigateTab('dashboard');
+                    }}
+                    className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white text-xs font-bold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer border border-slate-700"
+                    title="Đóng và quay lại trang chủ"
+                  >
+                    <Home className="w-3.5 h-3.5 text-orange-400" />
+                    <span className="hidden sm:inline">Trang chủ</span>
+                  </button>
+                )}
                 <button
                   onClick={() => handleDirectPrint(viewDetailPlan)}
                   className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
@@ -1502,21 +2054,21 @@ export const LessonPlanView: React.FC<LessonPlanViewProps> = ({
 
               {/* Digital Competencies & Equipment Card */}
               {(viewDetailPlan.digitalCompetencies || viewDetailPlan.devicesAndSoftware) && (
-                <div className="bg-gradient-to-br from-slate-900 via-indigo-950 to-blue-950 text-white p-4.5 rounded-xl border border-cyan-500/30 space-y-3 shadow-md">
-                  <div className="flex items-center justify-between border-b border-cyan-500/20 pb-2">
-                    <h4 className="font-extrabold text-xs text-cyan-300 uppercase tracking-wider flex items-center gap-2">
-                      <Cpu className="w-4 h-4 text-cyan-400" />
-                      <span>Khung Năng Lực Số (NLS) & Tên Thiết Bị / Phần Mềm</span>
+                <div className="bg-sky-50/80 p-4.5 rounded-xl border border-sky-200 space-y-3 shadow-xs">
+                  <div className="flex items-center justify-between border-b border-sky-200 pb-2">
+                    <h4 className="font-extrabold text-xs text-sky-950 uppercase tracking-wider flex items-center gap-2">
+                      <Cpu className="w-4 h-4 text-sky-600" />
+                      <span>2. Khung Năng Lực Số (NLS) & Tên Thiết Bị / Phần Mềm</span>
                     </h4>
-                    <span className="text-[10px] font-black uppercase px-2 py-0.5 bg-cyan-400 text-blue-950 rounded-full">
+                    <span className="text-[10px] font-black uppercase px-2.5 py-0.5 bg-sky-200 text-sky-950 rounded-full border border-sky-300">
                       GDPT 2018
                     </span>
                   </div>
 
                   {viewDetailPlan.digitalCompetencies && (
                     <div className="space-y-1">
-                      <span className="text-[11px] font-bold text-cyan-300 block">Mã hóa Năng lực số:</span>
-                      <p className="whitespace-pre-line text-xs text-slate-200 bg-slate-900/80 p-3 rounded-lg border border-cyan-500/20 font-mono leading-relaxed">
+                      <span className="text-[11px] font-bold text-sky-900 block">Mã hóa Năng lực số:</span>
+                      <p className="whitespace-pre-line text-xs font-mono text-slate-900 bg-white p-3 rounded-lg border border-sky-200 leading-relaxed font-semibold">
                         {viewDetailPlan.digitalCompetencies}
                       </p>
                     </div>
@@ -1524,8 +2076,8 @@ export const LessonPlanView: React.FC<LessonPlanViewProps> = ({
 
                   {viewDetailPlan.devicesAndSoftware && (
                     <div className="space-y-1">
-                      <span className="text-[11px] font-bold text-cyan-300 block">Thiết bị & Phần mềm sử dụng:</span>
-                      <p className="whitespace-pre-line text-xs text-slate-200 bg-slate-900/80 p-3 rounded-lg border border-cyan-500/20 leading-relaxed">
+                      <span className="text-[11px] font-bold text-sky-900 block">Thiết bị & Phần mềm sử dụng:</span>
+                      <p className="whitespace-pre-line text-xs font-medium text-slate-900 bg-white p-3 rounded-lg border border-sky-200 leading-relaxed">
                         {viewDetailPlan.devicesAndSoftware}
                       </p>
                     </div>
@@ -1535,16 +2087,30 @@ export const LessonPlanView: React.FC<LessonPlanViewProps> = ({
 
               {/* Bilingual English Teaching Segment Card */}
               {viewDetailPlan.bilingualSection && (
-                <div className="bg-gradient-to-br from-blue-950 via-slate-900 to-indigo-950 text-white p-4.5 rounded-xl border border-amber-500/30 space-y-4 shadow-md">
-                  <div className="flex items-center justify-between border-b border-amber-500/20 pb-2">
-                    <h4 className="font-extrabold text-xs text-amber-300 uppercase tracking-wider flex items-center gap-2">
-                      <Globe className="w-4 h-4 text-amber-400" />
-                      <span>{viewDetailPlan.bilingualSection.title || 'Bài dạy Song ngữ Tiếng Anh'}</span>
+                <div className="bg-amber-50/80 p-4.5 rounded-xl border border-amber-200 space-y-4 shadow-xs">
+                  <div className="flex items-center justify-between border-b border-amber-200 pb-2">
+                    <h4 className="font-extrabold text-xs text-amber-950 uppercase tracking-wider flex items-center gap-2">
+                      <Globe className="w-4 h-4 text-amber-600" />
+                      <span>{viewDetailPlan.bilingualSection.title || 'Phân đoạn Giảng dạy Song ngữ Tiếng Anh'}</span>
                     </h4>
-                    <span className="text-[10px] font-black uppercase px-2 py-0.5 bg-amber-400 text-blue-950 rounded-full">
+                    <span className="text-[10px] font-black uppercase px-2.5 py-0.5 bg-amber-300 text-amber-950 rounded-full border border-amber-400">
                       Bilingual English
                     </span>
                   </div>
+
+                  {viewDetailPlan.bilingualSection.targetActivities && viewDetailPlan.bilingualSection.targetActivities.length > 0 && (
+                    <div className="bg-amber-100/90 p-2.5 rounded-lg border border-amber-300 flex items-center gap-2 flex-wrap text-xs">
+                      <span className="font-extrabold text-amber-950 flex items-center gap-1">
+                        <CheckCircle className="w-3.5 h-3.5 text-amber-800" />
+                        <span>Hoạt động tích hợp Tiếng Anh:</span>
+                      </span>
+                      {viewDetailPlan.bilingualSection.targetActivities.map((act, i) => (
+                        <span key={i} className="bg-amber-600 text-white font-bold px-2 py-0.5 rounded-md text-[11px] shadow-xs">
+                          {act}
+                        </span>
+                      ))}
+                    </div>
+                  )}
 
                   <AudioPracticePlayer
                     textToSpeak={viewDetailPlan.bilingualSection.audioText || viewDetailPlan.bilingualSection.englishContent}
@@ -1552,105 +2118,148 @@ export const LessonPlanView: React.FC<LessonPlanViewProps> = ({
                   />
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                    <div className="bg-slate-900/90 p-3 rounded-xl border border-slate-700/80 space-y-1">
-                      <span className="font-extrabold text-amber-300 text-[11px] uppercase block">
+                    <div className="bg-white p-3.5 rounded-xl border border-amber-200 space-y-1">
+                      <span className="font-extrabold text-amber-900 text-[11px] uppercase block">
                         English Content:
                       </span>
-                      <p className="text-slate-100 leading-relaxed font-medium">
+                      <p className="text-slate-900 leading-relaxed font-semibold">
                         {viewDetailPlan.bilingualSection.englishContent}
                       </p>
                     </div>
 
-                    <div className="bg-slate-900/90 p-3 rounded-xl border border-slate-700/80 space-y-1">
-                      <span className="font-extrabold text-amber-300 text-[11px] uppercase block">
+                    <div className="bg-white p-3.5 rounded-xl border border-amber-200 space-y-1">
+                      <span className="font-extrabold text-amber-900 text-[11px] uppercase block">
                         Dịch nghĩa Tiếng Việt:
                       </span>
-                      <p className="text-slate-200 leading-relaxed">
+                      <p className="text-slate-800 leading-relaxed font-medium">
                         {viewDetailPlan.bilingualSection.vietnameseTranslation}
                       </p>
                     </div>
                   </div>
 
-                  {viewDetailPlan.bilingualSection.keyTerms && viewDetailPlan.bilingualSection.keyTerms.length > 0 && (
-                    <div className="space-y-2">
-                      <span className="text-[11px] font-extrabold text-amber-300 uppercase block">
-                        Từ vựng & Thuật ngữ Chuyên ngành:
-                      </span>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        {viewDetailPlan.bilingualSection.keyTerms.map((term, idx) => (
-                          <div key={idx} className="bg-slate-900/90 p-2.5 rounded-lg border border-amber-500/20 text-xs flex items-center justify-between gap-2">
-                            <div>
-                              <span className="font-extrabold text-amber-200">{term.word}</span>
-                              {term.ipa && <span className="text-[11px] text-slate-400 ml-1.5 font-mono">[{term.ipa}]</span>}
-                            </div>
-                            <span className="text-[11px] text-amber-400/90 font-medium">{term.meaning}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                  {/* 3-Column Bilingual Vocabulary Table with Audio Playback for each term */}
+                  <BilingualVocabTable
+                    terms={viewDetailPlan.bilingualSection.keyTerms}
+                    title="Bảng Từ Vựng & Thuật Ngữ Chuyên Ngành (3 Cột: Từ vựng - Phiên âm IPA - Dịch nghĩa có Loa phát âm)"
+                  />
                 </div>
               )}
 
               {/* Sections 5512 */}
               <div className="space-y-5">
-                {viewDetailPlan.objectives && (
-                  <div className="space-y-1.5 border-l-4 border-l-orange-500 pl-3">
-                    <h4 className="font-extrabold text-slate-900 text-xs uppercase tracking-wider text-orange-600">
-                      I. Mục tiêu bài học
-                    </h4>
-                    <p className="whitespace-pre-line text-slate-700 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-200">
-                      {viewDetailPlan.objectives}
-                    </p>
+                {/* I. MỤC TIÊU BÀI HỌC */}
+                {(viewDetailPlan.objectives || viewDetailPlan.objectivesKnowledge || viewDetailPlan.objectivesSkills || viewDetailPlan.objectivesAttitude) && (
+                  <div className="space-y-3 border-l-4 border-l-emerald-600 pl-3.5 bg-emerald-50/50 p-4 rounded-xl border border-emerald-200">
+                    <div className="flex items-center justify-between border-b border-emerald-200 pb-1.5">
+                      <h4 className="font-extrabold text-emerald-950 text-xs uppercase tracking-wider flex items-center gap-1.5">
+                        <Target className="w-4 h-4 text-emerald-600" />
+                        <span>I. Mục tiêu bài học (Thái độ - Kiến thức - Kĩ năng chuẩn 5512)</span>
+                      </h4>
+                      <span className="text-[10px] bg-emerald-200 text-emerald-900 font-extrabold px-2 py-0.5 rounded-full">
+                        Chuẩn GDPT 2018
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                      {viewDetailPlan.objectivesKnowledge && (
+                        <div className="bg-white p-3 rounded-xl border border-emerald-200 space-y-1">
+                          <span className="font-extrabold text-emerald-900 block">1. Về Kiến thức:</span>
+                          <p className="text-slate-800 leading-relaxed whitespace-pre-line">{viewDetailPlan.objectivesKnowledge}</p>
+                        </div>
+                      )}
+                      {viewDetailPlan.objectivesSkills && (
+                        <div className="bg-white p-3 rounded-xl border border-emerald-200 space-y-1">
+                          <span className="font-extrabold text-emerald-900 block">2. Về Năng lực & Kĩ năng:</span>
+                          <p className="text-slate-800 leading-relaxed whitespace-pre-line">{viewDetailPlan.objectivesSkills}</p>
+                        </div>
+                      )}
+                      {viewDetailPlan.objectivesAttitude && (
+                        <div className="bg-white p-3 rounded-xl border border-emerald-200 space-y-1">
+                          <span className="font-extrabold text-emerald-900 block">3. Về Phẩm chất & Thái độ:</span>
+                          <p className="text-slate-800 leading-relaxed whitespace-pre-line">{viewDetailPlan.objectivesAttitude}</p>
+                        </div>
+                      )}
+                    </div>
+
+                    {viewDetailPlan.objectives && !viewDetailPlan.objectivesKnowledge && (
+                      <p className="whitespace-pre-line text-slate-700 leading-relaxed bg-white p-3 rounded-lg border border-emerald-200 text-xs">
+                        {viewDetailPlan.objectives}
+                      </p>
+                    )}
                   </div>
                 )}
 
-                {viewDetailPlan.keyKnowledge && (
-                  <div className="space-y-1.5 border-l-4 border-l-[#001f3f] pl-3">
-                    <h4 className="font-extrabold text-slate-900 text-xs uppercase tracking-wider text-[#001f3f]">
-                      II. Kiến thức trọng tâm
-                    </h4>
-                    <p className="whitespace-pre-line text-slate-700 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-200">
-                      {viewDetailPlan.keyKnowledge}
-                    </p>
+                {/* II. THIẾT BỊ DẠY HỌC & HỌC LIỆU (CHUẨN BỊ GV - HS) */}
+                {(viewDetailPlan.teacherPrep || viewDetailPlan.studentPrep || viewDetailPlan.devicesAndSoftware) && (
+                  <div className="space-y-3 border-l-4 border-l-sky-600 pl-3.5 bg-sky-50/50 p-4 rounded-xl border border-sky-200">
+                    <div className="flex items-center justify-between border-b border-sky-200 pb-1.5">
+                      <h4 className="font-extrabold text-sky-950 text-xs uppercase tracking-wider flex items-center gap-1.5">
+                        <BookOpen className="w-4 h-4 text-sky-600" />
+                        <span>II. Thiết bị dạy học và học liệu (Chuẩn bị: GV - HS)</span>
+                      </h4>
+                      <span className="text-[10px] bg-sky-200 text-sky-900 font-extrabold px-2 py-0.5 rounded-full">
+                        Chuẩn 5512
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                      <div className="bg-white p-3 rounded-xl border border-sky-200 space-y-1">
+                        <span className="font-extrabold text-sky-900 block">1. Chuẩn bị của Giáo viên (GV):</span>
+                        <p className="text-slate-800 leading-relaxed whitespace-pre-line">
+                          {viewDetailPlan.teacherPrep || viewDetailPlan.devicesAndSoftware || 'Máy tính, bài giảng số tương tác, phiếu học tập...'}
+                        </p>
+                      </div>
+                      <div className="bg-white p-3 rounded-xl border border-sky-200 space-y-1">
+                        <span className="font-extrabold text-sky-900 block">2. Chuẩn bị của Học sinh (HS):</span>
+                        <p className="text-slate-800 leading-relaxed whitespace-pre-line">
+                          {viewDetailPlan.studentPrep || 'Sách giáo khoa, vở ghi, đồ dùng học tập theo phân công...'}
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 )}
 
-                {/* III. TIẾN TRÌNH DẠY HỌC (8 HOẠT ĐỘNG CHUẨN CV 5512 + AUDIO PLAYER) */}
+                {/* III. TIẾN TRÌNH DẠY HỌC (8 HOẠT ĐỘNG CHUẨN CV 5512 KÈM PHÂN BỔ THỜI GIAN) */}
                 <div className="space-y-4 border-l-4 border-l-blue-600 pl-3.5">
                   <div className="flex items-center justify-between flex-wrap gap-2">
                     <h4 className="font-extrabold text-slate-900 text-xs uppercase tracking-wider flex items-center gap-2">
-                      <BookOpen className="w-4 h-4 text-blue-600" />
-                      <span>III. Tiến trình dạy học (8 Hoạt động chuẩn CV 5512 + Audio Song ngữ)</span>
+                      <Layers className="w-4 h-4 text-blue-600" />
+                      <span>III. Tiến trình dạy học (8 Hoạt động chuẩn CV 5512 kèm phân bố thời lượng)</span>
                     </h4>
                     <span className="text-[10px] font-black uppercase px-2.5 py-0.5 bg-blue-100 text-blue-900 rounded-full border border-blue-300">
-                      Tích hợp Âm thanh Thu & Phát
+                      8 Hoạt động chuẩn
                     </span>
                   </div>
 
                   <div className="space-y-4">
                     {[
-                      { key: 'warmupActivity', label: 'Hoạt động 1: Khởi động (Warm-up)', content: viewDetailPlan.warmupActivity, icon: Zap },
-                      { key: 'newLessonActivity', label: 'Hoạt động 2: Tìm hiểu bài mới (Discovery & Presentation)', content: viewDetailPlan.newLessonActivity, icon: BookOpen },
-                      { key: 'practiceActivity', label: 'Hoạt động 3: Thực hành (Practice)', content: viewDetailPlan.practiceActivity, icon: Layers },
-                      { key: 'lowApplicationActivity', label: 'Hoạt động 4: Vận dụng thấp (Low Application)', content: viewDetailPlan.lowApplicationActivity, icon: Target },
-                      { key: 'highApplicationActivity', label: 'Hoạt động 5: Vận dụng cao (High Application / Deep Learning)', content: viewDetailPlan.highApplicationActivity, icon: Sparkles },
-                      { key: 'consolidationActivity', label: 'Hoạt động 6: Củng cố kiến thức (Consolidation)', content: viewDetailPlan.consolidationActivity, icon: CheckCircle },
-                      { key: 'homeworkActivity', label: 'Hoạt động 7: Hướng dẫn về nhà (Homework Guidance)', content: viewDetailPlan.homeworkActivity, icon: FileText },
-                      { key: 'projectActivity', label: 'Hoạt động 8: Dự án Project (STEM / English Project)', content: viewDetailPlan.projectActivity, icon: Cpu },
+                      { key: 'warmupActivity', label: '1. Hoạt động Khởi động (Warm-up)', time: viewDetailPlan.warmupTime || '5 phút', content: viewDetailPlan.warmupActivity, icon: Zap, badgeColor: 'bg-amber-100 text-amber-900 border-amber-300' },
+                      { key: 'newLessonActivity', label: '2. Hoạt động Tìm hiểu vào bài / Hình thành kiến thức mới', time: viewDetailPlan.newLessonTime || '15 phút', content: viewDetailPlan.newLessonActivity, icon: BookOpen, badgeColor: 'bg-blue-100 text-blue-900 border-blue-300' },
+                      { key: 'practiceActivity', label: '3. Hoạt động Thực hành / Luyện tập (Practice)', time: viewDetailPlan.practiceTime || '10 phút', content: viewDetailPlan.practiceActivity, icon: Layers, badgeColor: 'bg-indigo-100 text-indigo-900 border-indigo-300' },
+                      { key: 'lowApplicationActivity', label: '4. Hoạt động Vận dụng thấp (Low Application)', time: viewDetailPlan.lowAppTime || '5 phút', content: viewDetailPlan.lowApplicationActivity, icon: Target, badgeColor: 'bg-emerald-100 text-emerald-900 border-emerald-300' },
+                      { key: 'highApplicationActivity', label: '5. Hoạt động Vận dụng cao / Sáng tạo (High Application)', time: viewDetailPlan.highAppTime || '5 phút', content: viewDetailPlan.highApplicationActivity, icon: Sparkles, badgeColor: 'bg-purple-100 text-purple-900 border-purple-300' },
+                      { key: 'consolidationActivity', label: '6. Hoạt động Củng cố kiến thức (Consolidation)', time: viewDetailPlan.consolidationTime || '3 phút', content: viewDetailPlan.consolidationActivity, icon: CheckCircle, badgeColor: 'bg-teal-100 text-teal-900 border-teal-300' },
+                      { key: 'homeworkActivity', label: '7. Hướng dẫn học sinh tự học ở nhà & BTVN (Homework)', time: viewDetailPlan.homeworkTime || '2 phút', content: viewDetailPlan.homeworkActivity, icon: FileText, badgeColor: 'bg-rose-100 text-rose-900 border-rose-300' },
+                      { key: 'reflectionNotes', label: '8. Rút kinh nghiệm sau bài dạy (Reflection & Adjustment)', time: 'Sau tiết dạy', content: viewDetailPlan.reflectionNotes || viewDetailPlan.notes, icon: Sparkles, badgeColor: 'bg-amber-100 text-amber-950 border-amber-300' },
                     ].map((act) => act.content ? (
-                      <div key={act.key} className="bg-slate-900 text-slate-100 p-4 rounded-xl border border-slate-700 shadow-sm space-y-3">
-                        <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-                          <span className="font-extrabold text-xs text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
-                            <act.icon className="w-4 h-4 text-amber-400" />
+                      <div key={act.key} className="bg-slate-50 p-4 rounded-xl border border-slate-200 shadow-xs space-y-3">
+                        <div className="flex items-center justify-between border-b border-slate-200 pb-2 flex-wrap gap-2">
+                          <span className="font-extrabold text-xs text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                            <act.icon className="w-4 h-4 text-orange-600" />
                             <span>{act.label}</span>
                           </span>
-                          <span className="text-[10px] font-bold text-cyan-300 flex items-center gap-1">
-                            <Volume2 className="w-3 h-3 text-cyan-400" />
-                            <span>Audio AI & Micro</span>
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[11px] font-extrabold text-slate-700 bg-white px-2.5 py-0.5 rounded-md border border-slate-300 flex items-center gap-1">
+                              <Clock className="w-3 h-3 text-orange-600" />
+                              <span>{act.time}</span>
+                            </span>
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${act.badgeColor} flex items-center gap-1`}>
+                              <Volume2 className="w-3 h-3" />
+                              <span>Loa đọc AI</span>
+                            </span>
+                          </div>
                         </div>
-                        <p className="whitespace-pre-line text-xs text-slate-200 leading-relaxed font-medium">
+                        <p className="whitespace-pre-line text-xs sm:text-sm text-slate-800 leading-relaxed font-medium bg-white p-3 rounded-lg border border-slate-200">
                           {act.content}
                         </p>
                         
@@ -1691,23 +2300,10 @@ export const LessonPlanView: React.FC<LessonPlanViewProps> = ({
                 {viewDetailPlan.exercises && (
                   <div className="space-y-1.5 border-l-4 border-l-emerald-500 pl-3">
                     <h4 className="font-extrabold text-slate-900 text-xs uppercase tracking-wider text-emerald-700">
-                      IV. Bài tập & Phiếu củng cố
+                      IV. Bài tập & Phiếu củng cố học tập
                     </h4>
-                    <p className="whitespace-pre-line text-slate-700 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-200">
+                    <p className="whitespace-pre-line text-slate-700 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs sm:text-sm">
                       {viewDetailPlan.exercises}
-                    </p>
-                  </div>
-                )}
-
-                {/* V. MỤC ĐIỀU CHỈNH BỔ SUNG & RÚT KINH NGHIỆM SAU BÀI DẠY */}
-                {viewDetailPlan.notes && (
-                  <div className="space-y-2 border-l-4 border-l-amber-500 pl-3.5 bg-gradient-to-r from-amber-50 to-orange-50 p-4 rounded-xl border border-amber-200">
-                    <h4 className="font-extrabold text-amber-900 text-xs uppercase tracking-wider flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-amber-600" />
-                      <span>V. Mục điều chỉnh bổ sung & Rút kinh nghiệm sau bài dạy</span>
-                    </h4>
-                    <p className="whitespace-pre-line text-xs text-amber-950 font-medium leading-relaxed italic">
-                      {viewDetailPlan.notes}
                     </p>
                   </div>
                 )}

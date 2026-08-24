@@ -97,69 +97,105 @@ Yêu cầu nghiêm ngặt:
   // API Route for generating CV 5512 Lesson Plans using Gemini AI
   app.post("/api/generate-lesson-plan", async (req, res) => {
     try {
-      const { title, subject, gradeLevel, textbookSet, periodsCount } = req.body;
+      const { title, subject, className, curriculumPeriod, schoolName, teacherName, textbookSet, periodsCount, bilingualActivities, enableBilingual } = req.body;
 
       if (!title || !subject) {
         return res.status(400).json({ error: "Title and subject are required." });
       }
 
-      const promptText = `Bạn là một Chuyên gia Giáo dục & Sư phạm bậc cao tại Việt Nam. Hãy soạn một KẾ HOẠCH BÀI DẠY (GIÁO ÁN) CHUẨN CÔNG VĂN 5512 BỘ GD&ĐT Việt Nam cho bài học sau:
+      const activitiesList = Array.isArray(bilingualActivities) && bilingualActivities.length > 0
+        ? bilingualActivities.join(", ")
+        : "Khởi động (Warm-up), Hình thành kiến thức mới, Hướng dẫn về nhà (BTVN)";
+
+      const promptText = `Bạn là một Chuyên gia Giáo dục & Sư phạm bậc cao tại Việt Nam. Hãy biên soạn một KẾ HOẠCH BÀI DẠY (GIÁO ÁN) CHUẨN CÔNG VĂN 5512/BGDĐT-GDTrH của Bộ Giáo dục & Đào tạo Việt Nam:
 - Tên bài học / Tiết dạy: "${title}"
 - Môn học: "${subject}"
-- Khối lớp: "${gradeLevel || "THCS - Khối 7"}"
-- Bộ sách giáo khoa: "${textbookSet || "Kết nối tri thức với cuộc sống"}"
+- Lớp học: "${className || "Lớp 7"}"
+- Tiết PPCT (Phân phối chương trình): "${curriculumPeriod || "Tiết 1"}"
+- Họ và tên GV: "${teacherName || ""}"
+- Trường: "${schoolName || ""}"
+- NGUỒN DỮ LIỆU SÁCH GIÁO KHOA CHÍNH XÁC: "${textbookSet || (subject.toLowerCase().includes("tiếng anh") ? "Tiếng Anh Global Success" : "Kết nối tri thức với cuộc sống")}"
 - Số tiết: ${periodsCount || 1}
+- CÁC HOẠT ĐỘNG CHỌN TÍCH HỢP SONG NGỮ TIẾNG ANH: "${activitiesList}"
 
-YÊU CẦU NGHIÊM NGẶT VỀ NỘI DUNG:
-1. Bám sát CHÍNH XÁC nội dung Bài học và Khái niệm trong Sách Giáo Khoa (SGK ${textbookSet || "Kết nối tri thức với cuộc sống"}). Không dùng các cụm từ chung chung sơ sài, phải ghi rõ nội dung lý thuyết, công thức, từ vựng, bài tập SGK thật cụ thể, phong phú và sâu sắc.
-2. Cấu trúc chuẩn Công văn 5512 với ĐẦY ĐỦ các mục và 8 HOẠT ĐỘNG DẠY HỌC:
-   - I. Mục tiêu bài học (1. Kiến thức SGK chi tiết, 2. Năng lực chung & Năng lực đặc thù môn học, 3. Phẩm chất học sinh).
-   - II. Khung Năng lực số (NLS) mã hóa như [NLS1.1], [NLS2.3], [NLS5.2] & Thiết bị dạy học, Phần mềm sử dụng.
-   - III. Tiến trình dạy học bao gồm đủ 8 Hoạt động:
-     + Hoạt động 1: Mở đầu / Khởi động (Mục tiêu, Nội dung, Sản phẩm, Tổ chức B1-B2-B3-B4).
-     + Hoạt động 2: Hình thành kiến thức mới / Khám phá SGK (Mục tiêu, Nội dung, Sản phẩm, B1-B2-B3-B4).
-     + Hoạt động 3: Luyện tập (Giải bài tập SGK cụ thể).
-     + Hoạt động 4: Vận dụng thấp.
-     + Hoạt động 5: Vận dụng cao / Deep Learning / Sáng tạo.
-     + Hoạt động 6: Củng cố kiến thức.
-     + Hoạt động 7: Hướng dẫn học ở nhà.
-     + Hoạt động 8: Dự án STEM / Project.
-   - Tách biệt rõ "Hoạt động của Giáo viên" và "Hoạt động của Học sinh".
-   - Phân đoạn giảng dạy Song ngữ Tiếng Anh (English Content, Dịch tiếng Việt, Từ vựng chuyên ngành kèm phiên âm IPA).
+QUY CHUẨN SOẠN BÀI NGHIÊM NGẶT THEO CÔNG VĂN 5512:
+1. MỤC TIÊU BÀI HỌC (3 MỤC RÕ RÀNG):
+   - 1. Về Kiến thức (Knowledge): Chuẩn kiến thức SGK "${textbookSet || "Kết nối tri thức với cuộc sống"}".
+   - 2. Về Năng lực (Competencies):
+     + Năng lực chung: Tự chủ và tự học, Giao tiếp và hợp tác, Giải quyết vấn đề và sáng tạo.
+     + Năng lực đặc thù: Năng lực tư duy và lập luận, mô hình hóa, ngôn ngữ, thực hành thí nghiệm.
+   - 3. Về Phẩm chất (Qualities): Chăm chỉ, trung thực, trách nhiệm, tình yêu quê hương đất nước.
+   - Tích hợp Khung Năng lực số [NLS1.1], [NLS2.3], [NLS5.2].
 
-HÃY TRẢ VỀ DUY NHẤT MỘT ĐỐI TƯỢNG JSON (KHÔNG BỌC TRONG MARKDOWN CODE BLOCK TRỪ KHI BẮT BUỘC) VỚI CÁC TRƯỜNG CHÍNH XÁC SAU:
+2. THIẾT BỊ DẠY HỌC VÀ HỌC LIỆU:
+   - a) Chuẩn bị của Giáo viên (GV): Kế hoạch bài dạy, bài giảng điện tử số, SGK, bảng tương tác, phiếu học tập số 1, 2, học liệu số.
+   - b) Chuẩn bị của Học sinh (HS): Sách giáo khoa, vở ghi bài, đồ dùng học tập, chuẩn bị bài trước ở nhà.
+
+3. TIẾN TRÌNH DẠY HỌC (8 HOẠT ĐỘNG CHUẨN KÈM PHÂN BỔ THỜI GIAN CỤ THỂ):
+   - Hoạt động 1: Khởi động (Warm-up) — Thời gian: 5 phút
+   - Hoạt động 2: Hình thành kiến thức mới / Tìm hiểu vào bài — Thời gian: 15 phút
+   - Hoạt động 3: Thực hành / Luyện tập (Practice) — Thời gian: 10 phút
+   - Hoạt động 4: Vận dụng thấp (Low Application) — Thời gian: 5 phút
+   - Hoạt động 5: Vận dụng cao / Sáng tạo (High Application) — Thời gian: 5 phút
+   - Hoạt động 6: Củng cố kiến thức (Consolidation) — Thời gian: 3 phút
+   - Hoạt động 7: Hướng dẫn học sinh tự học ở nhà & BTVN (Homework) — Thời gian: 2 phút
+   - Hoạt động 8: Rút kinh nghiệm sau bài dạy (Reflection & Adjustment) — Sau tiết dạy
+   * Trong mỗi hoạt động (1-7), trình bày đủ 4 bước kỹ thuật: a) Mục tiêu, b) Nội dung, c) Sản phẩm, d) Tổ chức thực hiện (B1: GV chuyển giao nhiệm vụ -> B2: HS thực hiện -> B3: Báo cáo thảo luận -> B4: GV nhận xét, chuẩn hóa kiến thức).
+
+4. TÍCH HỢP SONG NGỮ TIẾNG ANH (CHO CÁC HOẠT ĐỘNG ĐƯỢC CHỌN: ${activitiesList}):
+   - Trong các hoạt động được chọn, lồng ghép thuật ngữ, câu lệnh sư phạm tiếng Anh và câu hỏi tình huống song ngữ.
+   - BẢNG TỪ VỰNG CHUYÊN NGÀNH CHUẨN 3 CỘT (bắt buộc dạng: TừTiếngAnh | /PhiênÂmIPA/ | DịchNghĩaTiếngViệt), từ 4 đến 8 thuật ngữ trọng tâm của bài.
+
+HÃY TRẢ VỀ DUY NHẤT MỘT ĐỐI TƯỢNG JSON (KHÔNG KÈM BẤT KỲ VĂN BẢN NÀO KHÁC) VỚI CÁC TRƯỜNG:
 {
   "title": "string",
   "subject": "string",
-  "gradeLevel": "string",
+  "className": "string",
+  "curriculumPeriod": "string",
+  "schoolName": "string",
+  "teacherName": "string",
   "textbookSet": "string",
   "periodsCount": number,
   "digitalCompetencies": "string",
   "devicesAndSoftware": "string",
   "objectives": "string",
+  "objectivesKnowledge": "string",
+  "objectivesSkills": "string",
+  "objectivesAttitude": "string",
+  "teacherPrep": "string",
+  "studentPrep": "string",
   "keyKnowledge": "string",
+  "warmupTime": "5 phút",
   "warmupActivity": "string",
+  "newLessonTime": "15 phút",
   "newLessonActivity": "string",
+  "practiceTime": "10 phút",
   "practiceActivity": "string",
+  "lowAppTime": "5 phút",
   "lowApplicationActivity": "string",
+  "highAppTime": "5 phút",
   "highApplicationActivity": "string",
+  "consolidationTime": "3 phút",
   "consolidationActivity": "string",
+  "homeworkTime": "2 phút",
   "homeworkActivity": "string",
+  "reflectionNotes": "string",
   "projectActivity": "string",
   "teacherActivity": "string",
   "studentActivity": "string",
   "exercises": "string",
   "notes": "string",
-  "enableBilingual": boolean,
+  "enableBilingual": true,
   "bilingualTitle": "string",
   "bilingualEnglish": "string",
   "bilingualVietnamese": "string",
-  "bilingualTermsRaw": "string"
+  "bilingualTermsRaw": "string",
+  "targetActivities": ["string"]
 }`;
 
       if (ai) {
         const response = await ai.models.generateContent({
-          model: "gemini-3.6-flash",
+          model: "gemini-3.7-flash",
           contents: [{ role: "user", parts: [{ text: promptText }] }],
           config: {
             temperature: 0.3,
@@ -182,7 +218,7 @@ HÃY TRẢ VỀ DUY NHẤT MỘT ĐỐI TƯỢNG JSON (KHÔNG BỌC TRONG MARKDO
       // Fallback generator if AI key is missing
       return res.json({
         success: true,
-        planData: generateFallbackLessonPlan(title, subject, gradeLevel, textbookSet, periodsCount),
+        planData: generateFallbackLessonPlan(title, subject, className, curriculumPeriod, textbookSet, periodsCount, schoolName, teacherName),
       });
     } catch (error: any) {
       console.error("Error in generate-lesson-plan API:", error);
@@ -191,9 +227,12 @@ HÃY TRẢ VỀ DUY NHẤT MỘT ĐỐI TƯỢNG JSON (KHÔNG BỌC TRONG MARKDO
         planData: generateFallbackLessonPlan(
           req.body.title || "Bài dạy chuẩn",
           req.body.subject || "Toán",
-          req.body.gradeLevel,
+          req.body.className,
+          req.body.curriculumPeriod,
           req.body.textbookSet,
-          req.body.periodsCount
+          req.body.periodsCount,
+          req.body.schoolName,
+          req.body.teacherName
         ),
       });
     }
@@ -203,9 +242,12 @@ HÃY TRẢ VỀ DUY NHẤT MỘT ĐỐI TƯỢNG JSON (KHÔNG BỌC TRONG MARKDO
   function generateFallbackLessonPlan(
     title: string,
     subject: string,
-    gradeLevel?: string,
+    className?: string,
+    curriculumPeriod?: string,
     textbookSet?: string,
-    periodsCount?: number
+    periodsCount?: number,
+    schoolName?: string,
+    teacherName?: string
   ) {
     const isEnglish =
       subject.toLowerCase().includes("tiếng anh") ||
@@ -218,7 +260,10 @@ HÃY TRẢ VỀ DUY NHẤT MỘT ĐỐI TƯỢNG JSON (KHÔNG BỌC TRONG MARKDO
       return {
         title: title || "Unit 1: Hobbies and Free Time Activities",
         subject: "Tiếng Anh",
-        gradeLevel: gradeLevel || "THCS - Khối 7",
+        className: className || "Lớp 7",
+        curriculumPeriod: curriculumPeriod || "Tiết 1",
+        schoolName: schoolName || "Trường THCS/THPT",
+        teacherName: teacherName || "Giáo viên Tiếng Anh",
         textbookSet: "Tiếng Anh Global Success",
         periodsCount: periodsCount || 1,
         digitalCompetencies:
@@ -226,41 +271,60 @@ HÃY TRẢ VỀ DUY NHẤT MỘT ĐỐI TƯỢNG JSON (KHÔNG BỌC TRONG MARKDO
         devicesAndSoftware:
           "Thiết bị: Máy tính GV, Bảng tương tác Smartboard, Loa Bluetooth, Micro thu âm AI.\nPhần mềm: Quizizz, Canva Presentation, Cambridge Dictionary, Miss Yến Còi AI App.",
         objectives:
-          "- About Knowledge: Master 8-12 core vocabulary items regarding hobbies, free time activities and community work. Understand grammar patterns (Present Simple for likes/dislikes, verbs of liking + V-ing).\n- About Skills: Develop 4 language skills (Listening, Speaking, Reading, Writing) with accurate IPA pronunciation /s/ and /z/.\n- About Qualities: Encourage positive lifestyle choices, active collaboration and communication in English.",
+          "1. Về Kiến thức: Master 8-12 core vocabulary items regarding hobbies, free time activities and community work. Understand grammar patterns (Present Simple for likes/dislikes, verbs of liking + V-ing).\n2. Về Kĩ năng: Develop 4 language skills (Listening, Speaking, Reading, Writing) with accurate IPA pronunciation /s/ and /z/.\n3. Về Phẩm chất: Encourage positive lifestyle choices, active collaboration and communication in English.",
+        objectivesKnowledge:
+          "- Nắm vững 8-12 từ vựng trọng tâm về sở thích, hoạt động thời gian rảnh rỗi (gardening, collecting, cycling, origami...).\n- Sử dụng thành thạo cấu trúc động từ chỉ sự yêu thích (like, love, adore, hate + V-ing/to-V).",
+        objectivesSkills:
+          "- Nghe hiểu các đoạn hội thoại chủ đề Hobbies trong SGK.\n- Nói lưu loát giới thiệu về sở thích cá nhân với ngữ điệu và phát âm âm đuôi /s/, /z/ chuẩn xác.\n- Kĩ năng hợp tác nhóm, giao tiếp tự tin bằng tiếng Anh.",
+        objectivesAttitude:
+          "- Hình thành thói quen rèn luyện các sở thích lành mạnh, bổ ích.\n- Tinh thần chăm chỉ, tích cực tham gia các hoạt động cộng đồng.",
+        teacherPrep:
+          "Giáo án điện tử PowerPoint/Canva, file âm thanh Audio MP3 SGK Global Success, flashcards từ vựng, máy chiếu, loa trợ giảng.",
+        studentPrep:
+          "Sách giáo khoa Tiếng Anh Global Success, vở ghi từ vựng, chuẩn bị trước bài đọc Getting Started ở nhà.",
         keyKnowledge:
-          "1. Vocabulary: donate, volunteer, community service, hobby, leisure activity, science fiction,crafts, gardening.\n2. Grammar: Verbs of liking (like, love, enjoy, hate) + V-ing / to-V.\n3. Pronunciation: Phonics sounds /s/ and /z/ in plural nouns and verbs ending.",
+          "1. Vocabulary: donate, volunteer, community service, hobby, leisure activity, science fiction, crafts, gardening.\n2. Grammar: Verbs of liking (like, love, enjoy, hate) + V-ing / to-V.\n3. Pronunciation: Phonics sounds /s/ and /z/ in plural nouns and verbs ending.",
+        warmupTime: "5 phút",
         warmupActivity:
-          "Hoạt động 1: Warm-up (5 mins)\n- Objective: Activate prior knowledge and warm up class atmosphere.\n- Content: Play 'Guess the Hobby' game. Teacher displays action cards on Smartboard.\n- Product: Students correctly identify at least 5 hobbies in English.\n- Execution (B1-B4): B1 Teacher presents game rules; B2 Students work in 2 teams; B3 Representatives answer; B4 Teacher praises and leads into Unit lesson.",
+          "Hoạt động 1: Khởi động (Warm-up - 5 phút)\n- Mục tiêu: Kích hoạt từ vựng sẵn có, tạo không khí hứng khởi đầu giờ.\n- Nội dung: Chơi trò chơi 'Guess the Hobby' (Đoán hành động qua hình ảnh minh họa trên màn hình).\n- Sản phẩm: Học sinh gọi tên đúng ít nhất 5 sở thích bằng Tiếng Anh.\n- Tổ chức thực hiện:\n  + B1 (Chuyển giao): GV chiếu slide trò chơi, nêu luật chơi.\n  + B2 (Thực hiện): Cả lớp quan sát hình ảnh và suy nghĩ.\n  + B3 (Báo cáo): Học sinh xung phong trả lời nhanh.\n  + B4 (Đánh giá): GV tuyên dương và dẫn dắt vào bài mới.",
+        newLessonTime: "15 phút",
         newLessonActivity:
-          "Hoạt động 2: Presentation & Discovery (15 mins)\n- Objective: Introduce new vocabulary and grammar structure according to SGK Global Success.\n- Content: Read Getting Started section, listen to dialogue between Ann and Minh, repeat key terms.\n- Product: Students write vocabulary with IPA in notebooks and complete activity 2 in SGK.\n- Execution: B1 Teacher plays audio MP3 and highlights vocabulary; B2 Students listen and repeat chorally; B3 Pair reading; B4 Teacher checks pronunciation.",
+          "Hoạt động 2: Tìm hiểu vào bài / Hình thành kiến thức mới (Presentation - 15 phút)\n- Mục tiêu: Khám phá từ vựng mới và cấu trúc ngữ pháp trọng tâm theo SGK Global Success.\n- Nội dung: Đọc đoạn hội thoại Getting Started, nghe phát âm chuẩn và ghi chép cấu trúc.\n- Sản phẩm: Bảng từ vựng kèm phiên âm IPA trong vở ghi bài của học sinh.\n- Tổ chức thực hiện:\n  + B1 (Chuyển giao): GV bật audio, hướng dẫn HS quan sát tranh.\n  + B2 (Thực hiện): HS nghe, nhắc lại đồng thanh và theo cặp.\n  + B3 (Báo cáo): HS đọc to trước lớp, giải thích nghĩa.\n  + B4 (Đánh giá): GV chuẩn hóa phát âm và giải thích ngữ pháp.",
+        practiceTime: "10 phút",
         practiceActivity:
-          "Hoạt động 3: Controlled Practice (10 mins)\n- Objective: Practice verb forms (enjoy/like + V-ing) through SGK exercises.\n- Content: Complete sentences 1-5 in SGK page 10. Pair work speaking drill.\n- Product: Correctly completed sentences and oral practice recording on Miss Yến Còi app.",
+          "Hoạt động 3: Thực hành / Luyện tập (Practice - 10 phút)\n- Mục tiêu: Vận dụng mẫu câu và từ vựng để hoàn thành bài tập SGK.\n- Nội dung: Làm bài tập 1, 2, 3 SGK trang 10 (Điền từ và chia động từ theo mẫu).\n- Sản phẩm: Đáp án chính xác được ghi vào vở bài tập.\n- Tổ chức thực hiện:\n  + B1: GV giao nhiệm vụ làm việc cá nhân 5 phút.\n  + B2: HS làm bài, đổi vở chấm chéo theo cặp.\n  + B3: 3 đại diện HS lên bảng viết câu trả lời.\n  + B4: GV nhận xét, phân tích lỗi sai và chấm điểm.",
+        lowAppTime: "5 phút",
         lowApplicationActivity:
-          "Hoạt động 4: Production / Low Application (5 mins)\n- Objective: Apply sentence patterns to survey classmates about hobbies.\n- Content: Interview 3 classmates using 'What do you enjoy doing in your free time?'.\n- Product: Completed survey table in student notebook.",
+          "Hoạt động 4: Vận dụng thấp (Production / Low Application - 5 phút)\n- Mục tiêu: Áp dụng mẫu câu để phỏng vấn bạn cùng bàn về sở thích.\n- Nội dung: Thực hành hỏi đáp cặp đôi: 'What do you like doing in your free time? - I love...'.\n- Sản phẩm: Bảng thông tin khảo sát 2-3 bạn trong lớp.",
+        highAppTime: "5 phút",
         highApplicationActivity:
-          "Hoạt động 5: High Application & Deep Learning (5 mins)\n- Objective: Discuss and write a 60-word passage about benefits of a specific hobby.\n- Content: Group discussion on 'Why gardening is good for mental health'.\n- Product: Group paragraph displayed on Canva or poster.",
+          "Hoạt động 5: Vận dụng cao / Sáng tạo (High Application - 5 phút)\n- Mục tiêu: Thuyết trình ngắn hoặc viết đoạn văn 40-50 từ về lợi ích của một sở thích.\n- Nội dung: Thảo luận nhóm: 'Why gardening is good for mental health?'.\n- Sản phẩm: Áp phích nhỏ hoặc bài chia sẻ trước lớp.",
+        consolidationTime: "3 phút",
         consolidationActivity:
-          "Hoạt động 6: Consolidation (3 mins)\n- Objective: Summarize key vocabulary and grammar rules.\n- Content: 5-question Quizizz game.\n- Product: Instant class leaderboards.",
+          "Hoạt động 6: Củng cố (Consolidation - 3 phút)\n- Mục tiêu: Tổng kết toàn bộ từ vựng và cấu trúc ngữ pháp tiết học.\n- Nội dung: Trả lời 4 câu trắc nghiệm nhanh qua trò chơi tương tác Quizizz / Flashcards.\n- Sản phẩm: Bảng xếp hạng kết quả tổng kết của lớp.",
+        homeworkTime: "2 phút",
         homeworkActivity:
-          "Hoạt động 7: Homework Guidance (2 mins)\n- Learn vocabulary and grammar by heart.\n- Record a 1-minute audio passage on Miss Yến Còi AI app.\n- Prepare for Closer Look 1.",
+          "Hoạt động 7: Hướng dẫn học ở nhà (BTVN - 2 phút)\n- Học thuộc lòng các từ vựng mới và mẫu câu chỉ sở thích.\n- Làm bài tập phần A (Phonetics) và B (Vocabulary) trong Sách bài tập.\n- Luyện phát âm qua loa âm thanh trên ứng dụng và chuẩn bị bài A Closer Look 1.",
+        reflectionNotes:
+          "Hoạt động 8: Rút kinh nghiệm sau tiết dạy\n- Phân bổ thời gian: Đảm bảo đúng thời lượng 45 phút.\n- Mức độ tiếp thu của học sinh: Đa số phát âm tốt âm đuôi /s/, /z/, một số em cần rèn thêm ngữ điệu tự nhiên.\n- Hướng điều chỉnh: Tăng cường hoạt động giao tiếp nhóm đôi trong các tiết sau.",
         projectActivity:
-          "Hoạt động 8: Project Work\n- Topic: 'Our Class Hobby Wall Poster'.\n- Product: A bilingual poster presenting favorite hobbies of group members.",
+          "Hoạt động mở rộng: Project Work\n- Topic: 'Our Class Hobby Wall Poster'.\n- Product: A bilingual poster presenting favorite hobbies of group members.",
         teacherActivity:
-          "1. Present target vocabulary with IPA pronunciation and native audio samples.\n2. Facilitate pair work and group discussions, correcting pronunciation errors gently.\n3. Conclude lesson and summarize core learning points.",
+          "1. Trình chiếu học liệu số, phát âm mẫu chuẩn quốc tế kèm phiên âm IPA.\n2. Tổ chức hoạt động nhóm tương tác, chỉnh sửa phát âm nhẹ nhàng.\n3. Đánh giá sự tiến bộ của từng nhóm học sinh theo định hướng phát triển năng lực.",
         studentActivity:
-          "1. Listen attentively, take notes, and repeat vocabulary with standard stress.\n2. Work actively in pairs/groups to complete tasks and present findings.\n3. Complete self-evaluation on learning app.",
+          "1. Lắng nghe, quan sát, tích cực phát biểu và ghi chép cẩn thận.\n2. Tương tác luyện nói cặp đôi/nhóm tự tin, sôi nổi.\n3. Tự đánh giá và hoàn thành nhiệm vụ được giao.",
         exercises:
           "Exercise 1, 2, 3 in SGK Global Success Page 10-11.\nExtra Worksheet: Complete 10 multiple choice questions on Present Simple and V-ing.",
         notes:
-          "Remind students to practice phonics /s/ and /z/ using the audio practice player on the app before next class.",
+          "Nhắc nhở học sinh luyện phát âm qua loa phát âm âm thanh trên hệ thống trước buổi học tiếp theo.",
         enableBilingual: true,
-        bilingualTitle: "Bilingual Segment: Hobbies and Personal Growth",
+        bilingualTitle: "Phân đoạn Song ngữ: Hobbies and Personal Growth",
         bilingualEnglish:
           "A: What do you like doing in your free time?\nB: I love reading books and playing badminton. It keeps me healthy and broadens my mind.",
         bilingualVietnamese:
           "A: Bạn thích làm gì vào thời gian rảnh rỗi?\nB: Mình rất thích đọc sách và chơi cầu lông. Nó giúp mình khỏe mạnh và mở rộng hiểu biết.",
         bilingualTermsRaw:
-          "Leisure Activity | /ˈleʒər ækˈtɪvəti/ | Hoạt động giải trí\nBroaden mind | /ˈbrɔːdn maɪnd/ | Mở rộng trí tuệ\nPhysical health | /ˈfɪzɪkl helθ/ | Sức khỏe thể chất",
+          "Leisure Activity | /ˈleʒər ækˈtɪvəti/ | Hoạt động giải trí\nBroaden mind | /ˈbrɔːdn maɪnd/ | Mở rộng trí tuệ\nPhysical health | /ˈfɪzɪkl helθ/ | Sức khỏe thể chất\nCommunity service | /kəˈmjuːnəti ˈsɜːrvɪs/ | Hoạt động tình nguyện phục vụ cộng đồng",
       };
     }
 
@@ -268,7 +332,10 @@ HÃY TRẢ VỀ DUY NHẤT MỘT ĐỐI TƯỢNG JSON (KHÔNG BỌC TRONG MARKDO
     return {
       title: title || `Bài dạy: ${subject} - Kiến thức trọng tâm`,
       subject: subject || "Toán",
-      gradeLevel: gradeLevel || "THCS - Khối 7",
+      className: className || "Lớp 7",
+      curriculumPeriod: curriculumPeriod || "Tiết 1",
+      schoolName: schoolName || "Trường THCS/THPT",
+      teacherName: teacherName || "Giáo viên bộ môn",
       textbookSet: book,
       periodsCount: periodsCount || 1,
       digitalCompetencies:
@@ -276,43 +343,66 @@ HÃY TRẢ VỀ DUY NHẤT MỘT ĐỐI TƯỢNG JSON (KHÔNG BỌC TRONG MARKDO
       devicesAndSoftware:
         "Thiết bị: Máy tính giáo viên/học sinh, Máy chiếu Projector, Bảng tương tác Smartboard.\nPhần mềm: GeoGebra, Canva Education, PhET Simulations, Quizizz, AI Miss Yến Còi.",
       objectives:
-        "- Về kiến thức: Học sinh nắm vững lý thuyết trọng tâm, các khái niệm, định lý và quy tắc trong SGK " +
+        "1. Về Kiến thức: Học sinh nắm vững định nghĩa, tính chất và công thức trọng tâm theo SGK " +
         book +
-        ". Biểu diễn và giải thành thạo bài tập cơ bản và nâng cao.\n- Về kỹ năng: Phát triển năng lực tư duy logic, phân tích tổng hợp, năng lực giải quyết vấn đề thực tiễn và hợp tác nhóm.\n- Về phẩm chất: Rèn luyện tính trung thực, cẩn thận, ý thức trách nhiệm và tinh thần chủ động sáng tạo.",
+        ".\n2. Về Kĩ năng: Giải thành thạo bài tập cơ bản và nâng cao, tư duy logic, làm việc nhóm.\n3. Về Thái độ: Trung thực, cẩn thận, chăm chỉ, có tinh thần trách nhiệm trong học tập.",
+      objectivesKnowledge:
+        "- Nắm vững lý thuyết trọng tâm, các khái niệm, định lý, công thức và quy tắc trong SGK " +
+        book +
+        ".\n- Hiểu rõ bản chất và vận dụng giải các dạng bài tập toán học/khoa học liên quan.",
+      objectivesSkills:
+        "- Rèn luyện kĩ năng tính toán, phân tích, tư duy logic và suy luận logic.\n- Phát triển năng lực giải quyết vấn đề thực tiễn, năng lực giao tiếp và hợp tác nhóm.",
+      objectivesAttitude:
+        "- Rèn luyện tính cẩn thận, trung thực, tỉ mỉ và kiên trì trong học tập.\n- Có hứng thú, say mê nghiên cứu khoa học và ứng dụng kiến thức vào đời sống.",
+      teacherPrep:
+        "Kế hoạch bài dạy (Giáo án CV 5512), Bài giảng điện tử trình chiếu PowerPoint/Canva, Phiếu học tập số 1, 2, Thiết bị máy chiếu, dụng cụ trực quan.",
+      studentPrep:
+        "Sách giáo khoa " +
+        book +
+        ", vở ghi bài, đồ dùng học tập (thước kẻ, bút màu, máy tính cầm tay), đọc trước nội dung bài học ở nhà.",
       keyKnowledge:
         "1. Khái niệm cốt lõi theo bài dạy SGK " +
         book +
         ": Định nghĩa, tính chất, quy tắc và biểu thức liên hệ.\n2. Phương pháp giải các dạng bài tập điển hình trong bài học.\n3. Mối liên hệ thực tiễn của bài học đối với đời sống.",
+      warmupTime: "5 phút",
       warmupActivity:
-        "Hoạt động 1: Mở đầu / Khởi động (5 phút)\n- Mục tiêu: Kích thích sự tò mò, kết nối kiến thức thực tế bài học.\n- Nội dung: GV đưa ra tình huống thực tiễn sinh động qua Slide trình chiếu Smartboard.\n- Sản phẩm: HS phát biểu ý kiến ban đầu và nêu vướng mắc cần giải quyết.\n- Tổ chức thực hiện (B1-B4):\n  + B1 (Chuyển giao): GV giao câu hỏi tình huống trên màn hình.\n  + B2 (Thực hiện): HS thảo luận cặp đôi trong 2 phút.\n  + B3 (Báo cáo): 2 đại diện HS trình bày câu trả lời.\n  + B4 (Kết luận): GV nhận xét và dẫn dắt vào bài học mới.",
+        "Hoạt động 1: Mở đầu / Khởi động (Warm-up - 5 phút)\n- Mục tiêu: Kích thích sự tò mò, tạo tâm thế tích cực và kết nối vào bài học mới.\n- Nội dung: GV đưa ra câu hỏi / hình ảnh tình huống thực tiễn sinh động trên máy chiếu.\n- Sản phẩm: HS suy nghĩ, đưa ra các dự đoán và câu trả lời ban đầu.\n- Tổ chức thực hiện (B1-B4):\n  + B1 (Chuyển giao): GV nêu bài toán tình huống thực tế.\n  + B2 (Thực hiện): HS quan sát, trao đổi cặp đôi nhanh trong 2 phút.\n  + B3 (Báo cáo): 2 học sinh đại diện trình bày suy nghĩ.\n  + B4 (Kết luận): GV nhận xét, khơi gợi vấn đề và dẫn dắt vào bài học mới.",
+      newLessonTime: "15 phút",
       newLessonActivity:
-        "Hoạt động 2: Hình thành kiến thức mới / Khám phá SGK (15 phút)\n- Mục tiêu: Học sinh tự khám phá lý thuyết và quy tắc trọng tâm SGK " +
+        "Hoạt động 2: Tìm hiểu vào bài / Hình thành kiến thức mới (Khám phá - 15 phút)\n- Mục tiêu: Học sinh phát hiện và chiếm lĩnh định nghĩa, quy tắc và công thức trọng tâm SGK " +
         book +
-        ".\n- Nội dung: Đọc nội dung khám phá 1, 2 trong SGK, làm việc với phần mềm mô phỏng.\n- Sản phẩm: Định nghĩa chuẩn mực, công thức đóng khung và tính chất bài học.\n- Tổ chức thực hiện:\n  + B1: GV chia lớp thành 4 nhóm, phát phiếu học tập số 1.\n  + B2: Các nhóm nghiên cứu SGK, thao tác trên phần mềm trực quan.\n  + B3: Đại diện Nhóm 1 & Nhóm 3 lên bảng trình bày kết quả thảo luận.\n  + B4: GV chuẩn hóa kiến thức, ghi bảng và chốt khái niệm.",
+        ".\n- Nội dung: Đọc mục Khám phá 1, 2 trong SGK, thảo luận nhóm và hoàn thành phiếu học tập số 1.\n- Sản phẩm: Khái niệm được phát biểu chính xác, công thức và ví dụ mẫu được trình bày rõ ràng.\n- Tổ chức thực hiện:\n  + B1 (Chuyển giao): GV chia lớp thành 4 nhóm, phát phiếu học tập.\n  + B2 (Thực hiện): Các nhóm trao đổi, làm việc với SGK và phần mềm mô phỏng.\n  + B3 (Báo cáo): Đại diện Nhóm 1 và Nhóm 3 lên bảng trình bày kết quả.\n  + B4 (Kết luận): GV chuẩn hóa kiến thức, ghi bảng nội dung trọng tâm.",
+      practiceTime: "10 phút",
       practiceActivity:
-        "Hoạt động 3: Luyện tập (10 phút)\n- Mục tiêu: Củng cố kiến thức vừa học qua bài tập SGK " +
+        "Hoạt động 3: Thực hành / Luyện tập (10 phút)\n- Mục tiêu: Củng cố và khắc sâu kiến thức vừa tiếp thu qua việc giải bài tập SGK " +
         book +
-        ".\n- Nội dung: Giải các bài tập Luyện tập 1, Luyện tập 2 trong SGK.\n- Sản phẩm: Lời giải chi tiết trên tập vở và bảng lớp.\n- Tổ chức thực hiện: HS làm việc cá nhân 5 phút, 2 HS lên bảng sửa bài. GV cùng cả lớp nhận xét, đánh giá điểm số.",
+        ".\n- Nội dung: Học sinh giải bài Luyện tập 1, Luyện tập 2 trong SGK.\n- Sản phẩm: Bài giải chi tiết, chính xác trên tập vở và bảng lớp.\n- Tổ chức thực hiện:\n  + B1: GV yêu cầu HS làm bài cá nhân trong 5 phút.\n  + B2: HS làm bài, đổi vở kiểm tra kết quả chéo.\n  + B3: 2 HS lên bảng trình bày lời giải.\n  + B4: GV nhận xét, chuẩn hóa phương pháp giải và cho điểm khích lệ.",
+      lowAppTime: "5 phút",
       lowApplicationActivity:
-        "Hoạt động 4: Vận dụng thấp (5 phút)\n- Mục tiêu: Vận dụng quy tắc bài học để giải bài toán thực tế đơn giản.\n- Nội dung: Bài toán tính toán trong đời sống gắn với gia đình/trường học.\n- Sản phẩm: Đáp số đúng và quy trình giải hợp lý.",
+        "Hoạt động 4: Vận dụng thấp (5 phút)\n- Mục tiêu: Vận dụng trực tiếp quy tắc vừa học để giải quyết bài toán thực tế đơn giản.\n- Nội dung: Bài toán tính toán liên quan đến đời sống gia đình/trường học.\n- Sản phẩm: Đáp án đúng và lập luận chặt chẽ trong vở ghi.",
+      highAppTime: "5 phút",
       highApplicationActivity:
-        "Hoạt động 5: Vận dụng cao / Deep Learning (5 phút)\n- Mục tiêu: Phát triển năng lực sáng tạo và tư duy phản biện.\n- Nội dung: Bài toán tích hợp liên môn và mô hình hóa dữ liệu trên ứng dụng Canva.\n- Sản phẩm: Báo cáo Infographic hoặc sơ đồ tư duy nhóm.",
+        "Hoạt động 5: Vận dụng cao / Sáng tạo (5 phút)\n- Mục tiêu: Phát triển tư duy phản biện, liên hệ liên môn và sáng tạo.\n- Nội dung: Bài toán mở rộng đòi hỏi kết hợp nhiều bước suy luận hoặc mô phỏng trên Canva.\n- Sản phẩm: Sơ đồ tư duy hoặc giải pháp giải toán sáng tạo của nhóm.",
+      consolidationTime: "3 phút",
       consolidationActivity:
-        "Hoạt động 6: Củng cố (3 phút)\n- Mục tiêu: Khái quát hóa toàn bộ sơ đồ bài học.\n- Nội dung: Trả lời 4 câu hỏi trắc nghiệm củng cố trên ứng dụng.\n- Sản phẩm: Kết quả đánh giá trắc nghiệm.",
+        "Hoạt động 6: Củng cố (3 phút)\n- Mục tiêu: Khái quát hóa và hệ thống lại toàn bộ sơ đồ bài học.\n- Nội dung: Trả lời 4 câu hỏi trắc nghiệm nhanh trên ứng dụng.\n- Sản phẩm: Học sinh nắm chắc sơ đồ kiến thức cốt lõi.",
+      homeworkTime: "2 phút",
       homeworkActivity:
-        "Hoạt động 7: Hướng dẫn về nhà (2 phút)\n- Học thuộc định nghĩa và công thức trọng tâm.\n- Hoàn thành bài tập còn lại trong SGK và SBT.\n- Đọc trước bài tiếp theo trong kế hoạch giảng dạy.",
+        "Hoạt động 7: Hướng dẫn học ở nhà (BTVN - 2 phút)\n- Học thuộc các định nghĩa, quy tắc và công thức đã học.\n- Hoàn thành các bài tập còn lại trong SGK và Sách bài tập.\n- Chuẩn bị trước bài học tiếp theo theo phân phối chương trình.",
+      reflectionNotes:
+        "Hoạt động 8: Rút kinh nghiệm sau tiết dạy\n- Tiến trình: Tiết dạy diễn ra đúng kế hoạch, đảm bảo đủ 45 phút.\n- Học sinh: Tích cực tương tác nhóm, phần lớn nắm vững kiến thức trọng tâm.\n- Rút kinh nghiệm: Cần dành thêm 1-2 phút hỗ trợ các học sinh còn lúng túng trong phần Luyện tập.",
       projectActivity:
-        "Hoạt động 8: Dự án Project / STEM\n- Chủ đề: 'Ứng dụng kiến thức bài học vào mô hình thực tế'.\n- Sản phẩm: Báo cáo sản phẩm nhóm sau 1 tuần.",
+        "Hoạt động mở rộng: Dự án STEM / Project\n- Chủ đề: 'Ứng dụng kiến thức bài học vào thiết kế mô hình thực tế'.\n- Sản phẩm: Báo cáo sản phẩm nhóm sau 1 tuần.",
       teacherActivity:
-        "1. Chuyển giao nhiệm vụ học tập rõ ràng, khoa học qua bảng tương tác.\n2. Quan sát, động viên và trợ giúp các nhóm gặp vướng mắc.\n3. Đánh giá, nhận xét, chuẩn hóa kiến thức theo đúng Công văn 5512.",
+        "1. Chuyển giao nhiệm vụ học tập rõ ràng, khoa học qua bảng tương tác và phiếu học tập.\n2. Quan sát, hướng dẫn, hỗ trợ kịp thời các nhóm học sinh còn khó khăn.\n3. Đánh giá, chuẩn hóa kiến thức theo đúng định hướng Công văn 5512.",
       studentActivity:
-        "1. Chủ động nhận nhiệm vụ, thảo luận nhóm nghiêm túc và hiệu quả.\n2. Trình bày sản phẩm học tập trước lớp tự tin, rõ ràng.\n3. Tự đánh giá và đánh giá chéo kết quả học tập của bạn.",
+        "1. Chủ động tiếp nhận nhiệm vụ, tích cực hợp tác thảo luận nhóm.\n2. Trình bày sản phẩm học tập tự tin, mạch lạc trước tập thể lớp.\n3. Lắng nghe, nhận xét và tự đánh giá kết quả học tập.",
       exercises:
         "1. Toàn bộ bài tập SGK " +
         book +
         " theo nội dung bài dạy.\n2. Phiếu bài tập phân hóa 3 cấp độ: Nhận biết - Thông hiểu - Vận dụng.",
       notes:
-        "Nhắc nhở học sinh chuẩn bị đầy đủ đồ dùng học tập và ôn lại công thức cũ trước giờ học sau.",
+        "Nhắc nhở học sinh chuẩn bị đầy đủ dụng cụ học tập và làm bài tập về nhà đầy đủ.",
       enableBilingual: true,
       bilingualTitle: "Phân đoạn Song ngữ Tiếng Anh (Bilingual Segment)",
       bilingualEnglish:
@@ -320,7 +410,7 @@ HÃY TRẢ VỀ DUY NHẤT MỘT ĐỐI TƯỢNG JSON (KHÔNG BỌC TRONG MARKDO
       bilingualVietnamese:
         "Nội dung trọng tâm bài học được tích hợp từ vựng học thuật Tiếng Anh chuẩn mực giúp học sinh tiếp cận tiêu chuẩn giáo dục quốc tế.",
       bilingualTermsRaw:
-        "Core Concept | /kɔːr ˈkɑːnsept/ | Khái niệm cốt lõi\nApplication | /ˌæplɪˈkeɪʃn/ | Sự vận dụng thực tế\nTheorem | /ˈθɪərəm/ | Định lý",
+        "Core Concept | /kɔːr ˈkɑːnsept/ | Khái niệm cốt lõi\nApplication | /ˌæplɪˈkeɪʃn/ | Sự vận dụng thực tế\nTheorem | /ˈθɪərəm/ | Định lý\nFormula | /ˈfɔːrmjələ/ | Công thức",
     };
   }
 

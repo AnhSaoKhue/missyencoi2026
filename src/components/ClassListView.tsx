@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Classroom } from '../types';
-import { School, BookOpen, Calendar, Users, Edit3, Trash2, PlusCircle, Search, ChevronRight, CalendarCheck } from 'lucide-react';
+import { School, BookOpen, Calendar, Users, Edit3, Trash2, PlusCircle, Search, ChevronRight, CalendarCheck, Filter } from 'lucide-react';
 
 interface ClassListViewProps {
   classrooms: Classroom[];
@@ -11,6 +11,8 @@ interface ClassListViewProps {
   onGoToAttendance?: (classId: string) => void;
 }
 
+const GRADES = ['ALL', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
+
 export const ClassListView: React.FC<ClassListViewProps> = ({
   classrooms,
   onSelectClass,
@@ -20,14 +22,23 @@ export const ClassListView: React.FC<ClassListViewProps> = ({
   onGoToAttendance,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedGradeFilter, setSelectedGradeFilter] = useState<string>('ALL');
 
-  const filteredClassrooms = classrooms.filter(
-    (c) =>
+  const filteredClassrooms = classrooms.filter((c) => {
+    const matchSearch =
       c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       c.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
       c.teacher.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      c.schoolYear.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+      c.schoolYear.toLowerCase().includes(searchTerm.toLowerCase());
+
+    if (!matchSearch) return false;
+
+    if (selectedGradeFilter === 'ALL') return true;
+
+    // Match grade number e.g. "Lớp 7A1" -> matches "7"
+    const regex = new RegExp(`\\b${selectedGradeFilter}\\b|Lớp ${selectedGradeFilter}|Khối ${selectedGradeFilter}|${selectedGradeFilter}[A-Z]`, 'i');
+    return regex.test(c.name);
+  });
 
   return (
     <div className="space-y-6">
@@ -39,7 +50,7 @@ export const ClassListView: React.FC<ClassListViewProps> = ({
             <span>Danh sách Lớp học ({classrooms.length})</span>
           </h2>
           <p className="text-xs text-slate-500 mt-1">
-            Quản lý, thêm mới, cập nhật thông tin lớp học, học sinh và thực hiện điểm danh
+            Quản lý linh hoạt lớp học từ Lớp 1 đến Lớp 12, thêm mới học sinh và điểm danh
           </p>
         </div>
 
@@ -52,16 +63,50 @@ export const ClassListView: React.FC<ClassListViewProps> = ({
         </button>
       </div>
 
-      {/* Search Input */}
-      <div className="relative max-w-md">
-        <Search className="w-5 h-5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-        <input
-          type="text"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Tìm theo tên lớp, môn học, giáo viên, năm học..."
-          className="w-full pl-11 pr-4 py-2.5 text-slate-800 bg-white border border-slate-300 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-orange-500/40 focus:border-orange-500 transition-all text-sm shadow-xs"
-        />
+      {/* Filter and Search Bar */}
+      <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="relative flex-1 max-w-md">
+            <Search className="w-5 h-5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Tìm theo tên lớp, môn học, giáo viên, năm học..."
+              className="w-full pl-11 pr-4 py-2 text-slate-800 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-orange-500/40 focus:border-orange-500 transition-all text-xs font-semibold"
+            />
+          </div>
+
+          <div className="text-xs text-slate-500 font-bold">
+            Hiển thị: <span className="text-orange-600 font-black">{filteredClassrooms.length}</span> lớp
+          </div>
+        </div>
+
+        {/* Grade Pills (All + Lớp 1 -> Lớp 12) */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pt-2 border-t border-slate-100 pb-1">
+          <span className="text-[11px] font-bold text-slate-500 flex items-center gap-1 shrink-0 mr-1">
+            <Filter className="w-3 h-3 text-orange-500" />
+            <span>Lọc theo khối:</span>
+          </span>
+
+          {GRADES.map((g) => {
+            const isSelected = selectedGradeFilter === g;
+            return (
+              <button
+                key={g}
+                type="button"
+                onClick={() => setSelectedGradeFilter(g)}
+                className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                  isSelected
+                    ? 'bg-[#001f3f] text-white shadow-xs'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+              >
+                {g === 'ALL' ? 'Tất cả khối (1-12)' : `Lớp ${g}`}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Class Grid */}
@@ -69,11 +114,13 @@ export const ClassListView: React.FC<ClassListViewProps> = ({
         <div className="bg-white rounded-2xl p-10 text-center border border-slate-200 shadow-sm">
           <School className="w-12 h-12 text-slate-300 mx-auto mb-3" />
           <p className="text-slate-700 font-bold text-base mb-1">
-            {searchTerm ? 'Không tìm thấy lớp học phù hợp' : 'Chưa có lớp học nào'}
+            {searchTerm || selectedGradeFilter !== 'ALL'
+              ? 'Không tìm thấy lớp học phù hợp'
+              : 'Chưa có lớp học nào'}
           </p>
           <p className="text-slate-400 text-xs max-w-sm mx-auto mb-4">
-            {searchTerm
-              ? 'Thử thay đổi từ khóa tìm kiếm hoặc bấm nút Tạo lớp học mới.'
+            {searchTerm || selectedGradeFilter !== 'ALL'
+              ? 'Thử thay đổi bộ lọc khối lớp hoặc từ khóa tìm kiếm.'
               : 'Hãy bắt đầu tạo lớp học đầu tiên của thầy/cô ngay bây giờ.'}
           </p>
           <button

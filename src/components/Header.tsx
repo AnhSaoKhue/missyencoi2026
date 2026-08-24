@@ -23,6 +23,8 @@ import {
   HardDrive,
   Award,
   Table,
+  ShieldCheck,
+  Settings,
   HelpCircle,
 } from 'lucide-react';
 
@@ -51,6 +53,8 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'resources', label: 'Kho học liệu', description: 'Hình ảnh, Audio, Video, Youtube', icon: FolderKanban },
     { id: 'lesson_history', label: 'Lịch sử bài soạn', description: 'Nhật ký & quản lý bài đã tạo', icon: History },
     { id: 'dashboard_data', label: 'Dashboard Data SDK', description: 'STT, Giáo viên, Ngày, QR code', icon: Table },
+    { id: 'admin', label: 'Admin Security', description: 'Phân quyền & giám sát giáo viên', icon: ShieldCheck },
+    { id: 'settings', label: 'Cài đặt & Bản quyền', description: 'Tùy chỉnh & Thông tin tác giả', icon: Settings },
     { id: 'classes', label: 'Lớp học', description: 'Danh sách lớp & học sinh', icon: GraduationCap },
     { id: 'attendance', label: 'Điểm danh', description: 'Điểm danh buổi học', icon: CalendarCheck },
     { id: 'oral_test', label: 'Kiểm tra miệng AI', description: 'Chọn ngẫu nhiên học sinh & Chấm điểm', icon: HelpCircle },

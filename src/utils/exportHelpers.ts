@@ -17,62 +17,91 @@ export function exportLessonPlanToWord(plan: LessonPlan) {
         body { font-family: 'Times New Roman', serif; font-size: 13pt; line-height: 1.5; color: #000; margin: 20px; }
         h1 { font-size: 16pt; font-weight: bold; text-align: center; text-transform: uppercase; color: #001f3f; margin-bottom: 5px; }
         h2 { font-size: 14pt; font-weight: bold; text-align: center; color: #333; margin-top: 0; margin-bottom: 20px; }
-        h3 { font-size: 13pt; font-weight: bold; color: #001f3f; margin-top: 15px; margin-bottom: 5px; border-bottom: 1px solid #001f3f; padding-bottom: 3px; }
+        h3 { font-size: 13pt; font-weight: bold; color: #001f3f; margin-top: 15px; margin-bottom: 5px; border-bottom: 1.5px solid #001f3f; padding-bottom: 3px; }
+        h4 { font-size: 12pt; font-weight: bold; color: #1e3a8a; margin-top: 10px; margin-bottom: 4px; }
         table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
         td, th { border: 1px solid #000; padding: 6px 10px; font-size: 12pt; vertical-align: top; }
         .meta-table td { border: none; padding: 4px 0; }
         .bg-gray { background-color: #f2f4f7; }
+        .activity-box { background-color: #f8fafc; border: 1px solid #cbd5e1; padding: 8px 12px; margin-bottom: 10px; }
         .bilingual-box { background-color: #f0f7ff; border: 1px solid #0056b3; padding: 10px; margin-bottom: 15px; border-radius: 4px; }
-        .vocab-table th { background-color: #001f3f; color: #fff; }
+        .vocab-table th { background-color: #001f3f; color: #fff; text-align: left; }
+        .badge-time { display: inline-block; background-color: #e0f2fe; color: #0369a1; font-weight: bold; font-size: 11pt; padding: 2px 8px; border-radius: 4px; margin-left: 8px; }
       </style>
     </head>
     <body>
-      <h1>KẾ HOẠCH BÀI DẠY (GIÁO ÁN)</h1>
-      <h2>BÀI: ${plan.title.toUpperCase()}</h2>
+      <div style="text-align:center;">
+        <p style="font-size:11pt; text-transform:uppercase; margin:0; color:#475569;">BỘ GIÁO DỤC VÀ ĐÀO TẠO — GDPT 2018 (CÔNG VĂN 5512)</p>
+        <h1>KẾ HOẠCH BÀI DẠY (GIÁO ÁN)</h1>
+        <h2>BÀI: ${plan.title.toUpperCase()}</h2>
+      </div>
 
       <table class="meta-table">
+        <tr>
+          <td><strong>Trường:</strong> ${plan.schoolName || 'Trường THCS/THPT'}</td>
+          <td><strong>Họ và tên GV:</strong> ${plan.teacherName || 'Giáo viên bộ môn'}</td>
+        </tr>
         <tr>
           <td><strong>Môn học:</strong> ${plan.subject}</td>
           <td><strong>Lớp học:</strong> ${plan.className}</td>
         </tr>
         <tr>
-          <td><strong>Khối lớp:</strong> ${plan.gradeLevel || 'THCS - Khối 7'}</td>
+          <td><strong>Tiết PPCT:</strong> ${plan.curriculumPeriod || 'Tiết 1'} (${plan.periodsCount || 1} tiết)</td>
           <td><strong>Bộ sách giáo khoa:</strong> ${plan.textbookSet || (plan.subject === 'Tiếng Anh' ? 'Tiếng Anh Global Success' : 'Kết nối tri thức với cuộc sống')}</td>
         </tr>
         <tr>
-          <td><strong>Số tiết:</strong> ${plan.periodsCount || 1} tiết</td>
-          <td><strong>Ngày soạn:</strong> ${plan.prepDate || plan.date} | <strong>Ngày dạy:</strong> ${plan.teachDate || plan.date}</td>
+          <td><strong>Ngày soạn:</strong> ${plan.prepDate || plan.date}</td>
+          <td><strong>Ngày dạy:</strong> ${plan.teachDate || plan.date}</td>
         </tr>
       </table>
 
-      <hr />
+      <hr style="border: 0.5px solid #ccc; margin: 10px 0;" />
 
+      <h3>I. MỤC TIÊU BÀI HỌC (CHUẨN CÔNG VĂN 5512)</h3>
       ${
-        plan.digitalCompetencies || plan.devicesAndSoftware
-          ? `
-        <h3>I. KHUNG NĂNG LỰC SỐ (NLS) & THIẾT BỊ DẠY HỌC</h3>
-        ${plan.digitalCompetencies ? `<p><strong>Mã hóa Năng lực số:</strong><br/>${plan.digitalCompetencies.replace(/\n/g, '<br/>')}</p>` : ''}
-        ${plan.devicesAndSoftware ? `<p><strong>Thiết bị & Phần mềm sử dụng:</strong><br/>${plan.devicesAndSoftware.replace(/\n/g, '<br/>')}</p>` : ''}
-      `
+        plan.objectivesKnowledge
+          ? `<p><strong>1. Về Kiến thức:</strong><br/>${plan.objectivesKnowledge.replace(/\n/g, '<br/>')}</p>`
+          : plan.objectives
+          ? `<p><strong>1. Về Kiến thức & Mục tiêu chung:</strong><br/>${plan.objectives.replace(/\n/g, '<br/>')}</p>`
           : ''
       }
+      ${
+        plan.objectivesSkills
+          ? `<p><strong>2. Về Kĩ năng & Năng lực:</strong><br/>${plan.objectivesSkills.replace(/\n/g, '<br/>')}</p>`
+          : ''
+      }
+      ${
+        plan.objectivesAttitude
+          ? `<p><strong>3. Về Phẩm chất & Thái độ:</strong><br/>${plan.objectivesAttitude.replace(/\n/g, '<br/>')}</p>`
+          : ''
+      }
+      ${
+        plan.digitalCompetencies
+          ? `<p><strong>* Khung Năng lực số (NLS):</strong><br/>${plan.digitalCompetencies.replace(/\n/g, '<br/>')}</p>`
+          : ''
+      }
+
+      <h3>II. THIẾT BỊ DẠY HỌC VÀ HỌC LIỆU (CHUẨN BỊ)</h3>
+      <p><strong>1. Chuẩn bị của Giáo viên (GV):</strong><br/>${(plan.teacherPrep || plan.devicesAndSoftware || 'Kế hoạch bài dạy, bài giảng trình chiếu, phiếu học tập, thiết bị dạy học.').replace(/\n/g, '<br/>')}</p>
+      <p><strong>2. Chuẩn bị của Học sinh (HS):</strong><br/>${(plan.studentPrep || 'Sách giáo khoa, vở ghi bài, đồ dùng học tập, chuẩn bị bài học trước ở nhà.').replace(/\n/g, '<br/>')}</p>
 
       ${
         b
           ? `
         <div class="bilingual-box">
-          <h3 style="margin-top:0;">PHÂN ĐOẠN GIẢNG DẠY SONG NGỮ (BILINGUAL ENGLISH)</h3>
+          <h3 style="margin-top:0; border-bottom:1px solid #0056b3;">TÍCH HỢP GIẢNG DẠY SONG NGỮ TIẾNG ANH (BILINGUAL INTEGRATION)</h3>
           <p><strong>English Content:</strong> ${b.englishContent}</p>
           <p><strong>Dịch nghĩa Tiếng Việt:</strong> ${b.vietnameseTranslation}</p>
           ${
             b.keyTerms && b.keyTerms.length > 0
               ? `
+            <p><strong>Bảng Từ Vựng & Thuật Ngữ Chuyên Ngành (3 Cột Chuẩn Quốc Tế):</strong></p>
             <table class="vocab-table">
               <thead>
                 <tr>
-                  <th>Từ Tiếng Anh</th>
-                  <th>Phiên âm IPA</th>
-                  <th>Nghĩa Tiếng Việt</th>
+                  <th style="width: 35%;">1. Từ / Thuật ngữ Tiếng Anh</th>
+                  <th style="width: 25%;">2. Phiên âm IPA</th>
+                  <th style="width: 40%;">3. Dịch nghĩa & Giải thích Tiếng Việt</th>
                 </tr>
               </thead>
               <tbody>
@@ -81,7 +110,7 @@ export function exportLessonPlanToWord(plan: LessonPlan) {
                     (t) => `
                   <tr>
                     <td><strong>${t.word}</strong></td>
-                    <td>${t.ipa || ''}</td>
+                    <td style="font-family: 'Consolas', monospace;">${t.ipa || ''}</td>
                     <td>${t.meaning}</td>
                   </tr>
                 `
@@ -97,34 +126,80 @@ export function exportLessonPlanToWord(plan: LessonPlan) {
           : ''
       }
 
-      <h3>II. MỤC TIÊU BÀI HỌC</h3>
-      <p>${(plan.objectives || 'Chưa cập nhật').replace(/\n/g, '<br/>')}</p>
+      <h3>III. TIẾN TRÌNH DẠY HỌC (8 HOẠT ĐỘNG CHUẨN CÔNG VĂN 5512)</h3>
+      
+      ${plan.warmupActivity ? `
+        <div class="activity-box">
+          <h4>1. Hoạt động 1: Mở đầu / Khởi động (Warm-up) <span class="badge-time">⏱️ ${plan.warmupTime || '5 phút'}</span></h4>
+          <p>${plan.warmupActivity.replace(/\n/g, '<br/>')}</p>
+        </div>
+      ` : ''}
 
-      <h3>III. KIẾN THỨC TRỌNG TÂM</h3>
-      <p>${(plan.keyKnowledge || 'Chưa cập nhật').replace(/\n/g, '<br/>')}</p>
+      ${plan.newLessonActivity ? `
+        <div class="activity-box">
+          <h4>2. Hoạt động 2: Hình thành kiến thức mới / Tìm hiểu vào bài <span class="badge-time">⏱️ ${plan.newLessonTime || '15 phút'}</span></h4>
+          <p>${plan.newLessonActivity.replace(/\n/g, '<br/>')}</p>
+        </div>
+      ` : ''}
 
-      <h3>IV. TIẾN TRÌNH DẠY HỌC (CÔNG VĂN 5512)</h3>
-      ${plan.warmupActivity ? `<p><strong>1. Hoạt động Khởi động:</strong><br/>${plan.warmupActivity.replace(/\n/g, '<br/>')}</p>` : ''}
+      ${plan.practiceActivity ? `
+        <div class="activity-box">
+          <h4>3. Hoạt động 3: Luyện tập / Thực hành (Practice) <span class="badge-time">⏱️ ${plan.practiceTime || '10 phút'}</span></h4>
+          <p>${plan.practiceActivity.replace(/\n/g, '<br/>')}</p>
+        </div>
+      ` : ''}
 
-      <table>
-        <thead>
-          <tr class="bg-gray">
-            <th style="width: 50%;">Hoạt động của Giáo viên</th>
-            <th style="width: 50%;">Hoạt động của Học sinh</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>${(plan.teacherActivity || 'GV hướng dẫn bài học').replace(/\n/g, '<br/>')}</td>
-            <td>${(plan.studentActivity || 'HS thảo luận và tiếp thu').replace(/\n/g, '<br/>')}</td>
-          </tr>
-        </tbody>
-      </table>
+      ${plan.lowApplicationActivity ? `
+        <div class="activity-box">
+          <h4>4. Hoạt động 4: Vận dụng thấp (Low Application) <span class="badge-time">⏱️ ${plan.lowAppTime || '5 phút'}</span></h4>
+          <p>${plan.lowApplicationActivity.replace(/\n/g, '<br/>')}</p>
+        </div>
+      ` : ''}
 
-      ${plan.exercises ? `<h3>V. BÀI TẬP VÀ CỦNG CỐ</h3><p>${plan.exercises.replace(/\n/g, '<br/>')}</p>` : ''}
-      ${plan.notes ? `<h3>VI. GHI CHÚ THÊM</h3><p>${plan.notes.replace(/\n/g, '<br/>')}</p>` : ''}
+      ${plan.highApplicationActivity ? `
+        <div class="activity-box">
+          <h4>5. Hoạt động 5: Vận dụng cao / Sáng tạo (High Application) <span class="badge-time">⏱️ ${plan.highAppTime || '5 phút'}</span></h4>
+          <p>${plan.highApplicationActivity.replace(/\n/g, '<br/>')}</p>
+        </div>
+      ` : ''}
 
-      <h3>VII. PHẦN KIỂM TRA, NHẬN XÉT VÀ KÝ PHÊ DUYỆT</h3>
+      ${plan.consolidationActivity ? `
+        <div class="activity-box">
+          <h4>6. Hoạt động 6: Củng cố kiến thức (Consolidation) <span class="badge-time">⏱️ ${plan.consolidationTime || '3 phút'}</span></h4>
+          <p>${plan.consolidationActivity.replace(/\n/g, '<br/>')}</p>
+        </div>
+      ` : ''}
+
+      ${plan.homeworkActivity ? `
+        <div class="activity-box">
+          <h4>7. Hoạt động 7: Hướng dẫn học ở nhà & BTVN <span class="badge-time">⏱️ ${plan.homeworkTime || '2 phút'}</span></h4>
+          <p>${plan.homeworkActivity.replace(/\n/g, '<br/>')}</p>
+        </div>
+      ` : ''}
+
+      ${(plan.teacherActivity || plan.studentActivity) ? `
+        <table>
+          <thead>
+            <tr class="bg-gray">
+              <th style="width: 50%;">Hoạt động của Giáo viên</th>
+              <th style="width: 50%;">Hoạt động của Học sinh</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>${(plan.teacherActivity || 'GV chuyển giao nhiệm vụ và hướng dẫn học sinh.').replace(/\n/g, '<br/>')}</td>
+              <td>${(plan.studentActivity || 'HS tiếp nhận nhiệm vụ, thảo luận và báo cáo sản phẩm.').replace(/\n/g, '<br/>')}</td>
+            </tr>
+          </tbody>
+        </table>
+      ` : ''}
+
+      ${plan.exercises ? `<h3>IV. BÀI TẬP VÀ PHIẾU CỦNG CỐ</h3><p>${plan.exercises.replace(/\n/g, '<br/>')}</p>` : ''}
+      
+      <h3>V. RÚT KINH NGHIỆM SAU TIẾT DẠY (HOẠT ĐỘNG 8)</h3>
+      <p><em>${(plan.reflectionNotes || plan.notes || '- Phân bổ thời gian: Đảm bảo đúng thời lượng phân phối chương trình.\n- Mức độ tiếp thu: Học sinh nắm vững nội dung bài dạy.\n- Hướng điều chỉnh: Phát huy tính tích cực, chủ động của học sinh trong các tiết tiếp theo.').replace(/\n/g, '<br/>')}</em></p>
+
+      <h3>VI. PHẦN KIỂM TRA, NHẬN XÉT VÀ KÝ PHÊ DUYỆT</h3>
       <table style="width:100%; border-collapse:collapse; margin-top:10px;">
         <thead>
           <tr class="bg-gray">
@@ -139,22 +214,22 @@ export function exportLessonPlanToWord(plan: LessonPlan) {
               <p><strong>Ngày soạn:</strong> ${plan.prepDate || plan.date}</p>
               <p><strong>Trạng thái:</strong> Hoàn thành</p>
               <br/>
-              <p style="text-align:center;"><strong>Ký tên:</strong></p>
-              <p style="text-align:center; margin-top:35px;"><strong>${plan.teacherName || 'Giáo viên phụ trách'}</strong></p>
+              <p style="text-align:center;"><strong>Giáo viên ký tên:</strong></p>
+              <p style="text-align:center; margin-top:35px;"><strong>${plan.teacherName || ''}</strong></p>
             </td>
             <td style="height: 120px; vertical-align:top; font-size:11pt;">
-              <p><strong>Ý kiến nhận xét:</strong> ${plan.headOfDepartmentReview || 'Đã kiểm tra, bài soạn đạt chuẩn 5512, đáp ứng khung NLS.'}</p>
+              <p><strong>Ý kiến nhận xét:</strong> ${plan.headOfDepartmentReview || 'Đã kiểm tra, bài soạn đạt chuẩn Công văn 5512.'}</p>
               <p><strong>Kết quả:</strong> <span style="color:green; font-weight:bold;">${plan.headOfDepartmentStatus || 'Đã duyệt'}</span></p>
               <br/>
               <p style="text-align:center;"><strong>Tổ trưởng ký tên:</strong></p>
-              <p style="text-align:center; margin-top:25px;"><strong>${plan.headOfDepartmentName || 'Tổ trưởng Chuyên môn'}</strong></p>
+              <p style="text-align:center; margin-top:25px;"><strong>${plan.headOfDepartmentName || ''}</strong></p>
             </td>
             <td style="height: 120px; vertical-align:top; font-size:11pt;">
               <p><strong>Ý kiến BGH:</strong> ${plan.schoolBoardReview || 'Đồng ý phê duyệt cho phép đưa vào giảng dạy.'}</p>
               <p><strong>Kết quả:</strong> <span style="color:blue; font-weight:bold;">${plan.schoolBoardStatus || 'Đã duyệt'}</span></p>
               <br/>
-              <p style="text-align:center;"><strong>BGH ký & đóng dấu:</strong></p>
-              <p style="text-align:center; margin-top:25px;"><strong>${plan.schoolBoardName || 'Ban Giám Hiệu'}</strong></p>
+              <p style="text-align:center;"><strong>Hiệu trưởng / BGH ký tên:</strong></p>
+              <p style="text-align:center; margin-top:25px;"><strong>${plan.schoolBoardName || ''}</strong></p>
             </td>
           </tr>
         </tbody>
@@ -170,7 +245,7 @@ export function exportLessonPlanToWord(plan: LessonPlan) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  const fileName = `GiaoAn_${plan.subject}_${plan.title.replace(/[^a-zA-Z0-9_]/g, '_')}.doc`;
+  const fileName = `GiaoAn_5512_${plan.subject}_${plan.title.replace(/[^a-zA-Z0-9_]/g, '_')}.doc`;
   a.download = fileName;
   document.body.appendChild(a);
   a.click();
@@ -215,17 +290,17 @@ export async function exportLessonPlanToPDF(plan: LessonPlan, targetElement?: HT
           <table style="width:100%; border-collapse:collapse; margin-top:8px;">
             <thead>
               <tr style="background-color:#001f3f; color:#ffffff;">
-                <th style="border:1px solid #333; padding:6px; font-size:11pt; text-align:left;">Từ Tiếng Anh</th>
-                <th style="border:1px solid #333; padding:6px; font-size:11pt; text-align:left;">Phiên âm IPA</th>
-                <th style="border:1px solid #333; padding:6px; font-size:11pt; text-align:left;">Nghĩa Tiếng Việt</th>
+                <th style="border:1px solid #333; padding:6px; font-size:10.5pt; text-align:left; width:35%;">1. Từ / Thuật ngữ Tiếng Anh</th>
+                <th style="border:1px solid #333; padding:6px; font-size:10.5pt; text-align:left; width:25%;">2. Phiên âm IPA</th>
+                <th style="border:1px solid #333; padding:6px; font-size:10.5pt; text-align:left; width:40%;">3. Dịch nghĩa & Giải thích Tiếng Việt</th>
               </tr>
             </thead>
             <tbody>
               ${b.keyTerms.map(t => `
                 <tr>
-                  <td style="border:1px solid #cbd5e1; padding:6px; font-weight:bold; font-size:11pt;">${t.word}</td>
-                  <td style="border:1px solid #cbd5e1; padding:6px; font-size:11pt; color:#475569;">${t.ipa || ''}</td>
-                  <td style="border:1px solid #cbd5e1; padding:6px; font-size:11pt;">${t.meaning}</td>
+                  <td style="border:1px solid #cbd5e1; padding:6px; font-weight:bold; font-size:10.5pt;">${t.word}</td>
+                  <td style="border:1px solid #cbd5e1; padding:6px; font-size:10.5pt; font-family:monospace; color:#475569;">${t.ipa || ''}</td>
+                  <td style="border:1px solid #cbd5e1; padding:6px; font-size:10.5pt;">${t.meaning}</td>
                 </tr>
               `).join('')}
             </tbody>
@@ -236,8 +311,8 @@ export async function exportLessonPlanToPDF(plan: LessonPlan, targetElement?: HT
       const bilingualHtml = b
         ? `
           <div style="background-color:#f0f9ff; border:1.5px solid #0284c7; padding:12px; margin-bottom:16px; border-radius:6px;">
-            <h3 style="font-size:12pt; font-weight:bold; color:#0369a1; margin-top:0; margin-bottom:6px; text-transform:uppercase;">
-              PHÂN ĐOẠN GIẢNG DẠY SONG NGỮ (BILINGUAL ENGLISH)
+            <h3 style="font-size:12pt; font-weight:bold; color:#0369a1; margin-top:0; margin-bottom:6px; text-transform:uppercase; border-bottom: 1px solid #0284c7; padding-bottom: 3px;">
+              TÍCH HỢP GIẢNG DẠY SONG NGỮ TIẾNG ANH (BILINGUAL INTEGRATION)
             </h3>
             <p style="margin:4px 0; font-size:11pt;"><strong>English Content:</strong> ${b.englishContent}</p>
             <p style="margin:4px 0; font-size:11pt;"><strong>Dịch nghĩa Tiếng Việt:</strong> ${b.vietnameseTranslation}</p>
@@ -246,33 +321,23 @@ export async function exportLessonPlanToPDF(plan: LessonPlan, targetElement?: HT
         `
         : '';
 
-      const digitalHtml = (plan.digitalCompetencies || plan.devicesAndSoftware)
-        ? `
-          <div style="background-color:#1e293b; color:#f8fafc; padding:12px; margin-bottom:16px; border-radius:6px; border-left:4px solid #38bdf8;">
-            <h3 style="font-size:12pt; font-weight:bold; color:#38bdf8; margin-top:0; margin-bottom:6px; text-transform:uppercase;">
-              I. KHUNG NĂNG LỰC SỐ (NLS) & THIẾT BỊ DẠY HỌC
-            </h3>
-            ${plan.digitalCompetencies ? `<p style="margin:4px 0; font-size:11pt;"><strong>Mã hóa Năng lực số:</strong><br/>${plan.digitalCompetencies.replace(/\n/g, '<br/>')}</p>` : ''}
-            ${plan.devicesAndSoftware ? `<p style="margin:4px 0; font-size:11pt;"><strong>Thiết bị & Phần mềm:</strong><br/>${plan.devicesAndSoftware.replace(/\n/g, '<br/>')}</p>` : ''}
-          </div>
-        `
-        : '';
-
       const activities = [
-        { label: 'Hoạt động 1: Khởi động (Warm-up)', content: plan.warmupActivity },
-        { label: 'Hoạt động 2: Tìm hiểu bài mới (Discovery & Presentation)', content: plan.newLessonActivity },
-        { label: 'Hoạt động 3: Thực hành (Practice)', content: plan.practiceActivity },
-        { label: 'Hoạt động 4: Vận dụng thấp (Low Application)', content: plan.lowApplicationActivity },
-        { label: 'Hoạt động 5: Vận dụng cao (High Application / Deep Learning)', content: plan.highApplicationActivity },
-        { label: 'Hoạt động 6: Củng cố kiến thức (Consolidation)', content: plan.consolidationActivity },
-        { label: 'Hoạt động 7: Hướng dẫn về nhà (Homework Guidance)', content: plan.homeworkActivity },
-        { label: 'Hoạt động 8: Dự án Project (STEM / English Project)', content: plan.projectActivity },
+        { label: 'Hoạt động 1: Mở đầu / Khởi động (Warm-up)', time: plan.warmupTime || '5 phút', content: plan.warmupActivity },
+        { label: 'Hoạt động 2: Hình thành kiến thức mới / Tìm hiểu vào bài', time: plan.newLessonTime || '15 phút', content: plan.newLessonActivity },
+        { label: 'Hoạt động 3: Luyện tập / Thực hành (Practice)', time: plan.practiceTime || '10 phút', content: plan.practiceActivity },
+        { label: 'Hoạt động 4: Vận dụng thấp (Low Application)', time: plan.lowAppTime || '5 phút', content: plan.lowApplicationActivity },
+        { label: 'Hoạt động 5: Vận dụng cao / Sáng tạo (High Application)', time: plan.highAppTime || '5 phút', content: plan.highApplicationActivity },
+        { label: 'Hoạt động 6: Củng cố kiến thức (Consolidation)', time: plan.consolidationTime || '3 phút', content: plan.consolidationActivity },
+        { label: 'Hoạt động 7: Hướng dẫn học ở nhà & BTVN', time: plan.homeworkTime || '2 phút', content: plan.homeworkActivity },
       ].filter(a => !!a.content);
 
       const activitiesHtml = activities.length > 0
         ? activities.map(a => `
             <div style="background-color:#f8fafc; border:1px solid #e2e8f0; padding:10px; margin-bottom:10px; border-radius:6px;">
-              <strong style="color:#001f3f; font-size:11pt; text-transform:uppercase;">${a.label}</strong>
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong style="color:#001f3f; font-size:11pt; text-transform:uppercase;">${a.label}</strong>
+                <span style="background-color:#e0f2fe; color:#0369a1; font-weight:bold; font-size:10pt; padding:2px 8px; border-radius:4px;">⏱️ ${a.time}</span>
+              </div>
               <p style="margin:6px 0 0 0; font-size:11pt; white-space:pre-line;">${a.content}</p>
             </div>
           `).join('')
@@ -308,53 +373,76 @@ export async function exportLessonPlanToPDF(plan: LessonPlan, targetElement?: HT
 
         <table style="width:100%; border-collapse:collapse; margin-bottom:14px; font-size:11pt;">
           <tr>
+            <td style="padding:4px 0; width:50%;"><strong>Trường:</strong> ${plan.schoolName || ''}</td>
+            <td style="padding:4px 0; width:50%;"><strong>Họ và tên GV:</strong> ${plan.teacherName || ''}</td>
+          </tr>
+          <tr>
             <td style="padding:4px 0; width:50%;"><strong>Môn học:</strong> ${plan.subject}</td>
             <td style="padding:4px 0; width:50%;"><strong>Lớp học:</strong> ${plan.className}</td>
           </tr>
           <tr>
-            <td style="padding:4px 0;"><strong>Khối lớp:</strong> ${plan.gradeLevel || 'THCS - Khối 7'}</td>
+            <td style="padding:4px 0;"><strong>Tiết PPCT:</strong> ${plan.curriculumPeriod || 'Tiết 1'} (${plan.periodsCount || 1} tiết)</td>
             <td style="padding:4px 0;"><strong>Bộ sách:</strong> ${plan.textbookSet || (plan.subject === 'Tiếng Anh' ? 'Tiếng Anh Global Success' : 'Kết nối tri thức với cuộc sống')}</td>
           </tr>
           <tr>
-            <td style="padding:4px 0;"><strong>Thời lượng:</strong> ${plan.periodsCount || 1} tiết</td>
-            <td style="padding:4px 0;"><strong>Ngày soạn:</strong> ${plan.prepDate || plan.date} | <strong>Ngày dạy:</strong> ${plan.teachDate || plan.date}</td>
+            <td style="padding:4px 0;"><strong>Ngày soạn:</strong> ${plan.prepDate || plan.date}</td>
+            <td style="padding:4px 0;"><strong>Ngày dạy:</strong> ${plan.teachDate || plan.date}</td>
           </tr>
         </table>
 
-        ${digitalHtml}
+        <h3 style="font-size:12pt; font-weight:bold; color:#001f3f; margin-top:14px; margin-bottom:6px; border-bottom:1.5px solid #001f3f; padding-bottom:2px; text-transform:uppercase;">
+          I. MỤC TIÊU BÀI HỌC (CHUẨN CÔNG VĂN 5512)
+        </h3>
+        ${
+          plan.objectivesKnowledge
+            ? `<p style="margin:2px 0 6px 0; font-size:11pt;"><strong>1. Về Kiến thức:</strong><br/>${plan.objectivesKnowledge.replace(/\n/g, '<br/>')}</p>`
+            : plan.objectives
+            ? `<p style="margin:2px 0 6px 0; font-size:11pt;"><strong>1. Về Kiến thức & Mục tiêu:</strong><br/>${plan.objectives.replace(/\n/g, '<br/>')}</p>`
+            : ''
+        }
+        ${
+          plan.objectivesSkills
+            ? `<p style="margin:2px 0 6px 0; font-size:11pt;"><strong>2. Về Kĩ năng & Năng lực:</strong><br/>${plan.objectivesSkills.replace(/\n/g, '<br/>')}</p>`
+            : ''
+        }
+        ${
+          plan.objectivesAttitude
+            ? `<p style="margin:2px 0 6px 0; font-size:11pt;"><strong>3. Về Phẩm chất & Thái độ:</strong><br/>${plan.objectivesAttitude.replace(/\n/g, '<br/>')}</p>`
+            : ''
+        }
+        ${
+          plan.digitalCompetencies
+            ? `<p style="margin:2px 0 6px 0; font-size:11pt;"><strong>* Khung Năng lực số (NLS):</strong><br/>${plan.digitalCompetencies.replace(/\n/g, '<br/>')}</p>`
+            : ''
+        }
+
+        <h3 style="font-size:12pt; font-weight:bold; color:#001f3f; margin-top:14px; margin-bottom:6px; border-bottom:1.5px solid #001f3f; padding-bottom:2px; text-transform:uppercase;">
+          II. THIẾT BỊ DẠY HỌC VÀ HỌC LIỆU (CHUẨN BỊ)
+        </h3>
+        <p style="margin:2px 0 4px 0; font-size:11pt;"><strong>1. Chuẩn bị của Giáo viên (GV):</strong><br/>${(plan.teacherPrep || plan.devicesAndSoftware || 'Kế hoạch bài dạy, bài giảng trình chiếu, phiếu học tập, thiết bị số.').replace(/\n/g, '<br/>')}</p>
+        <p style="margin:2px 0 6px 0; font-size:11pt;"><strong>2. Chuẩn bị của Học sinh (HS):</strong><br/>${(plan.studentPrep || 'Sách giáo khoa, vở ghi bài, đồ dùng học tập.').replace(/\n/g, '<br/>')}</p>
+
         ${bilingualHtml}
 
         <h3 style="font-size:12pt; font-weight:bold; color:#001f3f; margin-top:14px; margin-bottom:6px; border-bottom:1.5px solid #001f3f; padding-bottom:2px; text-transform:uppercase;">
-          II. MỤC TIÊU BÀI HỌC
-        </h3>
-        <p style="margin:0 0 12px 0; font-size:11pt; white-space:pre-line;">${plan.objectives || 'Chưa cập nhật'}</p>
-
-        <h3 style="font-size:12pt; font-weight:bold; color:#001f3f; margin-top:14px; margin-bottom:6px; border-bottom:1.5px solid #001f3f; padding-bottom:2px; text-transform:uppercase;">
-          III. KIẾN THỨC TRỌNG TÂM
-        </h3>
-        <p style="margin:0 0 12px 0; font-size:11pt; white-space:pre-line;">${plan.keyKnowledge || 'Chưa cập nhật'}</p>
-
-        <h3 style="font-size:12pt; font-weight:bold; color:#001f3f; margin-top:14px; margin-bottom:6px; border-bottom:1.5px solid #001f3f; padding-bottom:2px; text-transform:uppercase;">
-          IV. TIẾN TRÌNH DẠY HỌC (CÔNG VĂN 5512)
+          III. TIẾN TRÌNH DẠY HỌC (8 HOẠT ĐỘNG CHUẨN CÔNG VĂN 5512)
         </h3>
         ${activitiesHtml}
 
         ${plan.exercises ? `
           <h3 style="font-size:12pt; font-weight:bold; color:#001f3f; margin-top:14px; margin-bottom:6px; border-bottom:1.5px solid #001f3f; padding-bottom:2px; text-transform:uppercase;">
-            V. BÀI TẬP VÀ CỦNG CỐ
+            IV. BÀI TẬP VÀ PHIẾU CỦNG CỐ
           </h3>
           <p style="margin:0 0 12px 0; font-size:11pt; white-space:pre-line;">${plan.exercises}</p>
         ` : ''}
 
-        ${plan.notes ? `
-          <h3 style="font-size:12pt; font-weight:bold; color:#b45309; margin-top:14px; margin-bottom:6px; border-bottom:1.5px solid #b45309; padding-bottom:2px; text-transform:uppercase;">
-            VI. MỤC ĐIỀU CHỈNH & RÚT KINH NGHIỆM SAU BÀI DẠY
-          </h3>
-          <p style="margin:0 0 12px 0; font-size:11pt; font-style:italic; color:#78350f; white-space:pre-line;">${plan.notes}</p>
-        ` : ''}
+        <h3 style="font-size:12pt; font-weight:bold; color:#001f3f; margin-top:14px; margin-bottom:6px; border-bottom:1.5px solid #001f3f; padding-bottom:2px; text-transform:uppercase;">
+          V. RÚT KINH NGHIỆM SAU TIẾT DẠY (HOẠT ĐỘNG 8)
+        </h3>
+        <p style="margin:0 0 12px 0; font-size:11pt; font-style:italic; color:#334155; white-space:pre-line;">${plan.reflectionNotes || plan.notes || '- Phân bổ thời gian: Đảm bảo đúng thời lượng.\n- Mức độ tiếp thu: Học sinh tiếp thu bài tốt.\n- Hướng điều chỉnh: Tiếp tục phát huy tính chủ động của học sinh.'}</p>
 
         <h3 style="font-size:12pt; font-weight:bold; color:#001f3f; margin-top:18px; margin-bottom:8px; border-bottom:1.5px solid #001f3f; padding-bottom:2px; text-transform:uppercase;">
-          VII. PHẦN KIỂM TRA, NHẬN XÉT VÀ KÝ PHÊ DUYỆT
+          VI. PHẦN KIỂM TRA, NHẬN XÉT VÀ KÝ PHÊ DUYỆT
         </h3>
         <table style="width:100%; border-collapse:collapse; margin-top:8px;">
           <thead>
@@ -369,24 +457,24 @@ export async function exportLessonPlanToPDF(plan: LessonPlan, targetElement?: HT
               <td style="height:110px; vertical-align:top; border:1px solid #333; padding:8px; font-size:10pt;">
                 <p style="margin:0 0 4px 0;"><strong>Ngày soạn:</strong> ${plan.prepDate || plan.date}</p>
                 <p style="margin:0 0 16px 0;"><strong>Trạng thái:</strong> Hoàn thành</p>
-                <p style="text-align:center; margin:0;"><strong>${plan.teacherName || 'Giáo viên phụ trách'}</strong></p>
+                <p style="text-align:center; margin:0;"><strong>${plan.teacherName || ''}</strong></p>
               </td>
               <td style="height:110px; vertical-align:top; border:1px solid #333; padding:8px; font-size:10pt;">
                 <p style="margin:0 0 4px 0;"><strong>Nhận xét:</strong> ${plan.headOfDepartmentReview || 'Đã kiểm tra, bài soạn đạt chuẩn 5512.'}</p>
                 <p style="margin:0 0 16px 0;"><strong>Kết quả:</strong> <span style="color:#15803d; font-weight:bold;">${plan.headOfDepartmentStatus || 'Đã duyệt'}</span></p>
-                <p style="text-align:center; margin:0;"><strong>${plan.headOfDepartmentName || 'Tổ trưởng Chuyên môn'}</strong></p>
+                <p style="text-align:center; margin:0;"><strong>${plan.headOfDepartmentName || ''}</strong></p>
               </td>
               <td style="height:110px; vertical-align:top; border:1px solid #333; padding:8px; font-size:10pt;">
                 <p style="margin:0 0 4px 0;"><strong>Ý kiến BGH:</strong> ${plan.schoolBoardReview || 'Đồng ý phê duyệt cho phép giảng dạy.'}</p>
                 <p style="margin:0 0 16px 0;"><strong>Kết quả:</strong> <span style="color:#1d4ed8; font-weight:bold;">${plan.schoolBoardStatus || 'Đã duyệt'}</span></p>
-                <p style="text-align:center; margin:0;"><strong>${plan.schoolBoardName || 'Ban Giám Hiệu'}</strong></p>
+                <p style="text-align:center; margin:0;"><strong>${plan.schoolBoardName || ''}</strong></p>
               </td>
             </tr>
           </tbody>
         </table>
 
         <div style="margin-top:20px; text-align:center; font-size:9pt; color:#64748b; font-style:italic;">
-          Sản phẩm hệ thống: AI Lesson Plans - Anh Sao Khue (0346513056) — Bộ Giáo dục & Đào tạo GDPT 2018
+          Hệ thống Quản lý Kế hoạch bài dạy GDPT 2018 — Chuẩn Công văn 5512 / BGDĐT
         </div>
       `;
 

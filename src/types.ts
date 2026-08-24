@@ -47,6 +47,7 @@ export interface BilingualSection {
   vietnameseTranslation: string;
   keyTerms?: BilingualVocab[];
   audioText?: string;
+  targetActivities?: string[]; // Danh sách các hoạt động chọn tích hợp Tiếng Anh (vd: Khởi động, Luyện tập, BTVN...)
 }
 
 export interface LessonPlan {
@@ -59,23 +60,51 @@ export interface LessonPlan {
   prepDate?: string; // Ngày soạn YYYY-MM-DD
   teachDate?: string; // Ngày dạy YYYY-MM-DD
   periodsCount: number; // Số tiết (mặc định 1)
+  curriculumPeriod?: string; // Tiết PPCT (Phân phối chương trình, vd: Tiết 1, Tiết 15, Tiết 45...)
   status: 'draft' | 'ready' | 'completed'; // Trạng thái
   gradeLevel?: string; // Cấp học/Lớp (vd: THCS - Khối 7, THPT - Lớp 10)
   textbookSet?: string; // Bộ sách ('Kết nối tri thức với cuộc sống' | 'Tiếng Anh Global Success')
   digitalCompetencies?: string; // Mã hóa Năng lực số (NLS1.1, NLS2.3, NLS3.2, NLS4.1, NLS5.2...)
   devicesAndSoftware?: string; // Thiết bị & Phần mềm
-  objectives: string; // Mục tiêu bài học
-  keyKnowledge: string; // Kiến thức trọng tâm
-  warmupActivity: string; // 1. Hoạt động Khởi động
-  newLessonActivity?: string; // 2. Hoạt động Tìm hiểu bài mới
-  practiceActivity?: string; // 3. Hoạt động Thực hành
-  lowApplicationActivity?: string; // 4. Hoạt động Vận dụng thấp
-  highApplicationActivity?: string; // 5. Hoạt động Vận dụng cao
-  consolidationActivity?: string; // 6. Hoạt động Củng cố
-  homeworkActivity?: string; // 7. Hoạt động Hướng dẫn về nhà
-  projectActivity?: string; // 8. Dự án Project
-  teacherActivity: string; // Hoạt động của giáo viên
-  studentActivity: string; // Hoạt động của học sinh
+  
+  // I. Mục tiêu chuẩn CV 5512 (Thái độ - Kiến thức - Kĩ năng)
+  objectives: string; // Tổng hợp mục tiêu bài học
+  objectivesKnowledge?: string; // 1. Về Kiến thức
+  objectivesSkills?: string; // 2. Về Kĩ năng & Năng lực
+  objectivesAttitude?: string; // 3. Về Phẩm chất / Thái độ
+  keyKnowledge?: string; // Kiến thức trọng tâm / Bổ trợ
+  
+  // II. Thiết bị dạy học và học liệu (Chuẩn bị: GV - HS)
+  teacherPrep?: string; // Chuẩn bị của Giáo viên (Thiết bị, kế hoạch bài dạy, bài giảng số, phiếu học tập...)
+  studentPrep?: string; // Chuẩn bị của Học sinh (SGK, vở ghi, đồ dùng học tập, chuẩn bị bài trước...)
+
+  // III. Tiến trình dạy học chuẩn 8 hoạt động kèm Thời lượng (Phút)
+  warmupTime?: string; // Thời gian HĐ 1 (vd: "5 phút")
+  warmupActivity: string; // 1. Khởi động (Warm-up)
+  
+  newLessonTime?: string; // Thời gian HĐ 2 (vd: "15 phút")
+  newLessonActivity?: string; // 2. Hình thành kiến thức mới / Tìm hiểu vào bài
+  
+  practiceTime?: string; // Thời gian HĐ 3 (vd: "10 phút")
+  practiceActivity?: string; // 3. Luyện tập / Thực hành
+  
+  lowAppTime?: string; // Thời gian HĐ 4 (vd: "5 phút")
+  lowApplicationActivity?: string; // 4. Vận dụng thấp
+  
+  highAppTime?: string; // Thời gian HĐ 5 (vd: "5 phút")
+  highApplicationActivity?: string; // 5. Vận dụng cao / Sáng tạo
+  
+  consolidationTime?: string; // Thời gian HĐ 6 (vd: "3 phút")
+  consolidationActivity?: string; // 6. Củng cố kiến thức
+  
+  homeworkTime?: string; // Thời gian HĐ 7 (vd: "2 phút")
+  homeworkActivity?: string; // 7. Hướng dẫn học ở nhà (BTVN)
+  
+  reflectionNotes?: string; // 8. Rút kinh nghiệm sau tiết dạy
+  
+  projectActivity?: string; // Hoạt động mở rộng / Dự án STEM
+  teacherActivity: string; // Chi tiết Hoạt động của giáo viên
+  studentActivity: string; // Chi tiết Hoạt động của học sinh
   bilingualSection?: BilingualSection; // Phân đoạn giảng dạy Song ngữ Tiếng Anh
   illustrationImage?: string; // Hình minh họa đúng trọng tâm sắc nét, nổi bật
   illustrationTitle?: string; // Tiêu đề hình minh họa bài học
@@ -208,6 +237,8 @@ export type TabType =
   | 'lesson_history'
   | 'resources'
   | 'dashboard_data'
+  | 'admin'
+  | 'settings'
   | 'classes'
   | 'attendance'
   | 'attendance_stats'

@@ -260,7 +260,7 @@ export const GoogleWorkspaceIntegrationModal: React.FC<GoogleWorkspaceIntegratio
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white dark:bg-slate-900 w-full max-w-4xl rounded-2xl shadow-2xl border border-blue-200 dark:border-blue-900 flex flex-col max-h-[90vh] overflow-hidden">
+      <div className="bg-white w-full max-w-4xl rounded-2xl shadow-2xl border border-slate-200 flex flex-col max-h-[90vh] overflow-hidden text-slate-900">
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white p-4 sm:p-5 flex items-center justify-between border-b border-cyan-500/30">
           <div className="flex items-center gap-3">
@@ -288,9 +288,9 @@ export const GoogleWorkspaceIntegrationModal: React.FC<GoogleWorkspaceIntegratio
         </div>
 
         {/* Content Body */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 bg-white text-slate-900">
           {/* User Account Bar */}
-          <div className="bg-slate-50 dark:bg-slate-800/80 p-4 rounded-xl border border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
             {user ? (
               <div className="flex items-center gap-3 w-full sm:w-auto">
                 {user.photoURL ? (
@@ -301,15 +301,15 @@ export const GoogleWorkspaceIntegrationModal: React.FC<GoogleWorkspaceIntegratio
                   </div>
                 )}
                 <div>
-                  <div className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                  <div className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
                     <span>{user.displayName || 'Tài khoản Google'}</span>
                     <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                   </div>
-                  <div className="text-xs text-slate-500 dark:text-slate-400">{user.email}</div>
+                  <div className="text-xs text-slate-500">{user.email}</div>
                 </div>
               </div>
             ) : (
-              <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300 text-sm">
+              <div className="flex items-center gap-2 text-slate-700 text-sm font-medium">
                 <AlertCircle className="w-5 h-5 text-amber-500 shrink-0" />
                 <span>Chưa kết nối tài khoản Google. Hãy đăng nhập để truy cập Google Drive & Sheets!</span>
               </div>
@@ -319,7 +319,7 @@ export const GoogleWorkspaceIntegrationModal: React.FC<GoogleWorkspaceIntegratio
               {user ? (
                 <button
                   onClick={handleLogout}
-                  className="bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition-all cursor-pointer"
+                  className="bg-slate-200 hover:bg-slate-300 text-slate-800 text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition-all cursor-pointer border border-slate-300"
                 >
                   <LogOut className="w-4 h-4" /> Đăng xuất Google
                 </button>
@@ -328,7 +328,7 @@ export const GoogleWorkspaceIntegrationModal: React.FC<GoogleWorkspaceIntegratio
                 <button
                   onClick={handleSignIn}
                   disabled={isLoggingIn}
-                  className="bg-white hover:bg-slate-50 text-slate-700 font-semibold px-4 py-2.5 rounded-xl border border-slate-300 shadow-sm hover:shadow text-sm flex items-center gap-2.5 transition-all cursor-pointer disabled:opacity-50"
+                  className="bg-white hover:bg-slate-50 text-slate-800 font-semibold px-4 py-2.5 rounded-xl border border-slate-300 shadow-sm hover:shadow text-sm flex items-center gap-2.5 transition-all cursor-pointer disabled:opacity-50"
                 >
                   {isLoggingIn ? (
                     <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
@@ -347,7 +347,7 @@ export const GoogleWorkspaceIntegrationModal: React.FC<GoogleWorkspaceIntegratio
           </div>
 
           {authError && (
-            <div className="p-3 bg-rose-500/10 border border-rose-500/30 text-rose-500 text-xs rounded-xl flex items-center gap-2">
+            <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{authError}</span>
             </div>
@@ -356,13 +356,13 @@ export const GoogleWorkspaceIntegrationModal: React.FC<GoogleWorkspaceIntegratio
           {user ? (
             <div>
               {/* Internal Tab Navigation */}
-              <div className="flex border-b border-slate-200 dark:border-slate-800 space-x-2 mb-4">
+              <div className="flex border-b border-slate-200 space-x-2 mb-4">
                 <button
                   onClick={() => setActiveTab('drive')}
                   className={`pb-2.5 px-4 font-bold text-sm transition-all border-b-2 cursor-pointer ${
                     activeTab === 'drive'
-                      ? 'border-blue-600 text-blue-600 dark:text-cyan-400'
-                      : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                      ? 'border-blue-600 text-blue-600'
+                      : 'border-transparent text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   <span className="flex items-center gap-1.5">
@@ -374,8 +374,8 @@ export const GoogleWorkspaceIntegrationModal: React.FC<GoogleWorkspaceIntegratio
                   onClick={() => setActiveTab('import_sheets')}
                   className={`pb-2.5 px-4 font-bold text-sm transition-all border-b-2 cursor-pointer ${
                     activeTab === 'import_sheets'
-                      ? 'border-blue-600 text-blue-600 dark:text-cyan-400'
-                      : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                      ? 'border-blue-600 text-blue-600'
+                      : 'border-transparent text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   <span className="flex items-center gap-1.5">
@@ -387,8 +387,8 @@ export const GoogleWorkspaceIntegrationModal: React.FC<GoogleWorkspaceIntegratio
                   onClick={() => setActiveTab('export_sheets')}
                   className={`pb-2.5 px-4 font-bold text-sm transition-all border-b-2 cursor-pointer ${
                     activeTab === 'export_sheets'
-                      ? 'border-blue-600 text-blue-600 dark:text-cyan-400'
-                      : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
+                      ? 'border-blue-600 text-blue-600'
+                      : 'border-transparent text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   <span className="flex items-center gap-1.5">
@@ -411,11 +411,11 @@ export const GoogleWorkspaceIntegrationModal: React.FC<GoogleWorkspaceIntegratio
                           handleLoadDriveFiles(e.target.value);
                         }}
                         placeholder="Tìm kiếm tệp trên Google Drive..."
-                        className="w-full pl-9 pr-3 py-2 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
 
-                    <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 dark:text-slate-300 cursor-pointer">
+                    <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer">
                       <input
                         type="checkbox"
                         checked={onlySpreadsheets}
@@ -427,7 +427,7 @@ export const GoogleWorkspaceIntegrationModal: React.FC<GoogleWorkspaceIntegratio
 
                     <button
                       onClick={() => handleLoadDriveFiles()}
-                      className="p-2 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl hover:bg-slate-300 transition-colors cursor-pointer"
+                      className="p-2 bg-slate-100 text-slate-700 rounded-xl hover:bg-slate-200 transition-colors cursor-pointer border border-slate-300"
                       title="Tải lại danh sách"
                     >
                       <RefreshCw className={`w-4 h-4 ${isLoadingFiles ? 'animate-spin' : ''}`} />
@@ -435,12 +435,12 @@ export const GoogleWorkspaceIntegrationModal: React.FC<GoogleWorkspaceIntegratio
                   </div>
 
                   {isLoadingFiles ? (
-                    <div className="py-12 text-center text-slate-500 text-sm flex items-center justify-center gap-2">
+                    <div className="py-12 text-center text-slate-600 text-sm flex items-center justify-center gap-2">
                       <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
                       <span>Đang tải tệp từ Google Drive...</span>
                     </div>
                   ) : driveFiles.length === 0 ? (
-                    <div className="py-12 text-center text-slate-500 text-sm bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">
+                    <div className="py-12 text-center text-slate-600 text-sm bg-slate-50 rounded-2xl border border-dashed border-slate-300">
                       Không tìm thấy tệp nào trong tài khoản Google Drive.
                     </div>
                   ) : (
@@ -448,13 +448,13 @@ export const GoogleWorkspaceIntegrationModal: React.FC<GoogleWorkspaceIntegratio
                       {driveFiles.map((f) => (
                         <div
                           key={f.id}
-                          className="p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl flex items-center justify-between gap-3 hover:border-blue-500 transition-colors"
+                          className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between gap-3 hover:border-blue-500 transition-colors"
                         >
                           <div className="flex items-center gap-2.5 min-w-0">
                             <FileSpreadsheet className="w-5 h-5 text-emerald-600 shrink-0" />
                             <div className="min-w-0">
-                              <div className="text-sm font-bold text-slate-900 dark:text-slate-100 truncate">{f.name}</div>
-                              <div className="text-[10px] text-slate-500">
+                              <div className="text-sm font-bold text-slate-900 truncate">{f.name}</div>
+                              <div className="text-[10px] text-slate-500 font-medium">
                                 {f.modifiedTime ? new Date(f.modifiedTime).toLocaleDateString('vi-VN') : 'Google Sheet'}
                               </div>
                             </div>
@@ -495,13 +495,13 @@ export const GoogleWorkspaceIntegrationModal: React.FC<GoogleWorkspaceIntegratio
                 <div className="space-y-5">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-extrabold text-slate-700 dark:text-slate-300 uppercase mb-1">
+                      <label className="block text-xs font-extrabold text-slate-800 uppercase mb-1">
                         1. Chọn tệp Google Sheets từ Drive
                       </label>
                       <select
                         value={selectedSheetId}
                         onChange={(e) => handleSelectSheetToPreview(e.target.value)}
-                        className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       >
                         <option value="">-- Chọn bảng tính Google Sheet --</option>
                         {driveFiles.map((f) => (
@@ -513,13 +513,13 @@ export const GoogleWorkspaceIntegrationModal: React.FC<GoogleWorkspaceIntegratio
                     </div>
 
                     <div>
-                      <label className="block text-xs font-extrabold text-slate-700 dark:text-slate-300 uppercase mb-1">
+                      <label className="block text-xs font-extrabold text-slate-800 uppercase mb-1">
                         2. Chọn lớp học đích cần nhập danh sách
                       </label>
                       <select
                         value={targetClassId}
                         onChange={(e) => setTargetClassId(e.target.value)}
-                        className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       >
                         {classrooms.map((cls) => (
                           <option key={cls.id} value={cls.id}>
@@ -531,39 +531,39 @@ export const GoogleWorkspaceIntegrationModal: React.FC<GoogleWorkspaceIntegratio
                   </div>
 
                   {isLoadingPreview ? (
-                    <div className="py-8 text-center text-slate-500 text-sm flex items-center justify-center gap-2">
+                    <div className="py-8 text-center text-slate-600 text-sm flex items-center justify-center gap-2">
                       <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
                       <span>Đang đọc bảng tính Google Sheet...</span>
                     </div>
                   ) : previewRows.length > 0 ? (
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <div className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                        <div className="text-xs font-bold text-slate-800">
                           Xem trước bảng dữ liệu ({previewRows.length - 1} hàng phát hiện):
                         </div>
-                        <span className="text-[11px] text-slate-500">
+                        <span className="text-[11px] text-slate-600 font-medium">
                           (Hàng đầu làm tiêu đề; Cột 1: Tên, Cột 2: Mã, Cột 3: Ghi chú)
                         </span>
                       </div>
 
-                      <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-x-auto max-h-52 text-xs">
+                      <div className="border border-slate-200 rounded-xl overflow-x-auto max-h-52 text-xs">
                         <table className="w-full text-left">
-                          <thead className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold sticky top-0">
+                          <thead className="bg-slate-100 text-slate-800 font-bold sticky top-0">
                             <tr>
-                              <th className="p-2 border-b border-slate-200 dark:border-slate-700">#</th>
-                              <th className="p-2 border-b border-slate-200 dark:border-slate-700">Cột A (Tên)</th>
-                              <th className="p-2 border-b border-slate-200 dark:border-slate-700">Cột B (Mã/STT)</th>
-                              <th className="p-2 border-b border-slate-200 dark:border-slate-700">Cột C (Ghi chú)</th>
+                              <th className="p-2 border-b border-slate-200">#</th>
+                              <th className="p-2 border-b border-slate-200">Cột A (Tên)</th>
+                              <th className="p-2 border-b border-slate-200">Cột B (Mã/STT)</th>
+                              <th className="p-2 border-b border-slate-200">Cột C (Ghi chú)</th>
                             </tr>
                           </thead>
                           <tbody>
                             {previewRows.slice(0, 10).map((row, idx) => (
                               <tr
                                 key={idx}
-                                className={idx === 0 ? 'bg-amber-500/10 font-bold text-amber-900 dark:text-amber-200' : 'border-b border-slate-100 dark:border-slate-800'}
+                                className={idx === 0 ? 'bg-amber-50 font-bold text-amber-900' : 'border-b border-slate-100 text-slate-900'}
                               >
-                                <td className="p-2 text-slate-400">{idx === 0 ? 'Tiêu đề' : idx}</td>
-                                <td className="p-2">{row[0] || '-'}</td>
+                                <td className="p-2 text-slate-500 font-medium">{idx === 0 ? 'Tiêu đề' : idx}</td>
+                                <td className="p-2 font-semibold">{row[0] || '-'}</td>
                                 <td className="p-2">{row[1] || '-'}</td>
                                 <td className="p-2">{row[2] || '-'}</td>
                               </tr>
@@ -581,7 +581,7 @@ export const GoogleWorkspaceIntegrationModal: React.FC<GoogleWorkspaceIntegratio
                       </button>
                     </div>
                   ) : selectedSheetId ? (
-                    <div className="p-4 bg-slate-100 dark:bg-slate-800/60 rounded-xl text-center text-xs text-slate-500">
+                    <div className="p-4 bg-slate-50 rounded-xl text-center text-xs text-slate-600">
                       Bảng tính rỗng hoặc chưa có quyền đọc.
                     </div>
                   ) : null}
@@ -593,13 +593,13 @@ export const GoogleWorkspaceIntegrationModal: React.FC<GoogleWorkspaceIntegratio
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-extrabold text-slate-700 dark:text-slate-300 uppercase mb-1">
+                      <label className="block text-xs font-extrabold text-slate-800 uppercase mb-1">
                         Chọn lớp học cần xuất
                       </label>
                       <select
                         value={exportClassId}
                         onChange={(e) => setExportClassId(e.target.value)}
-                        className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       >
                         {classrooms.map((cls) => (
                           <option key={cls.id} value={cls.id}>
@@ -610,7 +610,7 @@ export const GoogleWorkspaceIntegrationModal: React.FC<GoogleWorkspaceIntegratio
                     </div>
 
                     <div>
-                      <label className="block text-xs font-extrabold text-slate-700 dark:text-slate-300 uppercase mb-1">
+                      <label className="block text-xs font-extrabold text-slate-800 uppercase mb-1">
                         Tên tệp Google Sheets mới
                       </label>
                       <input
@@ -618,13 +618,13 @@ export const GoogleWorkspaceIntegrationModal: React.FC<GoogleWorkspaceIntegratio
                         value={exportTitle}
                         onChange={(e) => setExportTitle(e.target.value)}
                         placeholder="Nhập tên bảng tính..."
-                        className="w-full px-3 py-2 bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
                   </div>
 
-                  <div className="p-4 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900 rounded-xl text-xs text-blue-900 dark:text-cyan-200 space-y-1">
-                    <div className="font-bold flex items-center gap-1.5">
+                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl text-xs text-blue-900 space-y-1">
+                    <div className="font-bold flex items-center gap-1.5 text-blue-950">
                       <Sparkles className="w-4 h-4 text-amber-500" /> Xuất trực tiếp lên tài khoản Google Drive:
                     </div>
                     <div>• Tự động khởi tạo tệp Google Sheets với tiêu đề chuẩn mực.</div>
@@ -650,11 +650,11 @@ export const GoogleWorkspaceIntegrationModal: React.FC<GoogleWorkspaceIntegratio
                   </button>
 
                   {exportedSheetUrl && (
-                    <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 text-emerald-800 dark:text-emerald-300 rounded-xl text-xs flex items-center justify-between gap-2">
+                    <div className="p-4 bg-emerald-50 border border-emerald-300 text-emerald-900 rounded-xl text-xs flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
-                        <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
+                        <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
                         <div>
-                          <div className="font-bold">Đã tạo Google Sheet thành công!</div>
+                          <div className="font-bold text-emerald-950">Đã tạo Google Sheet thành công!</div>
                           <div>Tệp đã được lưu trên Google Drive của Thầy/Cô.</div>
                         </div>
                       </div>
@@ -674,11 +674,11 @@ export const GoogleWorkspaceIntegrationModal: React.FC<GoogleWorkspaceIntegratio
             </div>
           ) : (
             <div className="py-12 text-center space-y-3">
-              <FolderPlus className="w-12 h-12 text-blue-400 mx-auto animate-bounce" />
-              <div className="text-base font-bold text-slate-800 dark:text-slate-100">
+              <FolderPlus className="w-12 h-12 text-blue-500 mx-auto animate-bounce" />
+              <div className="text-base font-bold text-slate-900">
                 Hãy đăng nhập tài khoản Google của Thầy/Cô
               </div>
-              <p className="text-xs text-slate-500 max-w-md mx-auto">
+              <p className="text-xs text-slate-600 max-w-md mx-auto">
                 Sau khi đăng nhập, Thầy/Cô có thể dễ dàng quản lý các tệp trên Google Drive, nhập danh sách học sinh từ Google Sheets và tạo báo cáo lưu trữ tự động.
               </p>
             </div>
@@ -689,18 +689,18 @@ export const GoogleWorkspaceIntegrationModal: React.FC<GoogleWorkspaceIntegratio
       {/* Confirmation Dialog for Destructive/Creation Google Workspace Operations */}
       {confirmExportModal && (
         <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="bg-white dark:bg-slate-900 max-w-md w-full rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-2xl space-y-4">
-            <div className="flex items-center gap-3 text-blue-600 dark:text-cyan-400">
+          <div className="bg-white max-w-md w-full rounded-2xl p-6 border border-slate-200 shadow-2xl space-y-4 text-slate-900">
+            <div className="flex items-center gap-3 text-blue-600">
               <FileSpreadsheet className="w-7 h-7" />
-              <h3 className="text-lg font-bold">Xác nhận tạo Google Sheet mới</h3>
+              <h3 className="text-lg font-bold text-slate-900">Xác nhận tạo Google Sheet mới</h3>
             </div>
-            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-              Thầy/cô có muốn tạo tệp Google Sheet tên <span className="font-bold text-slate-900 dark:text-white">"{exportTitle}"</span> trực tiếp trên tài khoản Google Drive của mình không?
+            <p className="text-xs text-slate-700 leading-relaxed">
+              Thầy/cô có muốn tạo tệp Google Sheet tên <span className="font-bold text-slate-950">"{exportTitle}"</span> trực tiếp trên tài khoản Google Drive của mình không?
             </p>
             <div className="flex items-center justify-end gap-3 pt-2">
               <button
                 onClick={() => setConfirmExportModal(false)}
-                className="px-4 py-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl transition-colors cursor-pointer"
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors cursor-pointer border border-slate-300"
               >
                 Hủy bỏ
               </button>

@@ -16,13 +16,35 @@ import { ResourceView } from './components/ResourceView';
 import { HomeworkView } from './components/HomeworkView';
 import { GradingEvaluationView } from './components/GradingEvaluationView';
 import { DashboardDataView } from './components/DashboardDataView';
+import { AdminView } from './components/AdminView';
+import { SettingsView } from './components/SettingsView';
 import { ClassModal } from './components/ClassModal';
 import { StudentModal } from './components/StudentModal';
 import { BatchImportModal } from './components/BatchImportModal';
 import { ConfirmModal } from './components/ConfirmModal';
 import { MissYenCoiChatbot } from './components/MissYenCoiChatbot';
 import { GoogleWorkspaceIntegrationModal } from './components/GoogleWorkspaceIntegrationModal';
+import { SecurityPinModal } from './components/SecurityPinModal';
 import { triggerCelebration } from './lib/celebration';
+import { Home, ChevronRight, LayoutDashboard, Sparkles } from 'lucide-react';
+
+const TAB_LABELS: Record<TabType, { name: string; desc: string }> = {
+  dashboard: { name: 'Trang chủ (Dashboard)', desc: 'Tổng quan & hoạt động' },
+  lesson_plan: { name: 'AI Soạn Giáo Án', desc: 'Chuẩn GDPT 2018 CV 5512' },
+  lesson_history: { name: 'Lịch Sử Bài Soạn', desc: 'Quản lý & tải giáo án' },
+  dashboard_data: { name: 'Dashboard Data SDK', desc: 'Quản lý dữ liệu bài dạy' },
+  admin: { name: 'Admin Security', desc: 'Bảo mật & Giám sát' },
+  settings: { name: 'Cài Đặt & Bản Quyền', desc: 'Hồ sơ giáo viên & Gemini AI' },
+  classes: { name: 'Quản Lý Lớp Học', desc: 'Danh sách lớp & học sinh' },
+  attendance: { name: 'Sổ Điểm Danh', desc: 'Điểm danh buổi học' },
+  attendance_history: { name: 'Lịch Sử Điểm Danh', desc: 'Nhật ký chuyên cần' },
+  attendance_stats: { name: 'Thống Kê Điểm Danh', desc: 'Phân tích & cảnh báo' },
+  oral_test: { name: 'Kiểm Tra Miệng AI', desc: 'Chọn ngẫu nhiên & Chấm điểm' },
+  schedule: { name: 'Thời Khóa Biểu', desc: 'Lịch dạy & phòng học' },
+  resources: { name: 'Kho Học Liệu', desc: 'Tranh ảnh, Audio, Video, Youtube' },
+  homework: { name: 'Bài Tập Về Nhà', desc: 'Theo dõi & nộp bài' },
+  grading: { name: 'Chấm & Chữa Bài AI', desc: 'Trắc nghiệm & Tự luận & 4 Kỹ năng' },
+};
 
 export default function App() {
   const {
@@ -67,6 +89,11 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<TabType>('dashboard');
   const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
 
+  // Security Locks state for Admin (ASK2002) and Settings (ASK2005)
+  const [isAdminUnlocked, setIsAdminUnlocked] = useState(false);
+  const [isSettingsUnlocked, setIsSettingsUnlocked] = useState(false);
+  const [pinModalTarget, setPinModalTarget] = useState<'admin' | 'settings' | null>(null);
+
   // Modals state
   const [isClassModalOpen, setIsClassModalOpen] = useState(false);
   const [editingClass, setEditingClass] = useState<Classroom | null>(null);
@@ -110,10 +137,40 @@ export default function App() {
   };
 
   const handleTabChange = (tab: TabType) => {
+    // Re-lock when leaving admin or settings tab
+    if (activeTab === 'admin' && tab !== 'admin') {
+      setIsAdminUnlocked(false);
+    }
+    if (activeTab === 'settings' && tab !== 'settings') {
+      setIsSettingsUnlocked(false);
+    }
+
+    if (tab === 'admin' && !isAdminUnlocked) {
+      setPinModalTarget('admin');
+      return;
+    }
+    if (tab === 'settings' && !isSettingsUnlocked) {
+      setPinModalTarget('settings');
+      return;
+    }
+
     setActiveTab(tab);
     if (tab !== 'classes' && tab !== 'attendance') {
       setSelectedClassId(null);
     }
+  };
+
+  const handlePinSuccess = () => {
+    if (pinModalTarget === 'admin') {
+      setIsAdminUnlocked(true);
+      setActiveTab('admin');
+      triggerCelebration('stars');
+    } else if (pinModalTarget === 'settings') {
+      setIsSettingsUnlocked(true);
+      setActiveTab('settings');
+      triggerCelebration('stars');
+    }
+    setPinModalTarget(null);
   };
 
   // Class Modal Handlers
@@ -220,7 +277,42 @@ export default function App() {
 
       {/* Main Content Area (Offset by md:pl-72 for Desktop Sidebar) */}
       <div className="md:pl-72 flex-1 flex flex-col min-h-screen">
-        <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8">
+        <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6">
+          {/* Universal Quick Navigation & Quay Lại Trang Chủ Bar */}
+          {activeTab !== 'dashboard' && (
+            <div className="mb-5 bg-gradient-to-r from-slate-900/95 via-[#001f3f]/90 to-slate-900/95 backdrop-blur-md border-2 border-orange-500/40 rounded-2xl p-3 sm:p-4 flex items-center justify-between gap-3 shadow-xl">
+              <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+                <button
+                  onClick={() => handleTabChange('dashboard')}
+                  className="px-4 py-2.5 bg-gradient-to-r from-orange-500 via-amber-500 to-orange-500 hover:from-orange-600 hover:to-amber-600 text-slate-950 font-black text-xs sm:text-sm rounded-xl shadow-lg flex items-center gap-2 transition-all cursor-pointer hover:scale-105 active:scale-95 group uppercase tracking-wider"
+                  title="Quay lại Màn hình chính / Trang chủ Dashboard"
+                >
+                  <Home className="w-4 h-4 text-slate-950 group-hover:-translate-x-0.5 transition-transform" />
+                  <span>Quay lại trang chủ</span>
+                </button>
+
+                <div className="hidden sm:flex items-center gap-2 text-xs font-bold text-slate-300">
+                  <ChevronRight className="w-4 h-4 text-orange-400" />
+                  <span className="bg-[#001730] border border-cyan-500/30 text-cyan-300 px-3 py-1.5 rounded-xl shadow-inner font-extrabold flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                    <span>{TAB_LABELS[activeTab]?.name || 'Giao diện chi tiết'}</span>
+                  </span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleTabChange('dashboard')}
+                  className="px-3.5 py-2 bg-slate-800/90 hover:bg-slate-700 text-slate-200 hover:text-white rounded-xl text-xs font-bold border border-slate-700 transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
+                  title="Về màn hình Dashboard"
+                >
+                  <LayoutDashboard className="w-4 h-4 text-orange-400" />
+                  <span className="hidden md:inline">Dashboard</span>
+                </button>
+              </div>
+            </div>
+          )}
+
           {activeTab === 'dashboard' && (
             <DashboardView
               classrooms={classrooms}
@@ -228,7 +320,6 @@ export default function App() {
               onSelectClass={handleSelectClass}
               onOpenCreateClass={handleOpenCreateClass}
               onNavigateTab={handleTabChange}
-              onResetSampleData={resetToSampleData}
             />
           )}
 
@@ -238,6 +329,7 @@ export default function App() {
                 <ClassDetailView
                   classroom={activeClassroom}
                   onBack={handleBackToClasses}
+                  onBackToHome={() => handleTabChange('dashboard')}
                   onEditClass={handleOpenEditClass}
                   onDeleteClass={handlePromptDeleteClass}
                   onOpenAddStudent={handleOpenAddStudent}
@@ -250,6 +342,7 @@ export default function App() {
                 <ClassListView
                   classrooms={classrooms}
                   onSelectClass={handleSelectClass}
+                  onBackToHome={() => handleTabChange('dashboard')}
                   onOpenCreateClass={handleOpenCreateClass}
                   onEditClass={handleOpenEditClass}
                   onDeleteClass={handlePromptDeleteClass}
@@ -264,6 +357,7 @@ export default function App() {
               classrooms={classrooms}
               initialClassId={selectedClassId || undefined}
               onBack={() => handleTabChange('classes')}
+              onBackToHome={() => handleTabChange('dashboard')}
               getAttendanceSession={getAttendanceSession}
               saveAttendanceSession={(session) => {
                 saveAttendanceSession(session);
@@ -279,6 +373,7 @@ export default function App() {
               classrooms={classrooms}
               attendanceSessions={attendanceSessions}
               onNavigateTab={handleTabChange}
+              onBackToHome={() => handleTabChange('dashboard')}
             />
           )}
 
@@ -289,6 +384,7 @@ export default function App() {
               saveAttendanceSession={saveAttendanceSession}
               deleteAttendanceSession={deleteAttendanceSession}
               onNavigateTab={handleTabChange}
+              onBackToHome={() => handleTabChange('dashboard')}
             />
           )}
 
@@ -308,6 +404,7 @@ export default function App() {
               }}
               deleteOralTestResult={deleteOralTestResult}
               onNavigateTab={handleTabChange}
+              onBackToHome={() => handleTabChange('dashboard')}
             />
           )}
 
@@ -322,6 +419,7 @@ export default function App() {
               updateScheduleItem={updateScheduleItem}
               deleteScheduleItem={deleteScheduleItem}
               onNavigateTab={handleTabChange}
+              onBackToHome={() => handleTabChange('dashboard')}
             />
           )}
 
@@ -335,6 +433,7 @@ export default function App() {
               }}
               deleteResourceItem={deleteResourceItem}
               onNavigateTab={handleTabChange}
+              onBackToHome={() => handleTabChange('dashboard')}
             />
           )}
 
@@ -353,11 +452,16 @@ export default function App() {
                 triggerCelebration('stars');
               }}
               onNavigateTab={handleTabChange}
+              onBackToHome={() => handleTabChange('dashboard')}
             />
           )}
 
           {activeTab === 'grading' && (
-            <GradingEvaluationView classrooms={classrooms} />
+            <GradingEvaluationView
+              classrooms={classrooms}
+              onNavigateTab={handleTabChange}
+              onBackToHome={() => handleTabChange('dashboard')}
+            />
           )}
 
           {activeTab === 'lesson_plan' && (
@@ -373,6 +477,7 @@ export default function App() {
               onUpdateLessonPlan={updateLessonPlan}
               onDeleteLessonPlan={deleteLessonPlan}
               onNavigateTab={handleTabChange}
+              onBackToHome={() => handleTabChange('dashboard')}
             />
           )}
 
@@ -389,6 +494,7 @@ export default function App() {
               onUpdateLessonPlan={updateLessonPlan}
               onDeleteLessonPlan={deleteLessonPlan}
               onNavigateTab={handleTabChange}
+              onBackToHome={() => handleTabChange('dashboard')}
             />
           )}
 
@@ -398,6 +504,23 @@ export default function App() {
               onSelectLessonPlan={(plan) => {
                 setActiveTab('lesson_plan');
               }}
+              onNavigateTab={handleTabChange}
+              onBackToHome={() => handleTabChange('dashboard')}
+            />
+          )}
+
+          {activeTab === 'admin' && (
+            <AdminView
+              lessonPlans={lessonPlans}
+              onNavigateTab={handleTabChange}
+              onBackToHome={() => handleTabChange('dashboard')}
+            />
+          )}
+
+          {activeTab === 'settings' && (
+            <SettingsView
+              onNavigateTab={handleTabChange}
+              onBackToHome={() => handleTabChange('dashboard')}
             />
           )}
         </main>
@@ -479,6 +602,19 @@ export default function App() {
         onImportStudentsToClass={(classId, students) => {
           addMultipleStudents(classId, students);
         }}
+      />
+
+      {/* Security Pin Modal for Admin & Settings */}
+      <SecurityPinModal
+        isOpen={!!pinModalTarget}
+        targetTitle={
+          pinModalTarget === 'admin'
+            ? 'Khu vực Admin Security'
+            : 'Cài đặt & Bản quyền Hệ thống'
+        }
+        requiredPin={pinModalTarget === 'admin' ? 'ASK2002' : 'ASK2005'}
+        onSuccess={handlePinSuccess}
+        onCancel={() => setPinModalTarget(null)}
       />
     </div>
   );

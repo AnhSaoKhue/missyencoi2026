@@ -2,45 +2,129 @@
 
 body {
   font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-}
-
-/* High-contrast explicit rules for form elements */
-input, select, textarea {
   color: #0f172a;
 }
 
-/* Ensure all form inputs with white or light backgrounds have ultra-clear high-contrast text */
+/* ==========================================================================
+   GLOBAL HIGH-CONTRAST FORM, BOX & CONTAINER CONTROLS
+   Ensures text is 100% crystal clear and visible on every light & dark element
+   ========================================================================== */
+
+/* 1. Universal Base Text & Form Controls */
+input, select, textarea {
+  color: #0f172a !important;
+  background-color: #ffffff;
+}
+
+/* 2. Light Backgrounds: Inputs, Textareas, Selects, and Containers -> Deep Dark Text */
+input:not([class*="bg-slate-9"]):not([class*="bg-blue-9"]):not([class*="bg-indigo-9"]):not([class*="bg-black"]):not([class*="bg-[#001"]):not([class*="bg-slate-8"]),
+textarea:not([class*="bg-slate-9"]):not([class*="bg-blue-9"]):not([class*="bg-indigo-9"]):not([class*="bg-black"]):not([class*="bg-[#001"]):not([class*="bg-slate-8"]),
+select:not([class*="bg-slate-9"]):not([class*="bg-blue-9"]):not([class*="bg-indigo-9"]):not([class*="bg-black"]):not([class*="bg-[#001"]):not([class*="bg-slate-8"]),
 input[class*="bg-white"], textarea[class*="bg-white"], select[class*="bg-white"],
 input[class*="bg-slate-50"], textarea[class*="bg-slate-50"], select[class*="bg-slate-50"],
-input[class*="bg-slate-100"], textarea[class*="bg-slate-100"], select[class*="bg-slate-100"] {
+input[class*="bg-slate-100"], textarea[class*="bg-slate-100"], select[class*="bg-slate-100"],
+input[class*="bg-slate-200"], textarea[class*="bg-slate-200"], select[class*="bg-slate-200"],
+input[class*="bg-orange-50"], textarea[class*="bg-orange-50"], select[class*="bg-orange-50"],
+input[class*="bg-amber-50"], textarea[class*="bg-amber-50"], select[class*="bg-amber-50"],
+input[class*="bg-blue-50"], textarea[class*="bg-blue-50"], select[class*="bg-blue-50"],
+input[class*="bg-emerald-50"], textarea[class*="bg-emerald-50"], select[class*="bg-emerald-50"],
+input[class*="bg-rose-50"], textarea[class*="bg-rose-50"], select[class*="bg-rose-50"],
+input[class*="bg-cyan-50"], textarea[class*="bg-cyan-50"], select[class*="bg-cyan-50"],
+input[class*="bg-gray-50"], textarea[class*="bg-gray-50"], select[class*="bg-gray-50"],
+input[class*="bg-gray-100"], textarea[class*="bg-gray-100"], select[class*="bg-gray-100"] {
   color: #0f172a !important;
 }
 
+/* Ensure placeholder text on light inputs is clearly legible */
 input::placeholder, textarea::placeholder {
   color: #64748b !important;
+  opacity: 1;
 }
 
-/* In dark mode, default inputs to light text */
-.dark input, .dark select, .dark textarea,
-html.dark input, html.dark select, html.dark textarea {
-  color: #f8fafc;
-}
-
-.dark input::placeholder, .dark textarea::placeholder,
-html.dark input::placeholder, html.dark textarea::placeholder {
-  color: #94a3b8 !important;
-}
-
-/* Explicit dark background inputs regardless of global mode */
-input[class*="bg-slate-950"], textarea[class*="bg-slate-950"],
-input[class*="bg-slate-900"], textarea[class*="bg-slate-900"],
-input[class*="bg-slate-800"], textarea[class*="bg-slate-800"],
-input[class*="bg-blue-950"], textarea[class*="bg-blue-950"],
-input[class*="bg-indigo-950"], textarea[class*="bg-indigo-950"] {
+/* 3. Dark Background Form Elements -> High-Contrast Bright Text */
+input[class*="bg-slate-950"], textarea[class*="bg-slate-950"], select[class*="bg-slate-950"],
+input[class*="bg-slate-900"], textarea[class*="bg-slate-900"], select[class*="bg-slate-900"],
+input[class*="bg-slate-800"], textarea[class*="bg-slate-800"], select[class*="bg-slate-800"],
+input[class*="bg-blue-950"], textarea[class*="bg-blue-950"], select[class*="bg-blue-950"],
+input[class*="bg-blue-900"], textarea[class*="bg-blue-900"], select[class*="bg-blue-900"],
+input[class*="bg-indigo-950"], textarea[class*="bg-indigo-950"], select[class*="bg-indigo-950"],
+input[class*="bg-indigo-900"], textarea[class*="bg-indigo-900"], select[class*="bg-indigo-900"],
+input[class*="bg-black"], textarea[class*="bg-black"], select[class*="bg-black"],
+input[class*="bg-[#001f3f]"], textarea[class*="bg-[#001f3f]"], select[class*="bg-[#001f3f]"],
+input[class*="bg-[#001730]"], textarea[class*="bg-[#001730]"], select[class*="bg-[#001730]"] {
   color: #f8fafc !important;
 }
 
-/* Select dropdown options styling for browser popovers */
+/* Inputs inside dark card containers */
+.bg-slate-900 input:not([class*="bg-white"]):not([class*="bg-slate-50"]):not([class*="bg-slate-100"]),
+.bg-slate-900 textarea:not([class*="bg-white"]):not([class*="bg-slate-50"]):not([class*="bg-slate-100"]),
+.bg-slate-950 input:not([class*="bg-white"]):not([class*="bg-slate-50"]):not([class*="bg-slate-100"]),
+.bg-slate-950 textarea:not([class*="bg-white"]):not([class*="bg-slate-50"]):not([class*="bg-slate-100"]),
+.bg-blue-950 input:not([class*="bg-white"]):not([class*="bg-slate-50"]):not([class*="bg-slate-100"]),
+.bg-blue-950 textarea:not([class*="bg-white"]):not([class*="bg-slate-50"]):not([class*="bg-slate-100"]),
+.bg-indigo-950 input:not([class*="bg-white"]):not([class*="bg-slate-50"]):not([class*="bg-slate-100"]),
+.bg-indigo-950 textarea:not([class*="bg-white"]):not([class*="bg-slate-50"]):not([class*="bg-slate-100"]) {
+  color: #f8fafc !important;
+}
+
+/* Placeholders inside dark inputs */
+input[class*="bg-slate-950"]::placeholder, textarea[class*="bg-slate-950"]::placeholder,
+input[class*="bg-slate-900"]::placeholder, textarea[class*="bg-slate-900"]::placeholder,
+input[class*="bg-slate-800"]::placeholder, textarea[class*="bg-slate-800"]::placeholder,
+input[class*="bg-blue-950"]::placeholder, textarea[class*="bg-blue-950"]::placeholder,
+input[class*="bg-indigo-950"]::placeholder, textarea[class*="bg-indigo-950"]::placeholder,
+.bg-slate-900 input::placeholder, .bg-slate-900 textarea::placeholder,
+.bg-slate-950 input::placeholder, .bg-slate-950 textarea::placeholder,
+.bg-blue-950 input::placeholder, .bg-blue-950 textarea::placeholder,
+.bg-indigo-950 input::placeholder, .bg-indigo-950 textarea::placeholder {
+  color: #94a3b8 !important;
+  opacity: 1;
+}
+
+/* 4. Universal White & Light Background Containers -> High-Contrast Dark Slate Text */
+.bg-white, .bg-slate-50, .bg-slate-100, .bg-slate-200,
+.bg-gray-50, .bg-gray-100, .bg-zinc-50, .bg-zinc-100,
+.bg-neutral-50, .bg-neutral-100,
+[class*="bg-white"], [class*="bg-slate-50"], [class*="bg-slate-100"], [class*="bg-slate-200"] {
+  color: #0f172a;
+}
+
+/* Ensure headings, labels, and text in white frames are bold, clear and never white */
+.bg-white h1, .bg-white h2, .bg-white h3, .bg-white h4, .bg-white h5, .bg-white h6,
+.bg-white label, .bg-white td, .bg-white th,
+.bg-slate-50 h1, .bg-slate-50 h2, .bg-slate-50 h3, .bg-slate-50 h4, .bg-slate-50 h5, .bg-slate-50 h6,
+.bg-slate-50 label, .bg-slate-50 td, .bg-slate-50 th,
+.bg-slate-100 h1, .bg-slate-100 h2, .bg-slate-100 h3, .bg-slate-100 h4, .bg-slate-100 h5, .bg-slate-100 h6,
+.bg-slate-100 label, .bg-slate-100 td, .bg-slate-100 th {
+  color: #0f172a;
+}
+
+/* Prevent white text leak into white cards when nested in dark parents */
+.bg-white :is(p, span, div, strong, b, li):not([class*="text-"]):not([class*="bg-"]) {
+  color: #0f172a;
+}
+.bg-slate-50 :is(p, span, div, strong, b, li):not([class*="text-"]):not([class*="bg-"]) {
+  color: #0f172a;
+}
+
+/* Ensure light boxes inside cards never inherit white text */
+.bg-white input, .bg-white textarea, .bg-white select,
+.bg-slate-50 input, .bg-slate-50 textarea, .bg-slate-50 select,
+.bg-slate-100 input, .bg-slate-100 textarea, .bg-slate-100 select {
+  color: #0f172a !important;
+}
+
+/* Code blocks text colors */
+pre, code {
+  color: inherit;
+}
+.bg-slate-950 code, .bg-slate-900 code, .bg-slate-800 code,
+.bg-blue-950 code, .bg-indigo-950 code,
+[class*="bg-slate-950"] pre, [class*="bg-slate-900"] pre, [class*="bg-slate-800"] pre {
+  color: #f1f5f9 !important;
+}
+
+/* 5. Select dropdown options styling across all browsers & OS */
 select option {
   background-color: #ffffff !important;
   color: #0f172a !important;
@@ -48,15 +132,17 @@ select option {
   padding: 8px 12px;
 }
 
-.dark select option,
-html.dark select option,
 select[class*="bg-slate-950"] option,
 select[class*="bg-slate-900"] option,
-select[class*="bg-slate-800"] option {
+select[class*="bg-slate-800"] option,
+select[class*="bg-blue-950"] option,
+select[class*="bg-indigo-950"] option,
+select[class*="bg-[#001f3f]"] option {
   background-color: #0f172a !important;
   color: #f8fafc !important;
 }
 
+/* 7. Marquee animation */
 @keyframes marquee {
   0% {
     transform: translateX(0%);
@@ -75,6 +161,7 @@ select[class*="bg-slate-800"] option {
   animation-play-state: paused;
 }
 
+/* 8. Print styles */
 @media print {
   body {
     background: #ffffff !important;
@@ -112,3 +199,4 @@ select[class*="bg-slate-800"] option {
     page-break-inside: avoid;
   }
 }
+

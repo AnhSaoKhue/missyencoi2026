@@ -29,17 +29,24 @@ import {
   ChevronRight,
   Zap,
   Download,
+  Home,
 } from 'lucide-react';
-import { Classroom, Student } from '../types';
+import { Classroom, Student, TabType } from '../types';
 import { StudentWorkUploader } from './StudentWorkUploader';
 import { COMPREHENSIVE_SUBJECTS } from '../constants';
 import { exportGradingReportToWord, exportGradingReportToPDF } from '../utils/exportHelpers';
 
 interface GradingEvaluationViewProps {
   classrooms: Classroom[];
+  onNavigateTab?: (tab: TabType) => void;
+  onBackToHome?: () => void;
 }
 
-export const GradingEvaluationView: React.FC<GradingEvaluationViewProps> = ({ classrooms }) => {
+export const GradingEvaluationView: React.FC<GradingEvaluationViewProps> = ({
+  classrooms,
+  onNavigateTab,
+  onBackToHome,
+}) => {
   // Selected filter states
   const [selectedClassId, setSelectedClassId] = useState<string>(classrooms[0]?.id || '');
   const [selectedStudentId, setSelectedStudentId] = useState<string>('');
@@ -494,6 +501,18 @@ export const GradingEvaluationView: React.FC<GradingEvaluationViewProps> = ({ cl
           </div>
 
           <div className="flex flex-wrap items-center gap-2 shrink-0">
+            {(onBackToHome || onNavigateTab) && (
+              <button
+                type="button"
+                onClick={() => (onBackToHome ? onBackToHome() : onNavigateTab && onNavigateTab('dashboard'))}
+                className="px-3.5 py-2 bg-slate-800/90 hover:bg-slate-700 text-slate-100 rounded-xl text-xs font-black shadow flex items-center gap-1.5 transition-all cursor-pointer border border-slate-600 uppercase tracking-tight"
+                title="Quay lại trang chủ Dashboard"
+              >
+                <Home className="w-4 h-4 text-orange-400" />
+                <span>Quay lại trang chủ</span>
+              </button>
+            )}
+
             <button
               onClick={handleExportClassWord}
               className="px-3 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl text-xs font-extrabold shadow flex items-center gap-1.5 transition-all cursor-pointer border border-cyan-400/40"

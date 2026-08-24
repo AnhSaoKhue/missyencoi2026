@@ -11,13 +11,10 @@ import {
   Calendar,
   Sparkles,
   ChevronRight,
-  RotateCcw,
   CalendarCheck,
   History,
   Zap,
   FileCheck,
-  Download,
-  HardDrive,
 } from 'lucide-react';
 
 interface DashboardViewProps {
@@ -26,7 +23,7 @@ interface DashboardViewProps {
   onSelectClass: (classId: string) => void;
   onOpenCreateClass: () => void;
   onNavigateTab: (tab: TabType) => void;
-  onResetSampleData: () => void;
+  onResetSampleData?: () => void;
 }
 
 export const DashboardView: React.FC<DashboardViewProps> = ({
@@ -35,7 +32,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   onSelectClass,
   onOpenCreateClass,
   onNavigateTab,
-  onResetSampleData,
 }) => {
   // Compute Stats
   const totalClasses = classrooms.length;
@@ -224,21 +220,15 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <School className="w-12 h-12 text-slate-300 mx-auto mb-3" />
             <p className="text-slate-600 font-bold mb-1">Chưa có lớp học nào được tạo</p>
             <p className="text-slate-400 text-xs max-w-md mx-auto mb-4">
-              Thầy/cô bấm nút bên dưới để tạo lớp học đầu tiên hoặc tải lại dữ liệu mẫu.
+              Thầy/cô bấm nút bên dưới để tạo lớp học đầu tiên.
             </p>
-            <div className="flex flex-wrap justify-center gap-3">
+            <div className="flex justify-center">
               <button
                 onClick={onOpenCreateClass}
-                className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white font-semibold text-sm rounded-xl shadow-xs transition-all cursor-pointer"
+                className="px-5 py-2.5 bg-orange-500 hover:bg-orange-600 text-white font-bold text-sm rounded-xl shadow-xs transition-all cursor-pointer flex items-center gap-2"
               >
-                + Tạo lớp mới ngay
-              </button>
-              <button
-                onClick={onResetSampleData}
-                className="px-4 py-2 bg-white hover:bg-slate-100 text-slate-700 font-semibold text-sm rounded-xl border border-slate-300 transition-all cursor-pointer flex items-center gap-1.5"
-              >
-                <RotateCcw className="w-4 h-4" />
-                <span>Nạp lớp mẫu "Lớp 7A1"</span>
+                <PlusCircle className="w-4 h-4" />
+                <span>+ Tạo lớp mới ngay</span>
               </button>
             </div>
           </div>
@@ -291,42 +281,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             ))}
           </div>
         )}
-      </div>
-
-      {/* Download Full Package Card */}
-      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-950 rounded-2xl border border-amber-400/40 p-6 shadow-xl relative overflow-hidden flex flex-col sm:flex-row items-center justify-between gap-5">
-        <div className="space-y-1.5 text-center sm:text-left">
-          <div className="inline-flex items-center gap-2 text-amber-300 font-extrabold text-xs uppercase tracking-wider">
-            <Sparkles className="w-4 h-4 text-amber-400" />
-            <span>MÃ NGUỒN FULL-STACK HOÀN THIỆN ĐẦY ĐỦ 100% (ALL-IN-ONE)</span>
-          </div>
-          <h3 className="text-white font-black text-base sm:text-lg">
-            Tải Gói Tệp Nén Toàn Diện 1 File Duy Nhất (.ZIP)
-          </h3>
-          <p className="text-slate-300 text-xs max-w-xl leading-relaxed">
-            Bao gồm toàn bộ mã nguồn (<code className="text-amber-300">src/</code>, <code className="text-amber-300">public/</code>, <code className="text-amber-300">package.json</code>, <code className="text-amber-300">server.ts</code>) + Thư mục bản dựng chạy ngay (<code className="text-cyan-300">dist/</code>) kéo thả vào Netlify Drop chạy ngay + File hướng dẫn chi tiết.
-          </p>
-        </div>
-        <a
-          href="/AI_Teacher_Management_PRO_ALL_IN_ONE_PACKAGE.zip"
-          download="AI_Teacher_Management_PRO_ALL_IN_ONE_PACKAGE.zip"
-          className="flex-shrink-0 px-6 py-3.5 bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-black text-xs uppercase tracking-wider rounded-xl shadow-2xl border border-amber-300 transition-all flex items-center gap-2 cursor-pointer transform active:scale-95 whitespace-nowrap"
-        >
-          <Download className="w-4.5 h-4.5 text-slate-950" />
-          <span>TẢI TOÀN BỘ MÃ NGUỒN (.ZIP)</span>
-        </a>
-      </div>
-
-      {/* Helper Restore Sample Data option if modified */}
-      <div className="flex items-center justify-between p-4 bg-slate-100 rounded-xl text-xs text-slate-600 border border-slate-200">
-        <span>💡 Bạn muốn trải nghiệm dữ liệu mẫu sẵn có của chương trình?</span>
-        <button
-          onClick={onResetSampleData}
-          className="text-orange-600 hover:text-orange-700 font-bold flex items-center gap-1 hover:underline cursor-pointer"
-        >
-          <RotateCcw className="w-3.5 h-3.5" />
-          <span>Tải lại dữ liệu mẫu Lớp 7A1</span>
-        </button>
       </div>
     </div>
   );
